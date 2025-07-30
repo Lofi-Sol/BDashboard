@@ -1,0 +1,88 @@
+name: Faction Data Sync
+
+on:
+  schedule:
+    # Run every 6 hours
+    - cron: '0 */6 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  sync-faction-data:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Install dependencies
+      run: npm install mongodb
+      
+    - name: Create sync script
+      run: |
+        cat > sync-faction-data.js << 'EOF'
+        const { MongoClient } = require('mongodb');
+        
+        async function syncFactionData() {
+          const uri = 'mongodb+srv://oowol003:TornData2341@torndata.vxouoj6.mongodb.net/?retryWrites=true&w=majority&appName=TornData';
+          const client = new MongoClient(uri);
+          
+          try {
+            await client.connect();
+            console.log('Connected to MongoDB');
+            
+            const db = client.db();
+            const factionsCollection = db.collection('factions');
+            
+            // Get all faction data
+            const factions = await factionsCollection.find({}).toArray();
+            
+            // Transform data for better readability
+            const factionData = {
+              lastUpdated: new Date().toISOString(),
+              totalFactions: factions.length,
+              factions: factions.map(faction => ({
+                id: faction.id,
+                name: faction.name,
+                respect: faction.respect || 0,
+                rank: faction.rank || 'Unranked',
+                members: faction.members || 0,
+                position: faction.position || null,
+                lastUpdated: faction.lastUpdated || new Date().toISOString()
+              }))
+            };
+            
+            // Write to JSON file
+            const fs = require('fs');
+            fs.writeFileSync('data/factions.json', JSON.stringify(factionData, null, 2));
+            
+            console.log(`Successfully synced ${factions.length} factions to data/factions.json`);
+            
+          } catch (error) {
+            console.error('Error syncing faction data:', error);
+            process.exit(1);
+          } finally {
+            await client.close();
+          }
+        }
+        
+        syncFactionData();
+        EOF
+        
+    - name: Create data directory
+      run: mkdir -p data
+      
+    - name: Sync faction data
+      run: node sync-faction-data.js
+      
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add data/factions.json
+        git diff --quiet && git diff --staged --quiet || git commit -m "Update faction data - $(date)"
+        git push 
