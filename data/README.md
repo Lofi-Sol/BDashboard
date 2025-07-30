@@ -31,7 +31,7 @@ The `factions.json` file contains:
 
 ## Sync Schedule
 
-The faction data is automatically synced every 6 hours via GitHub Actions.
+The faction data is automatically synced every 24 hours via GitHub Actions.
 
 ## Manual Sync
 
@@ -46,7 +46,7 @@ node scripts/sync-faction-data.js
 
 The sync is handled by `.github/workflows/faction-data-sync.yml` which:
 
-1. Runs every 6 hours automatically
+1. Runs every 24 hours automatically
 2. Can be triggered manually via GitHub Actions
 3. Connects to MongoDB and fetches all faction data
 4. Transforms and saves the data to `factions.json`
