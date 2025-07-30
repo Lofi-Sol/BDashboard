@@ -2402,7 +2402,7 @@
         
         // API-based odds system
         let oddsAPI = {
-            baseURL: window.location.origin,
+            baseURL: 'http://localhost:3000',
             calculateOdds: null,
             healthCheck: null
         };
@@ -2439,7 +2439,7 @@
             successMsg.textContent = 'Connecting...';
             
             // Test the API key by fetching user data
-                            fetch(`/api/torn/user?key=${apiKey}`)
+                            fetch(`http://localhost:3000/api/torn/user?key=${apiKey}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.error) {
@@ -2563,7 +2563,7 @@
             contentEl.style.display = 'none';
 
             try {
-                const response = await fetch(`/api/torn/rankedwars?key=${apiKey}`);
+                const response = await fetch(`http://localhost:3000/api/torn/rankedwars?key=${apiKey}`);
                 const data = await response.json();
                 
                 if (data.error) {
@@ -2990,7 +2990,7 @@
 
             try {
                 // Fetch ranked wars data
-                const warsResponse = await fetch(`/api/torn/rankedwars?key=${apiKey}`);
+                const warsResponse = await fetch(`http://localhost:3000/api/torn/rankedwars?key=${apiKey}`);
                 const warsData = await warsResponse.json();
 
                 if (warsData.error) {
@@ -3059,7 +3059,7 @@
             // Fetch chain data for each faction from Torn API
             const fetchPromises = Array.from(uniqueFactionIds).map(async (factionId) => {
                 try {
-                    const response = await fetch(`/api/torn/faction/${factionId}?selections=chain&key=${apiKey}`);
+                    const response = await fetch(`http://localhost:3000/api/torn/faction/${factionId}?selections=chain&key=${apiKey}`);
                     const data = await response.json();
                     
                     if (data.error) {
@@ -4139,7 +4139,7 @@
             try {
                 console.log('Checking logs for bet confirmations...');
                 
-                const response = await fetch(`/api/torn/user/log?key=${apiKey}`);
+                const response = await fetch(`http://localhost:3000/api/torn/user/log?key=${apiKey}`);
                 const data = await response.json();
                 
                 if (data.error) {
@@ -4797,7 +4797,7 @@
                 console.log('Fetching live war data for user bets...');
                 
                 // Fetch current war data from Torn API
-                const response = await fetch('/api/torn/rankedwars?key=C0wctKtdsgjJYpWe');
+                const response = await fetch('http://localhost:3000/api/torn/rankedwars?key=C0wctKtdsgjJYpWe');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
