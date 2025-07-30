@@ -2226,7 +2226,7 @@
             </h1>
             <p class="subtitle">Browse Ranked Wars from active faction wars with real-time odds and live updates.</p>
             <p class="call-to-action">Betting enthusiasts: Add your API key to access the Colosseum!</p>
-            <p class="info-message">💡 The system uses cached faction data from MongoDB to avoid rate limiting. Your API key is only used for essential Torn City data.</p>
+                            <p class="info-message">💡 The system uses local faction data to avoid rate limiting. Your API key is only used for essential Torn City data.</p>
         </div>
         
 
@@ -2474,7 +2474,7 @@
                 .catch(error => {
                     // Provide helpful error messages for rate limiting
                     if (error.message.includes('Too many requests') || error.message.includes('Rate limit')) {
-                        errorMsg.textContent = 'Rate limit exceeded. The system will use cached data from MongoDB instead.';
+                        errorMsg.textContent = 'Rate limit exceeded. The system will use local faction data instead.';
                         successMsg.textContent = 'Using local data...';
                         
                         // Still show dashboard but with cached data
@@ -3035,21 +3035,25 @@
                 });
             });
             
-            // Fetch MongoDB faction data (respect, rank, etc.)
-            let mongoFactionData = {};
+            // Load local faction data
+            let localFactionData = {};
             try {
-                console.log('Fetching faction data from MongoDB...');
-                const mongoResponse = await fetch('/api/factions');
-                const mongoResult = await mongoResponse.json();
+                console.log('Loading local faction data...');
+                const localResponse = await fetch('/data/factions.json');
+                const localResult = await localResponse.json();
                 
-                if (mongoResult.success) {
-                    mongoFactionData = mongoResult.data;
-                    console.log(`Loaded ${Object.keys(mongoFactionData).length} factions from MongoDB`);
+                if (localResult.factions) {
+                    // Convert array to object for easier lookup
+                    localFactionData = localResult.factions.reduce((acc, faction) => {
+                        acc[faction.id] = faction;
+                        return acc;
+                    }, {});
+                    console.log(`Loaded ${Object.keys(localFactionData).length} factions from local data`);
                 } else {
-                    console.warn('Failed to fetch MongoDB faction data:', mongoResult.error);
+                    console.warn('Failed to load local faction data');
                 }
             } catch (error) {
-                console.warn('Error fetching MongoDB faction data:', error);
+                console.warn('Error loading local faction data:', error);
             }
             
             // Fetch chain data for each faction from Torn API
@@ -3063,29 +3067,29 @@
                         return { factionId, chain: 0, respect: null, rank: null };
                     }
                     
-                    // Get MongoDB data for this faction
-                    const mongoData = mongoFactionData[factionId] || {};
+                    // Get local data for this faction
+                    const localData = localFactionData[factionId] || {};
                     
                     return { 
                         factionId, 
                         chain: data.chain?.current || 0,
-                        respect: mongoData.respect || null,
-                        rank: mongoData.rank || null,
-                        members: mongoData.members || null,
-                        position: mongoData.position || null
+                        respect: localData.respect || null,
+                        rank: localData.rank || null,
+                        members: localData.members || null,
+                        position: localData.position || null
                     };
                 } catch (error) {
                     console.warn(`Failed to fetch chain data for faction ${factionId}:`, error);
                     
-                    // Still try to get MongoDB data even if chain fetch fails
-                    const mongoData = mongoFactionData[factionId] || {};
+                    // Still try to get local data even if chain fetch fails
+                    const localData = localFactionData[factionId] || {};
                     return { 
                         factionId, 
                         chain: 0,
-                        respect: mongoData.respect || null,
-                        rank: mongoData.rank || null,
-                        members: mongoData.members || null,
-                        position: mongoData.position || null
+                        respect: localData.respect || null,
+                        rank: localData.rank || null,
+                        members: localData.members || null,
+                        position: localData.position || null
                     };
                 }
             });
@@ -4923,37 +4927,41 @@
             // Initialize enhanced data object
             const factionEnhancedData = {};
             
-            // Fetch MongoDB faction data (respect, rank, etc.)
-            let mongoFactionData = {};
+            // Load local faction data
+            let localFactionData = {};
             try {
-                console.log('Fetching faction data from MongoDB...');
-                const mongoResponse = await fetch('/api/factions');
-                const mongoResult = await mongoResponse.json();
+                console.log('Loading local faction data...');
+                const localResponse = await fetch('/data/factions.json');
+                const localResult = await localResponse.json();
                 
-                if (mongoResult.success) {
-                    mongoFactionData = mongoResult.data;
-                    console.log(`Loaded ${Object.keys(mongoFactionData).length} factions from MongoDB`);
+                if (localResult.factions) {
+                    // Convert array to object for easier lookup
+                    localFactionData = localResult.factions.reduce((acc, faction) => {
+                        acc[faction.id] = faction;
+                        return acc;
+                    }, {});
+                    console.log(`Loaded ${Object.keys(localFactionData).length} factions from local data`);
                 } else {
-                    console.warn('Failed to fetch MongoDB faction data:', mongoResult.error);
+                    console.warn('Failed to load local faction data');
                 }
             } catch (error) {
-                console.warn('Error fetching MongoDB faction data:', error);
+                console.warn('Error loading local faction data:', error);
             }
             
-            // Use only MongoDB data to avoid rate limiting
+            // Use only local data to avoid rate limiting
             Array.from(uniqueFactionIds).forEach((factionId) => {
-                const mongoData = mongoFactionData[factionId] || {};
+                const localData = localFactionData[factionId] || {};
                 
                 factionEnhancedData[factionId] = {
                     chain: 0, // Default to 0 to avoid API calls
-                    respect: mongoData.respect || null,
-                    rank: mongoData.rank || null,
-                    members: mongoData.members || null,
-                    position: mongoData.position || null
+                    respect: localData.respect || null,
+                    rank: localData.rank || null,
+                    members: localData.members || null,
+                    position: localData.position || null
                 };
             });
             
-            console.log('Fetched enhanced faction data from MongoDB:', factionEnhancedData);
+            console.log('Fetched enhanced faction data from local data:', factionEnhancedData);
             console.log('Total factions with enhanced data:', Object.keys(factionEnhancedData).length);
             console.log('Sample enhanced data:', Object.entries(factionEnhancedData).slice(0, 3));
             
