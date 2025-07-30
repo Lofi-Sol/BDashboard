@@ -10,7 +10,7 @@ async function syncFactionData() {
     await client.connect();
     console.log('✅ Connected to MongoDB');
     
-    const db = client.db();
+    const db = client.db('torn_data');
     const factionsCollection = db.collection('factions');
     
     // Get all faction data
