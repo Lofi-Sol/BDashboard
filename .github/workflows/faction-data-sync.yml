@@ -9,6 +9,9 @@ on:
 jobs:
   sync-faction-data:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     
     steps:
     - name: Checkout repository
@@ -81,8 +84,10 @@ jobs:
       
     - name: Commit and push changes
       run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
         git add data/factions.json
         git diff --quiet && git diff --staged --quiet || git commit -m "Update faction data - $(date)"
-        git push 
+        git push
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
