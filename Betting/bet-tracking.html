@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bet Tracking - Torn City</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'DM Sans', Arial, sans-serif;
+            background: #fafbfc;
+            color: #232526;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(35,37,38,0.04);
+            margin-bottom: 24px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #232526;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+
+        .tracking-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .tracking-status.active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .tracking-status.inactive {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(35,37,38,0.04);
+            margin-bottom: 24px;
+            border: 1px solid #e5e7eb;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'DM Sans', 'Inter', Arial, sans-serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #059669, #047857);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #047857, #059669);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(35,37,38,0.04);
+            border: 1px solid #e5e7eb;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: #6b7280;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #232526;
+        }
+
+        .bets-table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(35,37,38,0.04);
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+        }
+
+        .bets-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .bets-table th {
+            background: #f8fafc;
+            padding: 16px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .bets-table td {
+            padding: 16px 12px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 0.9rem;
+        }
+
+        .bets-table tr:hover {
+            background: #f9fafb;
+        }
+
+        .bets-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .player-id {
+            font-weight: 600;
+            color: #059669;
+        }
+
+        .war-id {
+            font-weight: 600;
+            color: #3b82f6;
+        }
+
+        .faction-id {
+            font-weight: 600;
+            color: #8b5cf6;
+        }
+
+        .xanax-amount {
+            font-weight: 600;
+            color: #f59e0b;
+        }
+
+        .bet-amount {
+            font-weight: 600;
+            color: #059669;
+        }
+
+        .timestamp {
+            color: #6b7280;
+            font-size: 0.85rem;
+        }
+        
+        .log-id {
+            font-weight: 600;
+            color: #7c3aed;
+            font-family: 'DM Sans', monospace;
+            font-size: 0.85rem;
+        }
+        
+        .bet-id {
+            font-weight: 600;
+            color: #dc2626;
+            font-family: 'DM Sans', monospace;
+            font-size: 0.85rem;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-confirmed {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-won {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-lost {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .status-paid {
+            background: #f0fdf4;
+            color: #059669;
+        }
+
+        .payout-amount {
+            font-weight: 600;
+            color: #059669;
+        }
+
+        .payout-status {
+            font-weight: 600;
+            color: #dc2626;
+        }
+
+        .payout-status.paid {
+            color: #059669;
+        }
+
+        .payout-status.pending {
+            color: #f59e0b;
+        }
+
+        .bookie-profit {
+            font-weight: 600;
+            color: #059669;
+        }
+
+        .bookie-profit.negative {
+            color: #dc2626;
+        }
+
+        .bookie-profit.neutral {
+            color: #6b7280;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+
+        .no-bets {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+
+        .no-bets h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+        }
+
+        .no-bets p {
+            font-size: 0.9rem;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            background: white;
+            color: #374151;
+        }
+
+        .search-input {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            min-width: 200px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #059669;
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        }
+
+        .export-btn {
+            margin-left: auto;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 12px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .filter-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .export-btn {
+                margin-left: 0;
+            }
+            
+            .bets-table {
+                font-size: 0.8rem;
+            }
+            
+            .bets-table th,
+            .bets-table td {
+                padding: 12px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Bet Tracking Dashboard</h1>
+            <p>Monitor all bets placed on faction wars with real-time updates</p>
+            <div class="tracking-status active" id="tracking-status">
+                <span>🔄</span>
+                <span>Auto-tracking active</span>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Bets</h3>
+                <div class="value" id="total-bets">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Volume</h3>
+                <div class="value" id="total-volume">$0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Active Bets</h3>
+                <div class="value" id="active-bets">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Pending Bets</h3>
+                <div class="value" id="pending-bets">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Won Bets</h3>
+                <div class="value" id="won-bets">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Lost Bets</h3>
+                <div class="value" id="lost-bets">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Payouts</h3>
+                <div class="value" id="total-payouts">$0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Paid Payouts</h3>
+                <div class="value" id="paid-payouts">$0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Pending Payouts</h3>
+                <div class="value" id="pending-payouts">$0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Bookie Profit</h3>
+                <div class="value" id="total-bookie-profit">$0</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="filter-controls">
+                <select class="filter-select" id="status-filter">
+                    <option value="">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="won">Won</option>
+                    <option value="lost">Lost</option>
+                    <option value="paid">Paid</option>
+                </select>
+                
+                <select class="filter-select" id="war-filter">
+                    <option value="">All Wars</option>
+                </select>
+                
+                <input type="text" class="search-input" id="player-search" placeholder="Search by Player ID...">
+                
+                <button class="btn btn-secondary" onclick="clearFilters()">Clear Filters</button>
+            </div>
+            
+            <button class="btn btn-primary export-btn" onclick="exportBets()">📊 Export Data</button>
+            <button class="btn btn-secondary" onclick="clearAllBets()" style="background: #dc2626; color: white;">🗑️ Clear All Bets</button>
+            <button class="btn btn-primary" onclick="manualWarOutcomeCheck()" style="background: #3b82f6;">⚔️ Check War Outcomes</button>
+        </div>
+
+        <div class="bets-table-container">
+            <div id="bets-loading" class="loading">
+                Loading bet data...
+            </div>
+            
+            <div id="bets-content" style="display: none;">
+                <table class="bets-table">
+                    <thead>
+                        <tr>
+                            <th>Player ID</th>
+                            <th>War ID</th>
+                            <th>Faction ID</th>
+                            <th>Xanax Amount</th>
+                            <th>Bet Amount</th>
+                            <th>Time Placed</th>
+                            <th>Bet ID</th>
+                            <th>Log ID</th>
+                            <th>Status</th>
+                            <th>Payout Amount</th>
+                            <th>Payout Status</th>
+                            <th>Bookie Profit</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bets-table-body">
+                        <!-- Bet data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div id="no-bets" class="no-bets" style="display: none;">
+                <h3>No bets found</h3>
+                <p>No bets have been placed yet. Check back later!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const XANAX_PRICE = 700000; // $700,000 per Xanax
+        let allBets = [];
+        let filteredBets = [];
+        let autoRefreshInterval = null;
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBets();
+            setupEventListeners();
+            startAutoRefresh();
+            startWarOutcomeTracking();
+        });
+
+        // Load bet data
+        async function loadBets() {
+            try {
+                const previousBetCount = allBets.length;
+                
+                // Load data from localStorage
+                allBets = await getSampleBets();
+                filteredBets = [...allBets];
+                
+                updateStats();
+                updateTable();
+                updateFilters();
+                
+                document.getElementById('bets-loading').style.display = 'none';
+                document.getElementById('bets-content').style.display = 'block';
+                
+                // Show notification if new bet was added
+                if (allBets.length > previousBetCount && previousBetCount > 0) {
+                    showNotification('New bet placed!', 'A new bet has been added to the tracking system.');
+                }
+                
+            } catch (error) {
+                console.error('Error loading bets:', error);
+                document.getElementById('bets-loading').textContent = 'Error loading bet data';
+            }
+        }
+        
+        // Show notification
+        function showNotification(title, message) {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification(title, { body: message });
+            }
+            
+            // Also show in-page notification
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #059669;
+                color: white;
+                padding: 16px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 1000;
+                max-width: 300px;
+            `;
+            notification.innerHTML = `
+                <div style="font-weight: 600; margin-bottom: 4px;">${title}</div>
+                <div style="font-size: 0.9rem;">${message}</div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
+        // Get bet data from localStorage (shared with betting dashboard)
+        async function getSampleBets() {
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Get bets from localStorage
+            const storedBets = localStorage.getItem('tornBets');
+            if (storedBets) {
+                try {
+                    return JSON.parse(storedBets);
+                } catch (error) {
+                    console.error('Error parsing stored bets:', error);
+                    return [];
+                }
+            }
+            
+            return [];
+        }
+
+        // Update statistics
+        function updateStats() {
+            const stats = {
+                total: allBets.length,
+                totalVolume: allBets.reduce((sum, bet) => sum + bet.betAmount, 0),
+                active: allBets.filter(bet => bet.status === 'confirmed').length,
+                pending: allBets.filter(bet => bet.status === 'pending').length,
+                won: allBets.filter(bet => bet.status === 'won').length,
+                lost: allBets.filter(bet => bet.status === 'lost').length
+            };
+
+            document.getElementById('total-bets').textContent = stats.total;
+            document.getElementById('total-volume').textContent = `$${(stats.totalVolume / 1000000).toFixed(1)}M`;
+            document.getElementById('active-bets').textContent = stats.active;
+            document.getElementById('pending-bets').textContent = stats.pending;
+            document.getElementById('won-bets').textContent = stats.won;
+            document.getElementById('lost-bets').textContent = stats.lost;
+        }
+
+        // Update the bets table
+        function updateTable() {
+            const tableBody = document.getElementById('bets-table-body');
+            
+            if (filteredBets.length === 0) {
+                document.getElementById('bets-content').style.display = 'none';
+                document.getElementById('no-bets').style.display = 'block';
+                return;
+            }
+            
+            document.getElementById('bets-content').style.display = 'block';
+            document.getElementById('no-bets').style.display = 'none';
+            
+            tableBody.innerHTML = filteredBets.map(bet => `
+                <tr>
+                    <td class="player-id">${bet.playerId}</td>
+                    <td class="war-id">War #${bet.warId}</td>
+                    <td class="faction-id">${bet.factionId}</td>
+                    <td class="xanax-amount">${bet.xanaxAmount} 💊</td>
+                    <td class="bet-amount">$${bet.betAmount.toLocaleString()}</td>
+                    <td class="timestamp">${formatTimestamp(bet.timestamp)}</td>
+                    <td class="bet-id">${bet.betId || '-'}</td>
+                    <td class="log-id">${bet.logId || '-'}</td>
+                    <td>
+                        <span class="status-badge status-${bet.status}">
+                            ${getStatusIcon(bet.status)} ${bet.status}
+                        </span>
+                    </td>
+                    <td class="payout-amount">${calculatePayoutAmount(bet)}</td>
+                    <td class="payout-status ${getPayoutStatusClass(bet)}">${getPayoutStatus(bet)}</td>
+                    <td class="bookie-profit ${getBookieProfitClass(bet)}">${calculateBookieProfit(bet)}</td>
+                    <td>
+                        ${getActionButtons(bet)}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Update filter options
+        function updateFilters() {
+            const warFilter = document.getElementById('war-filter');
+            const uniqueWars = [...new Set(allBets.map(bet => bet.warId))].sort();
+            
+            warFilter.innerHTML = '<option value="">All Wars</option>' +
+                uniqueWars.map(warId => `<option value="${warId}">War #${warId}</option>`).join('');
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            document.getElementById('status-filter').addEventListener('change', applyFilters);
+            document.getElementById('war-filter').addEventListener('change', applyFilters);
+            document.getElementById('player-search').addEventListener('input', applyFilters);
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const statusFilter = document.getElementById('status-filter').value;
+            const warFilter = document.getElementById('war-filter').value;
+            const playerSearch = document.getElementById('player-search').value.toLowerCase();
+            
+            filteredBets = allBets.filter(bet => {
+                const statusMatch = !statusFilter || bet.status === statusFilter;
+                const warMatch = !warFilter || bet.warId.toString() === warFilter;
+                const playerMatch = !playerSearch || bet.playerId.toString().includes(playerSearch);
+                
+                return statusMatch && warMatch && playerMatch;
+            });
+            
+            updateTable();
+        }
+
+        // Clear all filters
+        function clearFilters() {
+            document.getElementById('status-filter').value = '';
+            document.getElementById('war-filter').value = '';
+            document.getElementById('player-search').value = '';
+            
+            filteredBets = [...allBets];
+            updateTable();
+        }
+
+        // Export bet data
+        function exportBets() {
+            const csvContent = generateCSV(filteredBets);
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', `bet-tracking-${new Date().toISOString().split('T')[0]}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+
+        // Generate CSV content
+        function generateCSV(bets) {
+            const headers = ['Player ID', 'War ID', 'Faction ID', 'Xanax Amount', 'Bet Amount', 'Time Placed', 'Bet ID', 'Log ID', 'Status', 'Payout Amount', 'Payout Status', 'Bookie Profit'];
+            const rows = bets.map(bet => [
+                bet.playerId,
+                bet.warId,
+                bet.factionId,
+                bet.xanaxAmount,
+                bet.betAmount,
+                formatTimestamp(bet.timestamp),
+                bet.betId || '',
+                bet.logId || '',
+                bet.status,
+                calculatePayoutAmount(bet).replace('$', '').replace(',', '') || '0',
+                getPayoutStatus(bet),
+                calculateBookieProfitAmount(bet)
+            ]);
+            
+            return [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+        }
+
+        // Format timestamp
+        function formatTimestamp(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleString();
+        }
+
+        // Start auto refresh
+        function startAutoRefresh() {
+            // Refresh every 30 seconds
+            autoRefreshInterval = setInterval(loadBets, 30000);
+        }
+
+        // Stop auto refresh
+        function stopAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+            }
+        }
+
+        // Add a new bet (for testing)
+        function addTestBet() {
+            const newBet = {
+                id: Date.now(),
+                playerId: Math.floor(Math.random() * 999999) + 100000,
+                warId: 28339 + Math.floor(Math.random() * 10),
+                factionId: Math.floor(Math.random() * 99999) + 10000,
+                xanaxAmount: Math.floor(Math.random() * 5) + 1,
+                betAmount: XANAX_PRICE * (Math.floor(Math.random() * 5) + 1),
+                timestamp: Date.now(),
+                status: 'pending'
+            };
+            
+            // Save to localStorage
+            const existingBets = localStorage.getItem('tornBets');
+            let bets = [];
+            
+            if (existingBets) {
+                try {
+                    bets = JSON.parse(existingBets);
+                } catch (error) {
+                    bets = [];
+                }
+            }
+            
+            bets.unshift(newBet);
+            localStorage.setItem('tornBets', JSON.stringify(bets));
+            
+            // Refresh display
+            loadBets();
+        }
+
+        // Expose for testing
+        window.addTestBet = addTestBet;
+        
+        // Update bet status (called when backend confirms bet)
+        function updateBetStatus(betId, newStatus) {
+            const existingBets = localStorage.getItem('tornBets');
+            if (!existingBets) return;
+            
+            try {
+                let bets = JSON.parse(existingBets);
+                const betIndex = bets.findIndex(bet => bet.id === betId);
+                
+                if (betIndex !== -1) {
+                    bets[betIndex].status = newStatus;
+                    localStorage.setItem('tornBets', JSON.stringify(bets));
+                    
+                    // Refresh display
+                    loadBets();
+                    console.log(`Bet ${betId} status updated to ${newStatus}`);
+                }
+            } catch (error) {
+                console.error('Error updating bet status:', error);
+            }
+        }
+        
+        // Get status icon
+        function getStatusIcon(status) {
+            switch (status) {
+                case 'pending': return '⏳';
+                case 'confirmed': return '✅';
+                case 'won': return '🏆';
+                case 'lost': return '❌';
+                default: return '❓';
+            }
+        }
+        
+        // Handle real-time updates from betting dashboard
+        window.addEventListener('message', function(event) {
+            if (event.data.type === 'BET_CONFIRMED') {
+                console.log('Received bet confirmation:', event.data);
+                
+                // Refresh the display to show updated bet
+                loadBets();
+                
+                // Show notification
+                showNotification('Bet Confirmed!', `Bet ${event.data.betId} has been confirmed via log ${event.data.logId}`);
+            }
+        });
+        
+        // Expose for external use
+        window.updateBetStatus = updateBetStatus;
+        window.addTestBet = addTestBet;
+
+        // Clear all bets function
+        function clearAllBets() {
+            if (confirm('Are you sure you want to clear ALL bet data? This action cannot be undone.')) {
+                // Clear from localStorage
+                localStorage.removeItem('tornBets');
+                
+                // Reset arrays
+                allBets = [];
+                filteredBets = [];
+                
+                // Update display
+                updateStats();
+                updateTable();
+                
+                // Show confirmation
+                showNotification('Bets Cleared', 'All bet data has been cleared successfully.');
+                
+                console.log('All bet data cleared');
+            }
+        }
+
+        // War Outcome Tracking System
+        let warOutcomeInterval = null;
+        let lastWarCheck = 0;
+
+        // Start automatic war outcome tracking
+        function startWarOutcomeTracking() {
+            console.log('Starting war outcome tracking...');
+            
+            // Check war outcomes immediately
+            checkWarOutcomes();
+            
+            // Set up interval to check war outcomes every 60 seconds
+            warOutcomeInterval = setInterval(checkWarOutcomes, 60000);
+            
+            // Update status indicator
+            updateTrackingStatus(true);
+        }
+
+        // Stop war outcome tracking
+        function stopWarOutcomeTracking() {
+            if (warOutcomeInterval) {
+                clearInterval(warOutcomeInterval);
+                warOutcomeInterval = null;
+                console.log('War outcome tracking stopped');
+                
+                // Update status indicator
+                updateTrackingStatus(false);
+            }
+        }
+
+        // Check war outcomes for all confirmed bets
+        async function checkWarOutcomes() {
+            try {
+                console.log('Checking war outcomes...');
+                
+                // Get current war data from Torn API
+                const warData = await fetchWarData();
+                if (!warData) {
+                    console.log('No war data available');
+                    return;
+                }
+
+                // Get confirmed bets that haven't been resolved yet
+                const confirmedBets = allBets.filter(bet => 
+                    bet.status === 'confirmed' && 
+                    !bet.resolvedAt
+                );
+
+                if (confirmedBets.length === 0) {
+                    console.log('No confirmed bets to check');
+                    return;
+                }
+
+                console.log(`Checking ${confirmedBets.length} confirmed bets for war outcomes`);
+
+                // Check each confirmed bet
+                confirmedBets.forEach(bet => {
+                    checkBetOutcome(bet, warData);
+                });
+
+                // Update display if any bets were resolved
+                if (confirmedBets.some(bet => bet.resolvedAt)) {
+                    updateStats();
+                    updateTable();
+                }
+
+            } catch (error) {
+                console.error('Error checking war outcomes:', error);
+            }
+        }
+
+        // Fetch current war data from Torn API
+        async function fetchWarData() {
+            try {
+                // Get API key from localStorage or use a default one for testing
+                const apiKey = localStorage.getItem('tornApiKey') || 'C0wctKtdsgjJYpWe';
+                
+                const response = await fetch(`https://api.torn.com/torn/?selections=rankedwars&key=${apiKey}`);
+                const data = await response.json();
+                
+                if (data.error) {
+                    console.error('Error fetching war data:', data.error);
+                    return null;
+                }
+                
+                return data.rankedwars || {};
+            } catch (error) {
+                console.error('Error fetching war data:', error);
+                return null;
+            }
+        }
+
+        // Check outcome for a specific bet
+        function checkBetOutcome(bet, warData) {
+            const warId = bet.warId;
+            const war = warData[warId];
+            
+            if (!war) {
+                console.log(`War ${warId} not found in current data`);
+                return;
+            }
+
+            // Check if war has finished
+            if (war.war.winner === 0) {
+                console.log(`War ${warId} is still active`);
+                return;
+            }
+
+            console.log(`War ${warId} has finished. Winner: ${war.war.winner}`);
+
+            // Determine if the bet won or lost
+            const betWon = war.war.winner.toString() === bet.factionId.toString();
+            
+            // Update bet status
+            if (betWon) {
+                console.log(`Bet ${bet.betId} WON!`);
+                bet.status = 'won';
+                bet.payoutStatus = 'pending';
+                bet.resolvedAt = Date.now();
+                bet.warWinner = war.war.winner;
+                bet.warEndTime = war.war.end;
+            } else {
+                console.log(`Bet ${bet.betId} LOST!`);
+                bet.status = 'lost';
+                bet.resolvedAt = Date.now();
+                bet.warWinner = war.war.winner;
+                bet.warEndTime = war.war.end;
+            }
+
+            // Save updated bet data
+            saveBetsToStorage();
+            
+            // Show notification
+            const notificationMessage = betWon ? 
+                `🎉 Bet ${bet.betId} WON! ${bet.xanaxAmount} 💊 on ${bet.factionName}` :
+                `❌ Bet ${bet.betId} LOST! ${bet.xanaxAmount} 💊 on ${bet.factionName}`;
+            
+            showNotification('War Outcome', notificationMessage);
+        }
+
+        // Save bets to localStorage
+        function saveBetsToStorage() {
+            try {
+                localStorage.setItem('tornBets', JSON.stringify(allBets));
+                console.log('Bets saved to storage');
+            } catch (error) {
+                console.error('Error saving bets to storage:', error);
+            }
+        }
+
+        // Manual war outcome check (for testing)
+        async function manualWarOutcomeCheck() {
+            console.log('Manually checking war outcomes...');
+            await checkWarOutcomes();
+        }
+
+        // Expose manual check function globally
+        window.manualWarOutcomeCheck = manualWarOutcomeCheck;
+
+        // Update tracking status indicator
+        function updateTrackingStatus(isActive) {
+            const statusEl = document.getElementById('tracking-status');
+            if (statusEl) {
+                if (isActive) {
+                    statusEl.className = 'tracking-status active';
+                    statusEl.innerHTML = '<span>🔄</span><span>Auto-tracking active</span>';
+                } else {
+                    statusEl.className = 'tracking-status inactive';
+                    statusEl.innerHTML = '<span>⏸️</span><span>Auto-tracking paused</span>';
+                }
+            }
+        }
+
+        // Payout System Functions
+        
+        // Calculate payout amount based on bet status and odds
+        function calculatePayoutAmount(bet) {
+            if (bet.status === 'won') {
+                // Calculate payout based on odds (simplified calculation)
+                // In a real system, you'd store the odds when the bet was placed
+                const odds = bet.odds || 50; // Default to 50% if not stored
+                const payout = Math.round(bet.betAmount * (100 / odds));
+                return `$${payout.toLocaleString()}`;
+            } else if (bet.status === 'lost') {
+                return '$0';
+            } else {
+                return '-';
+            }
+        }
+
+        // Get payout status
+        function getPayoutStatus(bet) {
+            if (bet.status === 'won') {
+                return bet.payoutStatus || 'Pending';
+            } else if (bet.status === 'lost') {
+                return 'N/A';
+            } else {
+                return '-';
+            }
+        }
+
+        // Get payout status CSS class
+        function getPayoutStatusClass(bet) {
+            if (bet.status === 'won') {
+                const status = bet.payoutStatus || 'pending';
+                return status === 'paid' ? 'paid' : 'pending';
+            }
+            return '';
+        }
+
+        // Get action buttons for each bet
+        function getActionButtons(bet) {
+            let buttons = '';
+            
+            if (bet.status === 'won' && (!bet.payoutStatus || bet.payoutStatus === 'pending')) {
+                buttons += `<button class="btn btn-primary" style="padding: 4px 8px; font-size: 0.8rem;" onclick="markPayoutPaid('${bet.betId}')">Mark Paid</button>`;
+            }
+            
+            if (bet.status === 'confirmed') {
+                buttons += `<button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem; margin-left: 4px;" onclick="markBetWon('${bet.betId}')">Mark Won</button>`;
+                buttons += `<button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem; margin-left: 4px;" onclick="markBetLost('${bet.betId}')">Mark Lost</button>`;
+            }
+            
+            return buttons || '-';
+        }
+
+        // Mark bet as won
+        function markBetWon(betId) {
+            const betIndex = allBets.findIndex(bet => bet.betId === betId);
+            if (betIndex !== -1) {
+                allBets[betIndex].status = 'won';
+                allBets[betIndex].payoutStatus = 'pending';
+                allBets[betIndex].resolvedAt = Date.now();
+                
+                // Save to localStorage
+                localStorage.setItem('tornBets', JSON.stringify(allBets));
+                
+                // Update display
+                updateStats();
+                updateTable();
+                
+                showNotification('Bet Updated', `Bet ${betId} marked as won. Payout pending.`);
+            }
+        }
+
+        // Mark bet as lost
+        function markBetLost(betId) {
+            const betIndex = allBets.findIndex(bet => bet.betId === betId);
+            if (betIndex !== -1) {
+                allBets[betIndex].status = 'lost';
+                allBets[betIndex].resolvedAt = Date.now();
+                
+                // Save to localStorage
+                localStorage.setItem('tornBets', JSON.stringify(allBets));
+                
+                // Update display
+                updateStats();
+                updateTable();
+                
+                showNotification('Bet Updated', `Bet ${betId} marked as lost.`);
+            }
+        }
+
+        // Mark payout as paid
+        function markPayoutPaid(betId) {
+            const betIndex = allBets.findIndex(bet => bet.betId === betId);
+            if (betIndex !== -1) {
+                allBets[betIndex].payoutStatus = 'paid';
+                allBets[betIndex].paidAt = Date.now();
+                
+                // Save to localStorage
+                localStorage.setItem('tornBets', JSON.stringify(allBets));
+                
+                // Update display
+                updateStats();
+                updateTable();
+                
+                showNotification('Payout Updated', `Payout for bet ${betId} marked as paid.`);
+            }
+        }
+
+        // Override updateStats to include payout information
+        function updateStats() {
+            const stats = {
+                total: allBets.length,
+                totalVolume: allBets.reduce((sum, bet) => sum + bet.betAmount, 0),
+                active: allBets.filter(bet => bet.status === 'confirmed').length,
+                pending: allBets.filter(bet => bet.status === 'pending').length,
+                won: allBets.filter(bet => bet.status === 'won').length,
+                lost: allBets.filter(bet => bet.status === 'lost').length,
+                totalPayouts: allBets.filter(bet => bet.status === 'won').reduce((sum, bet) => {
+                    const odds = bet.odds || 50;
+                    return sum + Math.round(bet.betAmount * (100 / odds));
+                }, 0),
+                paidPayouts: allBets.filter(bet => bet.status === 'won' && bet.payoutStatus === 'paid').reduce((sum, bet) => {
+                    const odds = bet.odds || 50;
+                    return sum + Math.round(bet.betAmount * (100 / odds));
+                }, 0),
+                pendingPayouts: allBets.filter(bet => bet.status === 'won' && bet.payoutStatus === 'pending').reduce((sum, bet) => {
+                    const odds = bet.odds || 50;
+                    return sum + Math.round(bet.betAmount * (100 / odds));
+                }, 0),
+                totalBookieProfit: allBets.reduce((sum, bet) => sum + calculateBookieProfitAmount(bet), 0)
+            };
+
+            document.getElementById('total-bets').textContent = stats.total;
+            document.getElementById('total-volume').textContent = `$${(stats.totalVolume / 1000000).toFixed(1)}M`;
+            document.getElementById('active-bets').textContent = stats.active;
+            document.getElementById('pending-bets').textContent = stats.pending;
+            document.getElementById('won-bets').textContent = stats.won;
+            document.getElementById('lost-bets').textContent = stats.lost;
+            
+            // Add payout statistics if elements exist
+            const totalPayoutsEl = document.getElementById('total-payouts');
+            const paidPayoutsEl = document.getElementById('paid-payouts');
+            const pendingPayoutsEl = document.getElementById('pending-payouts');
+            
+            if (totalPayoutsEl) totalPayoutsEl.textContent = `$${(stats.totalPayouts / 1000000).toFixed(1)}M`;
+            if (paidPayoutsEl) paidPayoutsEl.textContent = `$${(stats.paidPayouts / 1000000).toFixed(1)}M`;
+            if (pendingPayoutsEl) pendingPayoutsEl.textContent = `$${(stats.pendingPayouts / 1000000).toFixed(1)}M`;
+            
+            // Update total bookie profit
+            const totalBookieProfitEl = document.getElementById('total-bookie-profit');
+            if (totalBookieProfitEl) {
+                const profit = stats.totalBookieProfit;
+                if (profit > 0) {
+                    totalBookieProfitEl.textContent = `+$${(profit / 1000000).toFixed(1)}M`;
+                    totalBookieProfitEl.style.color = '#059669'; // Green
+                } else if (profit < 0) {
+                    totalBookieProfitEl.textContent = `-$${(Math.abs(profit) / 1000000).toFixed(1)}M`;
+                    totalBookieProfitEl.style.color = '#dc2626'; // Red
+                } else {
+                    totalBookieProfitEl.textContent = '$0';
+                    totalBookieProfitEl.style.color = '#6b7280'; // Gray
+                }
+            }
+        }
+
+        // Calculate bookie profit for display
+        function calculateBookieProfit(bet) {
+            const profit = calculateBookieProfitAmount(bet);
+            
+            if (profit > 0) {
+                return `+$${profit.toLocaleString()}`;
+            } else if (profit < 0) {
+                return `-$${Math.abs(profit).toLocaleString()}`;
+            } else {
+                return '$0';
+            }
+        }
+
+        // Calculate bookie profit amount (numeric)
+        function calculateBookieProfitAmount(bet) {
+            if (bet.status === 'won') {
+                // Bookie loses money on winning bets
+                const odds = bet.odds || 50;
+                const payout = Math.round(bet.betAmount * (100 / odds));
+                return bet.betAmount - payout; // Negative (loss)
+            } else if (bet.status === 'lost') {
+                // Bookie keeps the entire bet amount
+                return bet.betAmount; // Positive (profit)
+            } else {
+                // Pending/confirmed bets - no profit/loss yet
+                return 0;
+            }
+        }
+
+        // Get CSS class for bookie profit styling
+        function getBookieProfitClass(bet) {
+            const profit = calculateBookieProfitAmount(bet);
+            
+            if (profit > 0) {
+                return ''; // Green (default)
+            } else if (profit < 0) {
+                return 'negative'; // Red
+            } else {
+                return 'neutral'; // Gray
+            }
+        }
+    </script>
+</body>
+</html> 

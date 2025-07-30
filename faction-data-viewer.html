@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faction Data Viewer - Torn City</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .controls {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.danger {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        }
+
+        .btn.danger:hover {
+            box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        .search-box {
+            flex: 1;
+            max-width: 300px;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .stats {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #dc3545;
+        }
+
+        .faction-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .faction-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border-left: 4px solid #667eea;
+        }
+
+        .faction-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .faction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .faction-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .faction-id {
+            background: #667eea;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .faction-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .detail-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .rank-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .rank-diamond { background: #e8f4fd; color: #0066cc; }
+        .rank-platinum { background: #f0f0f0; color: #666; }
+        .rank-gold { background: #fff3cd; color: #856404; }
+        .rank-silver { background: #f8f9fa; color: #495057; }
+        .rank-bronze { background: #f4e4bc; color: #8b4513; }
+
+        .last-updated {
+            font-size: 0.8em;
+            color: #999;
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 60px;
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        .table-view {
+            display: none;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        .faction-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .faction-table th,
+        .faction-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .faction-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+            text-transform: uppercase;
+            font-size: 0.8em;
+            letter-spacing: 0.5px;
+        }
+
+        .faction-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .toggle-btn {
+            background: #e9ecef;
+            color: #495057;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            background: #667eea;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏛️ Faction Data Viewer</h1>
+            <p>Real-time faction data from MongoDB collection</p>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="loadFactionData()">🔄 Refresh Data</button>
+            <button class="btn danger" onclick="clearData()">🗑️ Clear Display</button>
+            <input type="text" class="search-box" id="searchBox" placeholder="Search factions..." onkeyup="filterFactions()">
+            <span id="connectionStatus" style="margin-left: auto; font-weight: bold;"></span>
+        </div>
+
+        <div class="stats" id="statsContainer" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-number" id="totalFactions">0</div>
+                <div class="stat-label">Total Factions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="avgRespect">0</div>
+                <div class="stat-label">Avg Respect</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="avgMembers">0</div>
+                <div class="stat-label">Avg Members</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="lastUpdate">-</div>
+                <div class="stat-label">Last Updated</div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="view-toggle">
+                <button class="toggle-btn active" onclick="switchView('cards')">📋 Card View</button>
+                <button class="toggle-btn" onclick="switchView('table')">📊 Table View</button>
+            </div>
+
+            <div id="loadingIndicator" class="loading">Loading faction data...</div>
+            <div id="errorContainer"></div>
+            
+            <div id="cardView" class="faction-grid"></div>
+            
+            <div id="tableView" class="table-view">
+                <table class="faction-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Rank</th>
+                            <th>Respect</th>
+                            <th>Members</th>
+                            <th>Position</th>
+                            <th>Chain</th>
+                            <th>Last Updated</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let factionData = [];
+        let currentView = 'cards';
+
+        // Load faction data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFactionData();
+        });
+
+        async function loadFactionData() {
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const errorContainer = document.getElementById('errorContainer');
+            const connectionStatus = document.getElementById('connectionStatus');
+            
+            loadingIndicator.style.display = 'block';
+            errorContainer.innerHTML = '';
+            connectionStatus.textContent = 'Connecting...';
+            connectionStatus.style.color = '#ffc107';
+
+            try {
+                const response = await fetch('/api/factions');
+                const result = await response.json();
+
+                if (result.success) {
+                    factionData = Object.entries(result.data).map(([id, data]) => ({
+                        id: parseInt(id),
+                        ...data
+                    }));
+
+                    displayFactionData();
+                    updateStats();
+                    connectionStatus.textContent = '✅ Connected';
+                    connectionStatus.style.color = '#28a745';
+                } else {
+                    throw new Error(result.error || 'Failed to fetch faction data');
+                }
+            } catch (error) {
+                console.error('Error loading faction data:', error);
+                errorContainer.innerHTML = `
+                    <div class="error">
+                        <strong>Error:</strong> ${error.message}
+                        <br><small>Make sure the server is running and MongoDB is connected.</small>
+                    </div>
+                `;
+                connectionStatus.textContent = '❌ Connection Failed';
+                connectionStatus.style.color = '#dc3545';
+            } finally {
+                loadingIndicator.style.display = 'none';
+            }
+        }
+
+        function displayFactionData() {
+            const cardView = document.getElementById('cardView');
+            const tableBody = document.getElementById('tableBody');
+
+            if (factionData.length === 0) {
+                cardView.innerHTML = '<div class="no-data">No faction data available</div>';
+                tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center;">No faction data available</td></tr>';
+                return;
+            }
+
+            // Sort by respect (descending)
+            const sortedData = [...factionData].sort((a, b) => (b.respect || 0) - (a.respect || 0));
+
+            // Card view
+            cardView.innerHTML = sortedData.map(faction => `
+                <div class="faction-card" data-name="${faction.name?.toLowerCase() || ''}" data-id="${faction.id}">
+                    <div class="faction-header">
+                        <div class="faction-name">${faction.name || 'Unknown Faction'}</div>
+                        <div class="faction-id">#${faction.id}</div>
+                    </div>
+                    <div class="faction-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Rank:</span>
+                            <span class="detail-value">
+                                <span class="rank-badge ${getRankClass(faction.rank)}">${faction.rank || 'Unknown'}</span>
+                            </span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Position:</span>
+                            <span class="detail-value">#${faction.position || 'N/A'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Respect:</span>
+                            <span class="detail-value">${(faction.respect || 0).toLocaleString()}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Members:</span>
+                            <span class="detail-value">${faction.members || 0}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Chain:</span>
+                            <span class="detail-value">${faction.chain || 0}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Chain Duration:</span>
+                            <span class="detail-value">${formatDuration(faction.chain_duration)}</span>
+                        </div>
+                    </div>
+                    <div class="last-updated">
+                        Last updated: ${formatDate(faction.last_updated)}
+                    </div>
+                </div>
+            `).join('');
+
+            // Table view
+            tableBody.innerHTML = sortedData.map(faction => `
+                <tr>
+                    <td>#${faction.id}</td>
+                    <td>${faction.name || 'Unknown Faction'}</td>
+                    <td><span class="rank-badge ${getRankClass(faction.rank)}">${faction.rank || 'Unknown'}</span></td>
+                    <td>${(faction.respect || 0).toLocaleString()}</td>
+                    <td>${faction.members || 0}</td>
+                    <td>#${faction.position || 'N/A'}</td>
+                    <td>${faction.chain || 0}</td>
+                    <td>${formatDate(faction.last_updated)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function updateStats() {
+            const statsContainer = document.getElementById('statsContainer');
+            
+            if (factionData.length === 0) {
+                statsContainer.style.display = 'none';
+                return;
+            }
+
+            statsContainer.style.display = 'grid';
+
+            const totalFactions = factionData.length;
+            const avgRespect = Math.round(factionData.reduce((sum, f) => sum + (f.respect || 0), 0) / totalFactions);
+            const avgMembers = Math.round(factionData.reduce((sum, f) => sum + (f.members || 0), 0) / totalFactions);
+            const lastUpdate = factionData.reduce((latest, f) => {
+                const date = new Date(f.last_updated);
+                return date > latest ? date : latest;
+            }, new Date(0));
+
+            document.getElementById('totalFactions').textContent = totalFactions;
+            document.getElementById('avgRespect').textContent = avgRespect.toLocaleString();
+            document.getElementById('avgMembers').textContent = avgMembers;
+            document.getElementById('lastUpdate').textContent = formatDate(lastUpdate);
+        }
+
+        function filterFactions() {
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            const cards = document.querySelectorAll('.faction-card');
+            const rows = document.querySelectorAll('#tableBody tr');
+
+            cards.forEach(card => {
+                const name = card.dataset.name;
+                const id = card.dataset.id;
+                const visible = name.includes(searchTerm) || id.includes(searchTerm);
+                card.style.display = visible ? 'block' : 'none';
+            });
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const visible = text.includes(searchTerm);
+                row.style.display = visible ? '' : 'none';
+            });
+        }
+
+        function switchView(view) {
+            currentView = view;
+            const cardView = document.getElementById('cardView');
+            const tableView = document.getElementById('tableView');
+            const toggleBtns = document.querySelectorAll('.toggle-btn');
+
+            toggleBtns.forEach(btn => btn.classList.remove('active'));
+            
+            if (view === 'cards') {
+                cardView.style.display = 'grid';
+                tableView.style.display = 'none';
+                toggleBtns[0].classList.add('active');
+            } else {
+                cardView.style.display = 'none';
+                tableView.style.display = 'block';
+                toggleBtns[1].classList.add('active');
+            }
+        }
+
+        function clearData() {
+            factionData = [];
+            document.getElementById('cardView').innerHTML = '<div class="no-data">Data cleared</div>';
+            document.getElementById('tableBody').innerHTML = '<tr><td colspan="8" style="text-align: center;">Data cleared</td></tr>';
+            document.getElementById('statsContainer').style.display = 'none';
+            document.getElementById('connectionStatus').textContent = 'Disconnected';
+            document.getElementById('connectionStatus').style.color = '#6c757d';
+        }
+
+        function getRankClass(rank) {
+            if (!rank) return 'rank-bronze';
+            const rankLower = rank.toLowerCase();
+            if (rankLower.includes('diamond')) return 'rank-diamond';
+            if (rankLower.includes('platinum')) return 'rank-platinum';
+            if (rankLower.includes('gold')) return 'rank-gold';
+            if (rankLower.includes('silver')) return 'rank-silver';
+            return 'rank-bronze';
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            } else if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num.toLocaleString();
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'Never';
+            const date = new Date(dateString);
+            return date.toLocaleString();
+        }
+
+        function formatDuration(seconds) {
+            if (!seconds) return 'N/A';
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            return `${hours}h ${minutes}m`;
+        }
+
+        // Auto-refresh every 5 minutes
+        setInterval(loadFactionData, 5 * 60 * 1000);
+    </script>
+</body>
+</html>

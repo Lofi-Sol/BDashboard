@@ -1,0 +1,5163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Torn Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <style>
+        html, body {
+            height: 100%;
+        }
+        body {
+            font-family: 'Inter', 'DM Sans', Arial, sans-serif;
+            background: #fafbfc;
+            color: #232526;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .center-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .main-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            line-height: 1.2;
+            color: #232526;
+        }
+        
+        .title-text {
+            color: #232526;
+        }
+        
+        .title-highlight {
+            color: #2563eb;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: #6b7280;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        
+        .call-to-action {
+            font-size: 1rem;
+            color: #2563eb;
+            font-weight: 500;
+            margin-bottom: 0;
+        }
+        
+        .info-message {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-top: 12px;
+            text-align: center;
+            line-height: 1.4;
+        }
+        
+
+        
+        .login-form {
+            width: 100%;
+            max-width: 400px;
+        }
+        .center-box h2 {
+            font-size: 1.35rem;
+            font-weight: 500;
+            margin-bottom: 28px;
+            letter-spacing: -0.2px;
+            font-family: 'DM Sans', 'Inter', Arial, sans-serif;
+        }
+        .api-input {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+        .api-input input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1.2px solid #e3e6ea;
+            border-radius: 8px;
+            font-family: 'Inter', 'DM Sans', Arial, sans-serif;
+            font-size: 15px;
+            background: #f6f8fa;
+            color: #232526;
+            transition: all 0.2s cubic-bezier(.4,0,.2,1);
+        }
+        .api-input input:focus {
+            outline: none;
+            border-color: #232526;
+            background: #fff;
+            box-shadow: 0 0 0 2px rgba(35,37,38,0.08);
+        }
+        .api-input button {
+            padding: 12px 28px;
+            background: linear-gradient(90deg, #232526 0%, #414345 100%);
+            color: #fff;
+            border: none;
+            border-radius: 22px;
+            font-family: 'DM Sans', 'Inter', Arial, sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(.4,0,.2,1);
+            box-shadow: 0 2px 8px rgba(35,37,38,0.07);
+            letter-spacing: 0.01em;
+            position: relative;
+        }
+        .api-input button:hover, .api-input button:focus {
+            background: linear-gradient(90deg, #414345 0%, #232526 100%);
+            box-shadow: 0 6px 18px rgba(35,37,38,0.13);
+            transform: translateY(-1px) scale(1.04);
+        }
+        .error-message {
+            color: #e63946;
+            font-size: 0.98rem;
+            margin-top: 18px;
+            min-height: 22px;
+            font-family: 'Inter', 'DM Sans', Arial, sans-serif;
+            letter-spacing: -0.2px;
+        }
+        .success-message {
+            color: #16a34a;
+            font-size: 1.05rem;
+            margin-top: 22px;
+            font-family: 'Inter', 'DM Sans', Arial, sans-serif;
+            letter-spacing: -0.2px;
+            text-align: center;
+        }
+        /* Management System Styles */
+        .dashboard {
+            width: 100vw;
+            height: 100vh;
+            background: #fafbfc;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+        .dashboard-header {
+            display: flex;
+            gap: 0;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(35,37,38,0.04);
+            border-bottom: 1px solid #ececec;
+            padding: 0 0 0 0;
+        }
+        .dashboard-tab {
+            padding: 18px 36px;
+            font-size: 1rem;
+            font-family: 'DM Sans', 'Inter', Arial, sans-serif;
+            font-weight: 500;
+            color: #232526;
+            background: none;
+            border: none;
+            border-bottom: 2.5px solid transparent;
+            cursor: pointer;
+            transition: all 0.18s cubic-bezier(.4,0,.2,1);
+            min-height: 44px; /* Touch-friendly minimum size */
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        .dashboard-tab.active {
+            border-bottom: 2.5px solid #232526;
+            color: #232526;
+            background: #f6f8fa;
+        }
+        .dashboard-tab:not(.active):hover {
+            background: #f6f8fa;
+        }
+        .dashboard-content {
+            flex: 1;
+            padding: 40px 32px 0 32px;
+            width: 100%;
+            box-sizing: border-box;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .in-progress {
+            text-align: center;
+            color: #888;
+            font-size: 1.2rem;
+            margin-top: 80px;
+            font-family: 'Inter', 'DM Sans', Arial, sans-serif;
+        }
+        
+        /* Colosseum Betting Platform Styles */
+        .betting-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .betting-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #232526;
+        }
+
+        .betting-controls {
+            display: flex;
+                gap: 12px;
+            align-items: center;
+        }
+
+        .betting-info {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .betting-info p {
+            margin: 0;
+            color: #475569;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            font-family: 'Inter', 'DM Sans', Arial, sans-serif;
+        }
+
+        .betting-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .betting-filters {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding: 0 4px;
+        }
+        
+        .search-container {
+            width: 100%;
+        }
+        
+        .faction-search-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: 'Inter', 'DM Sans', Arial, sans-serif;
+            background: white;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+        
+        .faction-search-input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .faction-search-input::placeholder {
+            color: #9ca3af;
+        }
+        
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-tab {
+            padding: 10px 20px;
+            border: 1px solid #e5e7eb;
+            background: white;
+            color: #6b7280;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'DM Sans', 'Inter', Arial, sans-serif;
+        }
+        
+        .filter-tab:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+        
+        .filter-tab.active {
+            background: #232526;
+            color: white;
+            border-color: #232526;
+        }
+
+        .betting-stat-card {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(35,37,38,0.04);
+            border: 1px solid #e5e7eb;
+            text-align: center;
+        }
+
+        .betting-stat-card h3 {
+            color: #6b7280;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .betting-stat-card .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #232526;
+        }
+
+        .betting-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .betting-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(35,37,38,0.08);
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .betting-card:hover {
+            box-shadow: 0 8px 32px rgba(35,37,38,0.12);
+            transform: translateY(-4px);
+        }
+
+        .betting-card-header {
+            padding: 14px 18px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-bottom: 1px solid #e2e8f0;
+            position: relative;
+        }
+
+        .betting-card-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #059669, #10b981, #059669);
+        }
+
+        .betting-card-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 6px;
+            letter-spacing: -0.025em;
+        }
+
+        .betting-card-subtitle {
+            font-size: 0.8rem;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .betting-card-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .betting-card-status.active {
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .betting-card-status.finished {
+            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+
+        .betting-card-status.preparing {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        .betting-card-content {
+            padding: 16px 18px;
+        }
+
+        .betting-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .betting-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        }
+
+        .betting-option:hover {
+            border-color: #059669;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.15);
+        }
+
+        .betting-option.selected {
+            border-color: #059669;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
+        }
+
+        .betting-option-left {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .betting-option-name {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 0.9rem;
+            letter-spacing: -0.025em;
+        }
+
+        .betting-option-name a {
+            color: #059669;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .betting-option-name a:hover {
+            color: #047857;
+            text-decoration: none;
+        }
+
+        .betting-option-name a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #047857;
+            transition: width 0.2s ease;
+        }
+
+        .betting-option-name a:hover::after {
+            width: 100%;
+        }
+
+        .betting-option-details {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .betting-option-right {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .betting-odds {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #059669;
+            margin-bottom: 2px;
+            letter-spacing: -0.025em;
+        }
+
+        .betting-returns {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .betting-card-footer {
+            padding: 14px 18px;
+            border-top: 1px solid #e2e8f0;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .betting-volume {
+            font-size: 0.8rem;
+            color: #64748b;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .betting-volume::before {
+            content: '💰';
+            font-size: 1rem;
+        }
+
+        .betting-action-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(5, 150, 105, 0.2);
+            letter-spacing: 0.025em;
+        }
+
+        .betting-action-btn:hover {
+            background: linear-gradient(135deg, #10b981, #059669);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(5, 150, 105, 0.3);
+        }
+
+        .betting-action-btn:disabled {
+            background: linear-gradient(135deg, #9ca3af, #6b7280);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .betting-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .betting-report-link {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .betting-report-link:hover {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            transform: translateY(-1px);
+            text-decoration: none;
+            color: white;
+        }
+
+        .betting-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .betting-modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .betting-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .betting-modal-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #232526;
+        }
+
+        .betting-modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .betting-modal-close:hover {
+            background: #f3f4f6;
+            color: #232526;
+        }
+
+        .betting-form-group {
+            margin-bottom: 16px;
+        }
+
+        .betting-form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #232526;
+            margin-bottom: 8px;
+        }
+
+        .betting-form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .betting-form-input:focus {
+            outline: none;
+            border-color: #059669;
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        }
+
+        .betting-form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .betting-form-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .betting-form-btn-primary {
+            background: linear-gradient(135deg, #059669, #047857);
+            color: white;
+        }
+
+        .betting-form-btn-primary:hover {
+            background: linear-gradient(135deg, #047857, #059669);
+        }
+
+        .betting-form-btn-secondary {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .betting-form-btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .betting-message {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 16px;
+            font-size: 0.9rem;
+            color: #166534;
+        }
+
+        .betting-message.error {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #dc2626;
+        }
+
+        .betting-copy-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .betting-copy-btn:hover {
+            background: #2563eb;
+        }
+
+        .betting-copy-btn:active {
+            transform: scale(0.95);
+        }
+
+        .betting-timer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 6px;
+            margin-top: 8px;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .betting-timer.countdown {
+            animation: pulse 2s infinite;
+        }
+
+        .betting-timer.duration {
+            animation: subtle-glow 3s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(1.02);
+            }
+        }
+
+        @keyframes subtle-glow {
+            0%, 100% {
+                box-shadow: 0 0 0 rgba(5, 150, 105, 0);
+            }
+            50% {
+                box-shadow: 0 0 8px rgba(5, 150, 105, 0.3);
+            }
+        }
+
+        .betting-timer.countdown {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .betting-timer.duration {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .betting-timer.finished {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .betting-timer-icon {
+            font-size: 1rem;
+        }
+
+        @media (max-width: 1200px) {
+            .betting-grid {
+            grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard {
+                height: 100vh;
+                overflow-x: hidden;
+            }
+            
+            .dashboard-header {
+                flex-wrap: wrap;
+                padding: 0;
+            }
+            
+            .dashboard-tab {
+                flex: 1;
+                min-width: 0;
+                padding: 16px 12px;
+                font-size: 0.9rem;
+                text-align: center;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            .dashboard-content {
+                padding: 20px 16px 0 16px;
+                overflow-x: hidden;
+            }
+            
+            .betting-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .betting-header {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+            
+            .betting-controls {
+                width: 100%;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            
+            .betting-filters {
+                gap: 12px;
+            }
+            
+            .faction-search-input {
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+            
+            .filter-tabs {
+                gap: 6px;
+            }
+            
+            .filter-tab {
+                padding: 8px 16px;
+                font-size: 0.8rem;
+            }
+            
+            .betting-controls .btn {
+                font-size: 0.8rem;
+                padding: 8px 12px;
+            }
+            
+            .betting-title {
+                font-size: 1.3rem;
+            }
+            
+            .betting-info {
+                padding: 12px 16px;
+                margin-bottom: 20px;
+            }
+            
+            .betting-info p {
+                font-size: 0.85rem;
+                line-height: 1.4;
+            }
+            
+            .betting-stats {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 12px;
+            }
+            
+            .betting-stat-card {
+                padding: 12px;
+            }
+            
+            .betting-stat-card .value {
+                font-size: 1.3rem;
+            }
+            
+            .betting-card {
+                padding: 16px;
+            }
+            
+            .betting-card-header {
+                padding: 12px 16px;
+            }
+            
+            .betting-card-title {
+                font-size: 0.9rem;
+            }
+            
+            .betting-card-content {
+                padding: 14px 16px;
+            }
+            
+            .betting-option {
+                padding: 10px 12px;
+                flex-direction: column;
+                gap: 10px;
+                align-items: stretch;
+            }
+            
+            .betting-option-left {
+                text-align: center;
+            }
+            
+            .betting-option-right {
+                text-align: center;
+                align-items: center;
+            }
+            
+            .betting-odds {
+                font-size: 1rem;
+            }
+            
+            .betting-card-footer {
+                padding: 12px 16px;
+                flex-direction: column;
+                gap: 10px;
+                align-items: stretch;
+            }
+            
+            .betting-action-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .betting-modal-content {
+                width: 95%;
+                max-width: none;
+                margin: 20px;
+                padding: 20px;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+            
+            .betting-modal-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            
+            .betting-modal-title {
+                font-size: 1.1rem;
+            }
+            
+            .betting-form-actions {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .betting-form-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .betting-form-input {
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .dashboard-tab {
+                padding: 14px 8px;
+                font-size: 0.8rem;
+            }
+            
+            .dashboard-content {
+                padding: 16px 12px 0 12px;
+            }
+            
+            .betting-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .betting-controls .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .betting-stats {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            
+            .betting-stat-card {
+                padding: 10px;
+            }
+            
+            .betting-stat-card .value {
+                font-size: 1.2rem;
+            }
+            
+            .betting-card {
+                padding: 12px;
+            }
+            
+            .betting-card-title {
+                font-size: 1rem;
+            }
+            
+            .betting-modal-content {
+                width: 98%;
+                margin: 10px;
+                padding: 16px;
+            }
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'DM Sans', 'Inter', Arial, sans-serif;
+            min-height: 44px; /* Touch-friendly minimum size */
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #059669, #047857);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #047857, #059669);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        /* War Logs Styles */
+        .warlogs-controls {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .warlogs-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(35,37,38,0.04);
+            border: 1px solid #e5e7eb;
+        }
+
+        .stat-card h3 {
+            color: #6b7280;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #232526;
+        }
+
+        .warlogs-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(35,37,38,0.04);
+            overflow: hidden;
+        }
+
+        .war-card {
+            border-bottom: 1px solid #e5e7eb;
+            padding: 20px;
+            transition: all 0.2s;
+        }
+
+        .war-card:hover {
+            background: #f9fafb;
+        }
+
+        .war-card:last-child {
+            border-bottom: none;
+        }
+
+        .war-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .war-id {
+            font-size: 0.9rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .war-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .war-status.active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .war-status.finished {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .war-status.preparing {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .war-factions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 16px;
+        }
+
+        .war-faction {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .war-faction.winner {
+            border-color: #059669;
+            background: #f0fdf4;
+        }
+
+        .faction-name {
+            font-weight: 600;
+            color: #232526;
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+
+        .faction-score {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #059669;
+            margin-bottom: 4px;
+        }
+
+        .faction-details {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+
+        .war-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 0.85rem;
+            color: #6b7280;
+            flex-wrap: wrap;
+        }
+
+        .war-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .war-factions {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .war-meta {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .warlogs-controls {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            
+            .warlogs-stats {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 12px;
+            }
+            
+            .stat-card {
+                padding: 16px;
+            }
+            
+            .stat-card .value {
+                font-size: 1.5rem;
+            }
+            
+            .war-card {
+                padding: 16px;
+            }
+            
+            .war-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            
+            .war-factions {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .war-meta {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .warlogs-stats {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            
+            .stat-card {
+                padding: 12px;
+            }
+            
+            .stat-card .value {
+                font-size: 1.3rem;
+            }
+            
+            .war-card {
+                padding: 12px;
+            }
+        }
+        
+        /* User Bet Tracking Styles */
+        .user-betting-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .user-betting-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #232526;
+        }
+
+        .user-betting-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .user-bets-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .user-bet-stat-card {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(35,37,38,0.04);
+            border: 1px solid #e5e7eb;
+            text-align: center;
+        }
+
+        .user-bet-stat-card h3 {
+            color: #6b7280;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .user-bet-stat-card .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #232526;
+        }
+
+        .user-bet-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(35,37,38,0.04);
+            border: 1px solid #e5e7eb;
+            margin-bottom: 16px;
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .user-bet-card:hover {
+            box-shadow: 0 4px 16px rgba(35,37,38,0.08);
+            transform: translateY(-1px);
+        }
+
+        .user-bet-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f3f4f6;
+            background: #f8fafc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-bet-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #232526;
+        }
+
+        .user-bet-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .user-bet-status.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .user-bet-status.confirmed {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .user-bet-status.won {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .user-bet-status.lost {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .user-bet-status.paid {
+            background: #f0fdf4;
+            color: #059669;
+        }
+
+        .user-bet-content {
+            padding: 20px;
+        }
+
+        .user-bet-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .user-bet-detail {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .user-bet-detail-label {
+            font-size: 0.8rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .user-bet-detail-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #232526;
+        }
+
+        .user-bet-war-status {
+            margin-top: 16px;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .user-bet-war-status-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .user-bet-war-status-icon {
+            font-size: 1.1rem;
+        }
+
+        .user-bet-war-status-text {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .user-bet-scores {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .user-bet-score-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px;
+            background: #ffffff;
+            border-radius: 6px;
+            border: 1px solid #f3f4f6;
+        }
+
+        .user-bet-score-faction {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-bet-score-name {
+            font-weight: 500;
+            color: #374151;
+            font-size: 0.9rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 120px;
+        }
+
+        .user-bet-score-value {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #f59e0b;
+        }
+
+        .user-faction .user-bet-score-value {
+            color: #059669;
+        }
+
+        .opponent-faction .user-bet-score-value {
+            color: #dc2626;
+        }
+
+        .user-bet-score-progress {
+            flex: 1;
+            max-width: 100px;
+        }
+
+        .user-bet-progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #f3f4f6;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .user-bet-progress-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .user-bet-target {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 8px;
+            background: #eff6ff;
+            border-radius: 4px;
+            border: 1px solid #dbeafe;
+        }
+
+        .user-bet-target-label {
+            font-size: 0.8rem;
+            color: #3b82f6;
+            font-weight: 500;
+        }
+
+        .user-bet-target-value {
+            font-size: 0.8rem;
+            color: #1d4ed8;
+            font-weight: 600;
+        }
+
+        .user-bet-live-timestamp {
+            margin-top: 8px;
+            padding: 4px 8px;
+            background: #f0fdf4;
+            border-radius: 4px;
+            border: 1px solid #bbf7d0;
+            text-align: center;
+        }
+
+        .user-bet-live-timestamp-text {
+            font-size: 0.7rem;
+            color: #059669;
+            font-weight: 500;
+        }
+
+        .user-bet-lead-info {
+            margin-top: 8px;
+            padding: 6px 8px;
+            background: #fef3c7;
+            border-radius: 4px;
+            border: 1px solid #f59e0b;
+            text-align: center;
+        }
+
+        .user-bet-lead-info-text {
+            font-size: 0.8rem;
+            color: #92400e;
+            font-weight: 600;
+        }
+
+        .user-bet-detail-value a {
+            color: #059669;
+            text-decoration: none;
+        }
+
+        .user-bet-detail-value a:hover {
+            text-decoration: underline;
+        }
+
+        .user-bet-payout {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .user-bet-payout-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #166534;
+            margin-bottom: 8px;
+        }
+
+        .user-bet-payout-amount {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #059669;
+        }
+
+        .user-bet-payout-status {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .user-bet-payout-status.paid {
+            color: #059669;
+            font-weight: 600;
+        }
+
+        .user-bet-payout-status.pending {
+            color: #f59e0b;
+            font-weight: 600;
+        }
+
+        .user-bet-message {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 16px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #374151;
+        }
+
+        .user-bet-actions {
+            padding: 16px 20px;
+            border-top: 1px solid #f3f4f6;
+            background: #f8fafc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-bet-time {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+
+        .user-bet-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .user-bet-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .user-bet-btn-primary {
+            background: #059669;
+            color: white;
+        }
+
+        .user-bet-btn-primary:hover {
+            background: #047857;
+        }
+
+        .user-bet-btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .user-bet-btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        .user-bet-btn:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+        }
+
+        .no-bets-message {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+
+        .no-bets-message h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+        }
+
+        .no-bets-message p {
+            font-size: 0.9rem;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .user-betting-header {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+            
+            .user-betting-controls {
+                width: 100%;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            
+            .user-betting-controls .btn {
+                font-size: 0.8rem;
+                padding: 8px 12px;
+            }
+            
+            .user-betting-title {
+                font-size: 1.3rem;
+            }
+            
+            .user-bets-stats {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 12px;
+            }
+            
+            .user-bet-stat-card {
+                padding: 12px;
+            }
+            
+            .user-bet-stat-card .value {
+                font-size: 1.3rem;
+            }
+            
+            .user-bet-card {
+                margin-bottom: 12px;
+            }
+            
+            .user-bet-header {
+                padding: 12px 16px;
+                flex-direction: column;
+                gap: 8px;
+                align-items: flex-start;
+            }
+            
+            .user-bet-title {
+                font-size: 1rem;
+            }
+            
+            .user-bet-details {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .user-bet-actions {
+                flex-direction: column;
+                gap: 12px;
+                align-items: stretch;
+            }
+            
+            .user-bet-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .center-box {
+                max-width: 100%;
+                padding: 16px;
+            }
+            
+            .main-title {
+                font-size: 2rem;
+            }
+            
+
+            
+            .user-betting-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .user-betting-controls .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .user-bets-stats {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            
+            .user-bet-stat-card {
+                padding: 10px;
+            }
+            
+            .user-bet-stat-card .value {
+                font-size: 1.2rem;
+            }
+            
+            .user-bet-header {
+                padding: 10px 12px;
+            }
+            
+            .user-bet-title {
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Bet Tracking Styles */
+        .bet-tracking-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(35,37,38,0.04);
+            border: 1px solid #e5e7eb;
+            margin-top: 24px;
+            overflow: hidden;
+        }
+
+        .bet-tracking-header {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            color: white;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bet-tracking-header h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .bet-tracking-toggle {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .bet-tracking-toggle:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .bet-tracking-content {
+            display: none;
+            padding: 24px;
+        }
+
+        .bet-tracking-content.active {
+            display: block;
+        }
+
+        /* Compact Stats Grid */
+        .compact-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .compact-stat-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .compact-stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .compact-stat-card h4 {
+            font-size: 0.75rem;
+            color: #64748b;
+            font-weight: 500;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .compact-stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .compact-stat-change {
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .compact-stat-change.positive {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .compact-stat-change.negative {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .compact-stat-change.neutral {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        /* Bet Table Styles */
+        .bet-table-container {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .bet-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .bet-table th {
+            background: #f8fafc;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .bet-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+
+        .bet-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .bet-status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .bet-status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .bet-status-confirmed {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .bet-status-won {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .bet-status-lost {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .bet-status-paid {
+            background: #f0fdf4;
+            color: #059669;
+        }
+
+        .bet-amount {
+            font-weight: 600;
+            color: #059669;
+            font-family: 'DM Sans', monospace;
+        }
+
+        .bet-payout {
+            font-weight: 600;
+            color: #7c3aed;
+            font-family: 'DM Sans', monospace;
+        }
+
+        .bet-profit {
+            font-weight: 600;
+            font-family: 'DM Sans', monospace;
+        }
+
+        .bet-profit.positive {
+            color: #059669;
+        }
+
+        .bet-profit.negative {
+            color: #dc2626;
+        }
+
+        .bet-profit.neutral {
+            color: #64748b;
+        }
+
+        .bet-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .bet-action-btn {
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .bet-action-btn.view {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .bet-action-btn.edit {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .bet-action-btn.delete {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .bet-action-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Bet Filters */
+        .bet-filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .bet-filter-select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            background: white;
+            color: #374151;
+            min-width: 120px;
+        }
+
+        .bet-search-input {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            min-width: 200px;
+        }
+
+        .bet-search-input:focus {
+            outline: none;
+            border-color: #059669;
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        }
+
+        .bet-control-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .bet-control-btn.primary {
+            background: #059669;
+            color: white;
+        }
+
+        .bet-control-btn.secondary {
+            background: #f1f5f9;
+            color: #374151;
+        }
+
+        .bet-control-btn.danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .bet-control-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Bet Chart */
+        .bet-chart-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+
+        .bet-chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .bet-chart-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .bet-chart-legend {
+            display: flex;
+            gap: 16px;
+            font-size: 0.8rem;
+        }
+
+        .bet-chart-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .bet-chart-legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        .bet-chart-canvas {
+            width: 100%;
+            height: 200px;
+            background: #f8fafc;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        /* Pulse Animation */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .compact-stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .bet-table {
+                font-size: 0.75rem;
+            }
+            
+            .bet-table th,
+            .bet-table td {
+                padding: 8px 12px;
+            }
+            
+            .bet-filters {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="center-box" id="mainBox">
+        <div class="login-header">
+            <h1 class="main-title">
+                <span class="title-text">Find the best deals in</span>
+                <span class="title-highlight">Torn City Betting</span>
+            </h1>
+            <p class="subtitle">Browse Ranked Wars from active faction wars with real-time odds and live updates.</p>
+            <p class="call-to-action">Betting enthusiasts: Add your API key to access the Colosseum!</p>
+            <p class="info-message">💡 The system uses cached faction data from MongoDB to avoid rate limiting. Your API key is only used for essential Torn City data.</p>
+        </div>
+        
+
+        
+        <div class="login-form">
+            <div class="api-input">
+                <input type="text" id="apiKey" placeholder="Enter Public Torn API KEY" minlength="16" maxlength="64">
+                <button id="connectBtn" onclick="connectAPI()">Connect</button>
+            </div>
+            <div class="error-message" id="errorMsg"></div>
+            <div class="success-message" id="successMsg"></div>
+        </div>
+    </div>
+    <div id="dashboard" class="dashboard" style="display:none;">
+        <div class="dashboard-header">
+            <button class="dashboard-tab active" data-tab="colosseum">Colosseum</button>
+            <button class="dashboard-tab" data-tab="bettracking">Bet Tracking</button>
+        </div>
+        <div class="dashboard-content">
+            <div class="tab-content" id="tab-colosseum">
+                <div class="betting-header">
+                    <div class="betting-title">🏛️ Colosseum Betting</div>
+                    <div class="betting-controls">
+                        <span id="betting-last-updated" style="color: #6b7280; font-size: 0.9rem;"></span>
+                    </div>
+                </div>
+                <div class="betting-info">
+                    <p>💰 <strong>How Betting Works:</strong> Place bets on faction wars using Xanax as currency. Odds are calculated dynamically based on faction strength, historical performance, and current betting volume. Higher odds mean bigger potential returns, but lower probability of winning. Bet amounts are locked once the war starts, and payouts are calculated when the war ends.</p>
+                </div>
+                    
+                <div id="betting-loading" class="inventory-loading">Loading Ranked Wars...</div>
+                <div id="betting-content" style="display:none;">
+                    <div id="betting-stats" class="betting-stats"></div>
+                    <div id="betting-filters" class="betting-filters">
+                        <div class="search-container">
+                            <input type="text" id="faction-search" placeholder="Search faction name..." class="faction-search-input">
+                        </div>
+                        <div class="filter-tabs">
+                            <button class="filter-tab active" data-filter="all">All Wars</button>
+                            <button class="filter-tab" data-filter="active">Active</button>
+                            <button class="filter-tab" data-filter="upcoming">Upcoming</button>
+                            <button class="filter-tab" data-filter="finished">Finished</button>
+                        </div>
+                    </div>
+                    <div id="betting-grid" class="betting-grid"></div>
+                </div>
+                    </div>
+                    
+            <!-- Betting Modal -->
+            <div id="betting-modal" class="betting-modal">
+                <div class="betting-modal-content">
+                    <div class="betting-modal-header">
+                        <div class="betting-modal-title">Place Your Bet</div>
+                        <button class="betting-modal-close" onclick="closeBettingModal()">&times;</button>
+                                </div>
+                    <div id="betting-modal-body">
+                        <!-- Modal content will be populated dynamically -->
+                            </div>
+                        </div>
+                        </div>
+
+
+
+
+            <div class="tab-content" id="tab-bettracking" style="display:none;">
+                <!-- Bet Tracking Header -->
+                <div class="bet-tracking-header">
+                    <h2>🎯 Bet Tracking Dashboard</h2>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <span style="font-size: 0.9rem; color: rgba(255,255,255,0.8);">Auto-tracking active</span>
+                        <div style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: pulse 2s infinite;"></div>
+                    </div>
+                </div>
+                
+                <!-- Compact Stats Grid -->
+                <div class="compact-stats-grid">
+                    <div class="compact-stat-card">
+                        <h4>Total Bets</h4>
+                        <div class="compact-stat-value" id="total-bets">0</div>
+                        <div class="compact-stat-change positive" id="total-bets-change">+0</div>
+                    </div>
+                    <div class="compact-stat-card">
+                        <h4>Volume</h4>
+                        <div class="compact-stat-value" id="total-volume">$0</div>
+                        <div class="compact-stat-change positive" id="volume-change">+$0</div>
+                    </div>
+                    <div class="compact-stat-card">
+                        <h4>Active</h4>
+                        <div class="compact-stat-value" id="active-bets">0</div>
+                        <div class="compact-stat-change neutral" id="active-change">0</div>
+                    </div>
+                    <div class="compact-stat-card">
+                        <h4>Won</h4>
+                        <div class="compact-stat-value" id="won-bets">0</div>
+                        <div class="compact-stat-change positive" id="won-change">+0</div>
+                    </div>
+                    <div class="compact-stat-card">
+                        <h4>Lost</h4>
+                        <div class="compact-stat-value" id="lost-bets">0</div>
+                        <div class="compact-stat-change negative" id="lost-change">+0</div>
+                    </div>
+                    <div class="compact-stat-card">
+                        <h4>Payouts</h4>
+                        <div class="compact-stat-value" id="total-payouts">$0</div>
+                        <div class="compact-stat-change positive" id="payout-change">+$0</div>
+                    </div>
+                    <div class="compact-stat-card">
+                        <h4>Profit</h4>
+                        <div class="compact-stat-value" id="total-profit">$0</div>
+                        <div class="compact-stat-change positive" id="profit-change">+$0</div>
+                    </div>
+                </div>
+
+
+
+                <!-- Bet Filters -->
+                <div class="bet-filters">
+                    <select class="bet-filter-select" id="bet-status-filter">
+                        <option value="">All Statuses</option>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="won">Won</option>
+                        <option value="lost">Lost</option>
+                        <option value="paid">Paid</option>
+                    </select>
+                    
+                    <select class="bet-filter-select" id="bet-war-filter">
+                        <option value="">All Wars</option>
+                    </select>
+                    
+                    <button class="bet-control-btn secondary" onclick="clearBetFilters()">Clear Filters</button>
+                </div>
+
+                <!-- Bet Table -->
+                <div class="bet-table-container">
+                    <table class="bet-table">
+                        <thead>
+                            <tr>
+                                <th>Player</th>
+                                <th>War</th>
+                                <th>Faction</th>
+                                <th>Amount</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                                <th>Payout</th>
+                                <th>Profit</th>
+                                <th>Bet Message</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bet-table-body">
+                            <!-- Bet data will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let apiKey = '';
+        let userData = null;
+        let warLogsData = null;
+        let autoRefreshInterval = null;
+        let isAutoRefreshEnabled = false;
+        
+        // Betting system variables
+        let bettingData = null;
+        let bettingCache = null;
+        let autoRefreshBettingInterval = null;
+        let isAutoRefreshBettingEnabled = false;
+        let selectedBet = null;
+        const XANAX_PRICE = 700000; // $700,000 per Xanax
+        
+        // API-based odds system
+        let oddsAPI = {
+            baseURL: window.location.origin,
+            calculateOdds: null,
+            healthCheck: null
+        };
+        let historicalData = {}; // Historical faction performance data
+        let currentBettingVolume = {}; // Current betting volume data
+        
+        // Filter system
+        let currentFilter = 'all';
+        let currentSearch = '';
+        
+        // Log monitoring system
+        let logMonitoringInterval = null;
+        let lastLogCheck = 0;
+        let processedLogs = new Set(); // Track processed log IDs to avoid duplicates
+
+        function connectAPI() {
+            const apiKeyInput = document.getElementById('apiKey');
+            const errorMsg = document.getElementById('errorMsg');
+            const successMsg = document.getElementById('successMsg');
+            
+            apiKey = apiKeyInput.value.trim();
+            
+            if (!apiKey) {
+                errorMsg.textContent = 'Please enter your API key';
+                return;
+            }
+            
+            if (apiKey.length < 16) {
+                errorMsg.textContent = 'API key must be at least 16 characters';
+                return;
+            }
+            
+            errorMsg.textContent = '';
+            successMsg.textContent = 'Connecting...';
+            
+            // Test the API key by fetching user data
+            fetch(`https://api.torn.com/user/?selections=profile&key=${apiKey}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        // Handle specific rate limiting error
+                        if (data.error.error && data.error.error.includes('Too many requests')) {
+                            throw new Error('Rate limit exceeded. Please wait a few minutes before trying again.');
+                        }
+                        throw new Error(data.error.error);
+                    }
+                    
+                    userData = data;
+                    successMsg.textContent = 'Connected successfully!';
+                    
+                    // Show dashboard after a short delay
+                    setTimeout(() => {
+                        document.getElementById('mainBox').style.display = 'none';
+                        document.getElementById('dashboard').style.display = 'flex';
+                        
+                        // Start log monitoring
+                        startLogMonitoring();
+                        
+                        // Automatically load betting interface since Colosseum tab is active by default
+                        loadBettingInterface();
+                        
+                        // Enable automatic refresh for betting data
+                        startAutoRefreshBetting();
+                        
+                        // Enable automatic refresh for user bets
+                        startAutoRefreshUserBets();
+                    }, 1000);
+                })
+                .catch(error => {
+                    // Provide helpful error messages for rate limiting
+                    if (error.message.includes('Too many requests') || error.message.includes('Rate limit')) {
+                        errorMsg.textContent = 'Rate limit exceeded. The system will use cached data from MongoDB instead.';
+                        successMsg.textContent = 'Using local data...';
+                        
+                        // Still show dashboard but with cached data
+                        setTimeout(() => {
+                            document.getElementById('mainBox').style.display = 'none';
+                            document.getElementById('dashboard').style.display = 'flex';
+                            
+                            // Load betting interface with cached data
+                            loadBettingInterface();
+                        }, 1000);
+                    } else {
+                        errorMsg.textContent = `Error: ${error.message}`;
+                        successMsg.textContent = '';
+                    }
+                });
+        }
+
+        // Handle Enter key in API key input
+        document.getElementById('apiKey').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                connectAPI();
+            }
+        });
+        
+
+
+        // Tab switching functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.dashboard-tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const targetTab = this.getAttribute('data-tab');
+                    
+                    // Remove active class from all tabs and contents
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(content => content.style.display = 'none');
+                    
+                    // Add active class to clicked tab and show corresponding content
+                    this.classList.add('active');
+                    document.getElementById(`tab-${targetTab}`).style.display = 'block';
+                    
+                    // Load data when switching to tabs
+                    if (targetTab === 'colosseum' && apiKey) {
+                        loadBettingInterface();
+                    } else if (targetTab === 'bettracking' && apiKey) {
+                        loadBetData();
+                    }
+                });
+            });
+            
+            // Filter tab functionality
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('filter-tab')) {
+                    const filterTabs = document.querySelectorAll('.filter-tab');
+                    filterTabs.forEach(tab => tab.classList.remove('active'));
+                    e.target.classList.add('active');
+                    
+                    currentFilter = e.target.getAttribute('data-filter');
+                    displayFilteredBettingCards();
+                }
+            });
+            
+            // Search functionality
+            const searchInput = document.getElementById('faction-search');
+            if (searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    currentSearch = e.target.value;
+                    displayFilteredBettingCards();
+                });
+            }
+        });
+
+        // War Logs Functions
+        async function fetchWarLogs() {
+            if (!apiKey) {
+                console.error('No API key available');
+                return;
+            }
+
+            const loadingEl = document.getElementById('warlogs-loading');
+            const contentEl = document.getElementById('warlogs-content');
+            
+            loadingEl.style.display = 'block';
+            contentEl.style.display = 'none';
+
+            try {
+                const response = await fetch(`https://api.torn.com/torn/?selections=rankedwars&key=${apiKey}`);
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error.error);
+                }
+
+                warLogsData = data.rankedwars;
+                displayWarLogs();
+                updateLastUpdated();
+                
+            } catch (error) {
+                console.error('Error fetching war logs:', error);
+                loadingEl.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        function displayWarLogs() {
+            const loadingEl = document.getElementById('warlogs-loading');
+            const contentEl = document.getElementById('warlogs-content');
+            const statsEl = document.getElementById('warlogs-stats');
+            const containerEl = document.getElementById('warlogs-container');
+
+            loadingEl.style.display = 'none';
+            contentEl.style.display = 'block';
+
+            if (!warLogsData || Object.keys(warLogsData).length === 0) {
+                containerEl.innerHTML = '<div style="text-align: center; padding: 40px; color: #6b7280;">No war data available</div>';
+                return;
+            }
+            
+            // Display statistics
+            displayWarStats();
+
+            // Display war cards
+            const wars = Object.entries(warLogsData)
+                .sort(([,a], [,b]) => parseInt(b.war.start) - parseInt(a.war.start));
+
+            containerEl.innerHTML = wars.map(([warId, war]) => createWarCard(warId, war)).join('');
+        }
+
+        function displayWarStats() {
+            const statsEl = document.getElementById('warlogs-stats');
+            const wars = Object.values(warLogsData || {});
+
+            const stats = {
+                total: wars.length,
+                active: wars.filter(war => war.war.winner === 0).length,
+                finished: wars.filter(war => war.war.winner !== 0).length,
+                totalTarget: wars.reduce((sum, war) => sum + (war.war.target || 0), 0),
+                totalScore: wars.reduce((sum, war) => {
+                    const factionIds = Object.keys(war.factions);
+                    return sum + (war.factions[factionIds[0]]?.score || 0) + (war.factions[factionIds[1]]?.score || 0);
+                }, 0)
+            };
+
+            statsEl.innerHTML = `
+                <div class="stat-card">
+                    <h3>Total Wars</h3>
+                    <div class="value">${stats.total}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Active Wars</h3>
+                    <div class="value">${stats.active}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Finished Wars</h3>
+                    <div class="value">${stats.finished}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Lead Target</h3>
+                    <div class="value">${stats.totalTarget.toLocaleString()}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Score</h3>
+                    <div class="value">${stats.totalScore.toLocaleString()}</div>
+                </div>
+            `;
+        }
+
+        function createWarCard(warId, war) {
+            const status = getWarStatus(war.war.winner);
+            const startTime = formatTimestamp(war.war.start);
+            const endTime = war.war.end ? formatTimestamp(war.war.end) : 'N/A';
+            const target = war.war.target;
+            
+            // Get faction data
+            const factionIds = Object.keys(war.factions);
+            const faction1 = war.factions[factionIds[0]];
+            const faction2 = war.factions[factionIds[1]];
+            
+            const winner = getWinner(war);
+
+            return `
+                <div class="war-card">
+                    <div class="war-header">
+                        <div class="war-id">War #${warId}</div>
+                        <span class="war-status ${status.class}">${status.text}</span>
+                    </div>
+                    
+                    <div class="war-factions">
+                        <div class="war-faction ${winner === faction1.name ? 'winner' : ''}">
+                            <div class="faction-name">${faction1.name || 'Unknown Faction'}</div>
+                            <div class="faction-score">${faction1.score || 0}</div>
+                            <div class="faction-details">
+                                Chain: ${faction1.chain || 0} | Faction ID: <a href="https://www.torn.com/factions.php?step=profile&ID=${factionIds[0]}" target="_blank" style="color: #059669; text-decoration: none;">${factionIds[0]}</a>
+                            </div>
+                        </div>
+                        
+                        <div class="war-faction ${winner === faction2.name ? 'winner' : ''}">
+                            <div class="faction-name">${faction2.name || 'Unknown Faction'}</div>
+                            <div class="faction-score">${faction2.score || 0}</div>
+                            <div class="faction-details">
+                                Chain: ${faction2.chain || 0} | Faction ID: <a href="https://www.torn.com/factions.php?step=profile&ID=${factionIds[1]}" target="_blank" style="color: #059669; text-decoration: none;">${factionIds[1]}</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="war-meta">
+                        <div class="war-meta-item">
+                            <span>🏁 Start:</span>
+                            <span>${startTime}</span>
+                        </div>
+                        <div class="war-meta-item">
+                            <span>🎯 Lead Target:</span>
+                            <span>${target.toLocaleString()}</span>
+                        </div>
+                        <div class="war-meta-item">
+                            <span>🏁 End:</span>
+                            <span>${endTime}</span>
+                        </div>
+                        <div class="war-meta-item">
+                            <span>🏆 Winner:</span>
+                            <span>${winner}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getWarStatus(winner) {
+            if (winner === 0) {
+                return { text: 'Active', class: 'active' };
+            } else {
+                return { text: 'Finished', class: 'finished' };
+            }
+        }
+
+        function getWinner(war) {
+            if (war.war.winner === 0) return 'N/A';
+            
+            const factionIds = Object.keys(war.factions);
+            const faction1 = war.factions[factionIds[0]];
+            const faction2 = war.factions[factionIds[1]];
+            
+            if (war.war.winner === parseInt(factionIds[0])) {
+                return faction1.name || 'Faction 1';
+            } else if (war.war.winner === parseInt(factionIds[1])) {
+                return faction2.name || 'Faction 2';
+            } else {
+                return 'Unknown';
+            }
+        }
+
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return 'N/A';
+            
+            const date = new Date(parseInt(timestamp));
+            
+            // Format with user's local timezone
+            const options = {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                timeZoneName: 'short'
+            };
+            
+            return date.toLocaleString(undefined, options);
+        }
+
+        function updateLastUpdated() {
+            const lastUpdatedEl = document.getElementById('last-updated');
+            const now = new Date();
+            
+            // Format with user's local timezone
+            const options = {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                timeZoneName: 'short'
+            };
+            
+            lastUpdatedEl.textContent = `Last updated: ${now.toLocaleString(undefined, options)}`;
+        }
+
+        function toggleAutoRefresh() {
+            const toggleBtn = document.getElementById('auto-refresh-toggle');
+            
+            if (isAutoRefreshEnabled) {
+                // Disable auto refresh
+                if (autoRefreshInterval) {
+                    clearInterval(autoRefreshInterval);
+                    autoRefreshInterval = null;
+                }
+                isAutoRefreshEnabled = false;
+                toggleBtn.textContent = '▶️ Auto Refresh';
+            } else {
+                // Enable auto refresh
+                autoRefreshInterval = setInterval(fetchWarLogs, 30000); // Refresh every 30 seconds
+                isAutoRefreshEnabled = true;
+                toggleBtn.textContent = '⏸️ Auto Refresh';
+            }
+        }
+
+        // Betting Cache System
+        class BettingCache {
+            constructor() {
+                this.cacheKey = 'tornBettingData';
+                this.cacheDuration = 5 * 60 * 1000; // 5 minutes
+            }
+
+            save(data) {
+                const cacheData = {
+                    data: data,
+                    timestamp: Date.now(),
+                    version: '1.0'
+                };
+                
+                try {
+                    localStorage.setItem(this.cacheKey, JSON.stringify(cacheData));
+                    console.log('Betting data cached successfully');
+                } catch (error) {
+                    console.error('Error saving betting cache:', error);
+                }
+            }
+
+            load() {
+                try {
+                    const stored = localStorage.getItem(this.cacheKey);
+                    if (!stored) return null;
+
+                    const parsed = JSON.parse(stored);
+                    const age = Date.now() - parsed.timestamp;
+
+                    if (age < this.cacheDuration) {
+                        console.log('Using cached betting data');
+                        return parsed.data;
+                    } else {
+                        console.log('Cached betting data expired, fetching fresh data');
+                        return null;
+                    }
+            } catch (error) {
+                    console.error('Error loading cached betting data:', error);
+                    return null;
+                }
+            }
+
+            clear() {
+                localStorage.removeItem(this.cacheKey);
+            }
+
+            isValid() {
+                const stored = localStorage.getItem(this.cacheKey);
+                if (!stored) return false;
+
+                try {
+                    const parsed = JSON.parse(stored);
+                    const age = Date.now() - parsed.timestamp;
+                    return age < this.cacheDuration;
+                } catch {
+                    return false;
+                }
+            }
+        }
+
+        // Initialize betting cache
+        bettingCache = new BettingCache();
+        
+        // Initialize API-based odds calculation
+        initializeOddsAPI();
+        
+        // Initialize sample historical data
+        initializeHistoricalData();
+        
+        // Initialize sample betting volume data
+        initializeBettingVolumeData();
+        
+        // Initialize API-based odds calculation
+        function initializeOddsAPI() {
+            // Calculate odds between two factions using the API
+            oddsAPI.calculateOdds = async function(faction1Id, faction2Id) {
+                try {
+                    const response = await fetch(`${this.baseURL}/api/odds/calculate`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            faction1Id: faction1Id.toString(),
+                            faction2Id: faction2Id.toString()
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    if (!data.success) {
+                        throw new Error(data.error || 'Failed to calculate odds');
+                    }
+                    
+                    return data.odds;
+                } catch (error) {
+                    console.error('Error calculating odds:', error);
+                    // Return fallback odds if API fails
+                    return {
+                        [faction1Id]: 50,
+                        [faction2Id]: 50,
+                        metadata: {
+                            confidence: 0,
+                            timestamp: new Date(),
+                            fallback: true
+                        }
+                    };
+                }
+            };
+            
+            // Health check for the odds engine
+            oddsAPI.healthCheck = async function() {
+                try {
+                    const response = await fetch(`${this.baseURL}/api/odds/health`);
+                    const data = await response.json();
+                    return data.success ? data.health : null;
+                } catch (error) {
+                    console.error('Error checking odds engine health:', error);
+                    return null;
+                }
+            };
+            
+            console.log('Odds API initialized');
+        }
+        
+        // Initialize sample historical data for factions
+        function initializeHistoricalData() {
+            const sampleFactions = [
+                { id: 1, name: "Bloodbath and Beyond" },
+                { id: 2, name: "Ara Pacis" },
+                { id: 3, name: "Nuclear Blast" },
+                { id: 4, name: "FLATLINE" },
+                { id: 5, name: "Leeches" },
+                { id: 6, name: "Premature Attackulation" },
+                { id: 7, name: "New Sith Order" },
+                { id: 8, name: "Naughty Souls" },
+                { id: 9, name: "LaFamilia" },
+                { id: 10, name: "Duck Around & Find Out" },
+                { id: 11, name: "Mana" },
+                { id: 12, name: "Golden Jackals" },
+                { id: 13, name: "The Shogunate" },
+                { id: 14, name: "The Classroom" },
+                { id: 15, name: "The Cut" },
+                { id: 16, name: "New Beginning" },
+                { id: 17, name: "NBA 4KT" },
+                { id: 18, name: "Lost Shinobi" },
+                { id: 19, name: "CottonTail Crew - Origin" },
+                { id: 20, name: "Battlefield Angels" }
+            ];
+            
+            sampleFactions.forEach(faction => {
+                historicalData[faction.id] = {
+                    winRate: Math.random() * 0.4 + 0.3, // 30-70% win rate
+                    avgScore: Math.random() * 5000 + 2000, // 2000-7000 avg score
+                    avgScoreBaseline: 4000, // Baseline for comparison
+                    totalWars: Math.floor(Math.random() * 50) + 10, // 10-60 total wars
+                    recentPerformance: Math.random() * 0.6 + 0.2 // 20-80% recent performance
+                };
+            });
+        }
+        
+        // Initialize sample betting volume data
+        function initializeBettingVolumeData() {
+            // This would normally come from the backend
+            // For now, create sample volume data
+            currentBettingVolume = {
+                // Sample war volumes
+                "28339": {
+                    "46166": Math.floor(Math.random() * 1000000) + 50000,
+                    "49862": Math.floor(Math.random() * 1000000) + 50000
+                },
+                "28340": {
+                    "22631": Math.floor(Math.random() * 1000000) + 50000,
+                    "51197": Math.floor(Math.random() * 1000000) + 50000
+                }
+            };
+        }
+
+        // Betting System Functions
+        async function loadBettingInterface() {
+            if (!apiKey) {
+                console.error('No API key available');
+                return;
+            }
+
+            const loadingEl = document.getElementById('betting-loading');
+            const contentEl = document.getElementById('betting-content');
+            
+            // Try to load from cache first
+            const cachedData = bettingCache.load();
+            if (cachedData) {
+                bettingData = cachedData;
+                displayBettingInterface();
+                updateBettingLastUpdated();
+                loadingEl.style.display = 'none';
+                contentEl.style.display = 'block';
+            }
+            
+            loadingEl.style.display = 'block';
+            contentEl.style.display = 'none';
+
+            try {
+                // Fetch ranked wars data
+                const warsResponse = await fetch(`https://api.torn.com/torn/?selections=rankedwars&key=${apiKey}`);
+                const warsData = await warsResponse.json();
+
+                if (warsData.error) {
+                    throw new Error(warsData.error.error);
+                }
+
+                // Fetch enhanced faction data (chain, respect, rank) for all factions in the wars
+                const factionEnhancedData = await fetchFactionChainData(warsData.rankedwars, apiKey);
+
+                // Transform war data into betting format with enhanced faction data
+                bettingData = await transformWarDataToBetting(warsData.rankedwars, factionEnhancedData);
+                
+                // Cache the data
+                bettingCache.save(bettingData);
+                
+                displayBettingInterface();
+                updateBettingLastUpdated();
+                
+            } catch (error) {
+                console.error('Error fetching betting data:', error);
+                loadingEl.textContent = `Error: ${error.message}`;
+                
+                // If fetch failed but we have cached data, show it
+                if (cachedData) {
+                    bettingData = cachedData;
+                    displayBettingInterface();
+                    updateBettingLastUpdated();
+                    loadingEl.style.display = 'none';
+                    contentEl.style.display = 'block';
+                }
+            }
+        }
+
+        async function fetchFactionChainData(warData, apiKey) {
+            const factionEnhancedData = {};
+            const uniqueFactionIds = new Set();
+            
+            // Collect all unique faction IDs from wars
+            Object.values(warData || {}).forEach(war => {
+                Object.keys(war.factions).forEach(factionId => {
+                    uniqueFactionIds.add(factionId);
+                });
+            });
+            
+            // Fetch MongoDB faction data (respect, rank, etc.)
+            let mongoFactionData = {};
+            try {
+                console.log('Fetching faction data from MongoDB...');
+                const mongoResponse = await fetch('/api/factions');
+                const mongoResult = await mongoResponse.json();
+                
+                if (mongoResult.success) {
+                    mongoFactionData = mongoResult.data;
+                    console.log(`Loaded ${Object.keys(mongoFactionData).length} factions from MongoDB`);
+                } else {
+                    console.warn('Failed to fetch MongoDB faction data:', mongoResult.error);
+                }
+            } catch (error) {
+                console.warn('Error fetching MongoDB faction data:', error);
+            }
+            
+            // Fetch chain data for each faction from Torn API
+            const fetchPromises = Array.from(uniqueFactionIds).map(async (factionId) => {
+                try {
+                    const response = await fetch(`https://api.torn.com/faction/${factionId}?selections=chain&key=${apiKey}`);
+                    const data = await response.json();
+                    
+                    if (data.error) {
+                        console.warn(`Error fetching chain data for faction ${factionId}:`, data.error);
+                        return { factionId, chain: 0, respect: null, rank: null };
+                    }
+                    
+                    // Get MongoDB data for this faction
+                    const mongoData = mongoFactionData[factionId] || {};
+                    
+                    return { 
+                        factionId, 
+                        chain: data.chain?.current || 0,
+                        respect: mongoData.respect || null,
+                        rank: mongoData.rank || null,
+                        members: mongoData.members || null,
+                        position: mongoData.position || null
+                    };
+                } catch (error) {
+                    console.warn(`Failed to fetch chain data for faction ${factionId}:`, error);
+                    
+                    // Still try to get MongoDB data even if chain fetch fails
+                    const mongoData = mongoFactionData[factionId] || {};
+                    return { 
+                        factionId, 
+                        chain: 0,
+                        respect: mongoData.respect || null,
+                        rank: mongoData.rank || null,
+                        members: mongoData.members || null,
+                        position: mongoData.position || null
+                    };
+                }
+            });
+            
+            // Wait for all requests to complete
+            const results = await Promise.all(fetchPromises);
+            
+            // Convert to lookup object with enhanced data
+            results.forEach(({ factionId, chain, respect, rank, members, position }) => {
+                factionEnhancedData[factionId] = {
+                    chain,
+                    respect,
+                    rank,
+                    members,
+                    position
+                };
+            });
+            
+            console.log('Fetched enhanced faction data:', factionEnhancedData);
+            console.log('Total factions with enhanced data:', Object.keys(factionEnhancedData).length);
+            console.log('Sample enhanced data:', Object.entries(factionEnhancedData).slice(0, 3));
+            
+            // Log factions with respect data
+            const factionsWithRespect = Object.entries(factionEnhancedData)
+                .filter(([id, data]) => data.respect !== null)
+                .length;
+            console.log(`Factions with respect data: ${factionsWithRespect}/${Object.keys(factionEnhancedData).length}`);
+            
+            return factionEnhancedData;
+        }
+
+        async function transformWarDataToBetting(warData, factionEnhancedData = {}) {
+            const bettingMarkets = [];
+            
+            // Create 20 sample factions for prototype
+            const sampleFactions = [
+                { id: 1, name: "Bloodbath and Beyond", score: 8145, chain: 621 },
+                { id: 2, name: "Ara Pacis", score: 3266, chain: 368 },
+                { id: 3, name: "Nuclear Blast", score: 5212, chain: 522 },
+                { id: 4, name: "FLATLINE", score: 5065, chain: 0 },
+                { id: 5, name: "Leeches", score: 9791, chain: 528 },
+                { id: 6, name: "Premature Attackulation", score: 3043, chain: 0 },
+                { id: 7, name: "New Sith Order", score: 9423, chain: 801 },
+                { id: 8, name: "Naughty Souls", score: 1328, chain: 4 },
+                { id: 9, name: "LaFamilia", score: 4943, chain: 0 },
+                { id: 10, name: "Duck Around & Find Out", score: 1582, chain: 0 },
+                { id: 11, name: "Mana", score: 3031, chain: 0 },
+                { id: 12, name: "Golden Jackals", score: 1623, chain: 0 },
+                { id: 13, name: "The Shogunate", score: 1143, chain: 200 },
+                { id: 14, name: "The Classroom", score: 90, chain: 0 },
+                { id: 15, name: "The Cut", score: 2300, chain: 0 },
+                { id: 16, name: "New Beginning", score: 465, chain: 1 },
+                { id: 17, name: "NBA 4KT", score: 64, chain: 0 },
+                { id: 18, name: "Lost Shinobi", score: 1170, chain: 0 },
+                { id: 19, name: "CottonTail Crew - Origin", score: 1951, chain: 0 },
+                { id: 20, name: "Battlefield Angels", score: 1441, chain: 0 }
+            ];
+
+            // Create Ranked Wars from real war data with actual chain data
+            for (const [warId, war] of Object.entries(warData || {})) {
+                const factionIds = Object.keys(war.factions);
+                const faction1 = war.factions[factionIds[0]];
+                const faction2 = war.factions[factionIds[1]];
+                
+                // Get enhanced faction data (chain, respect, rank, etc.)
+                const faction1Enhanced = factionEnhancedData[factionIds[0]] || { chain: 0, respect: null, rank: null, members: null, position: null };
+                const faction2Enhanced = factionEnhancedData[factionIds[1]] || { chain: 0, respect: null, rank: null, members: null, position: null };
+                
+                // Log enhanced data usage for debugging
+                console.log(`War ${warId}: Faction ${factionIds[0]} - Chain: ${faction1Enhanced.chain}, Respect: ${faction1Enhanced.respect?.toLocaleString() || 'N/A'}, Rank: ${faction1Enhanced.rank || 'N/A'}`);
+                console.log(`War ${warId}: Faction ${factionIds[1]} - Chain: ${faction2Enhanced.chain}, Respect: ${faction2Enhanced.respect?.toLocaleString() || 'N/A'}, Rank: ${faction2Enhanced.rank || 'N/A'}`);
+                
+                
+                // Create war data with enhanced faction information
+                const warDataWithEnhancedInfo = {
+                    id: warId,
+                    factions: {
+                        [factionIds[0]]: { ...faction1, ...faction1Enhanced },
+                        [factionIds[1]]: { ...faction2, ...faction2Enhanced }
+                    },
+                    war: war.war
+                };
+                
+                // Calculate odds using the new API-based system
+                const calculatedOdds = await oddsAPI.calculateOdds(factionIds[0], factionIds[1]);
+                const odds1 = calculatedOdds[factionIds[0]] || 50;
+                const odds2 = calculatedOdds[factionIds[1]] || 50;
+                
+                // Determine actual status based on current time and war state
+                const now = Math.floor(Date.now() / 1000);
+                let actualStatus;
+                if (war.war.winner !== 0) {
+                    actualStatus = 'finished';
+                } else if (war.war.start > now) {
+                    actualStatus = 'preparing';
+                } else {
+                    actualStatus = 'active';
+                }
+                
+                bettingMarkets.push({
+                    id: warId,
+                    title: `War #${warId}`,
+                    subtitle: `Lead Target: ${war.war.target.toLocaleString()}`,
+                    status: actualStatus,
+                    startTime: war.war.start,
+                    endTime: war.war.end || 0,
+                    target: war.war.target,
+                    winner: war.war.winner,
+                    options: [
+                        {
+                            id: factionIds[0],
+                            name: faction1.name,
+                            score: faction1.score,
+                            chain: faction1Enhanced.chain,
+                            respect: faction1Enhanced.respect,
+                            rank: faction1Enhanced.rank,
+                            members: faction1Enhanced.members,
+                            position: faction1Enhanced.position,
+                            odds: odds1,
+                            volume: 0
+                        },
+                        {
+                            id: factionIds[1],
+                            name: faction2.name,
+                            score: faction2.score,
+                            chain: faction2Enhanced.chain,
+                            respect: faction2Enhanced.respect,
+                            rank: faction2Enhanced.rank,
+                            members: faction2Enhanced.members,
+                            position: faction2Enhanced.position,
+                            odds: odds2,
+                            volume: 0
+                        }
+                    ],
+                    totalVolume: 0
+                });
+            }
+
+            // Add some sample Ranked Wars if we don't have enough real wars
+            while (bettingMarkets.length < 12) {
+                const index = bettingMarkets.length;
+                const faction1 = sampleFactions[index * 2];
+                const faction2 = sampleFactions[index * 2 + 1];
+                
+                // Calculate sophisticated odds using the odds engine
+                const sampleWarData = {
+                    id: `sample_${index}`,
+                    factions: {
+                        [faction1.id]: faction1,
+                        [faction2.id]: faction2
+                    },
+                    war: {
+                        start: startTime,
+                        end: endTime,
+                        target: Math.floor(Math.random() * 10000 + 2000),
+                        winner: status === 'finished' ? (Math.random() > 0.5 ? faction1.id : faction2.id) : 0
+                    }
+                };
+                
+                // Generate random odds for sample data (no API call needed)
+                const odds1 = Math.floor(Math.random() * 60) + 20; // 20-80%
+                const odds2 = 100 - odds1; // Ensure they add up to 100%
+                
+                // Create a mix of preparing, active, and finished wars
+                let status, startTime, endTime;
+                const random = Math.random();
+                
+                if (random < 0.4) {
+                    // Preparing war (40% chance) - ensure future start time
+                    status = 'preparing';
+                    startTime = Math.floor(Date.now() / 1000) + Math.floor(Math.random() * 7200) + 300; // 5 minutes to 2 hours from now
+                    endTime = 0;
+                } else if (random < 0.8) {
+                    // Active war (40% chance) - ensure past start time
+                    status = 'active';
+                    startTime = Math.floor(Date.now() / 1000) - Math.floor(Math.random() * 3600) - 60; // Started 1 minute to 1 hour ago
+                    endTime = 0;
+                } else {
+                    // Finished war (20% chance) - ensure past start and end times
+                    status = 'finished';
+                    startTime = Math.floor(Date.now() / 1000) - Math.floor(Math.random() * 86400) - 3600; // Started 1-24 hours ago
+                    endTime = startTime + Math.floor(Math.random() * 7200) + 1800; // Lasted 30 minutes to 2 hours
+                }
+                
+                bettingMarkets.push({
+                    id: `sample_${index}`,
+                    title: `Sample War #${index + 1}`,
+                    subtitle: `Lead Target: ${(Math.random() * 10000 + 2000).toFixed(0)}`,
+                    status: status,
+                    startTime: startTime,
+                    endTime: endTime,
+                    target: Math.floor(Math.random() * 10000 + 2000),
+                    winner: status === 'finished' ? (Math.random() > 0.5 ? faction1.id : faction2.id) : 0,
+                    options: [
+                        {
+                            id: faction1.id,
+                            name: faction1.name,
+                            score: faction1.score,
+                            chain: faction1.chain,
+                            odds: odds1,
+                            volume: 0
+                        },
+                        {
+                            id: faction2.id,
+                            name: faction2.name,
+                            score: faction2.score,
+                            chain: faction2.chain,
+                            odds: odds2,
+                            volume: 0
+                        }
+                    ],
+                    totalVolume: Math.floor(Math.random() * 5000000) + 100000
+                });
+            }
+
+            return bettingMarkets;
+        }
+
+        function displayBettingInterface() {
+            const loadingEl = document.getElementById('betting-loading');
+            const contentEl = document.getElementById('betting-content');
+            const statsEl = document.getElementById('betting-stats');
+            const gridEl = document.getElementById('betting-grid');
+
+            loadingEl.style.display = 'none';
+            contentEl.style.display = 'block';
+
+            if (!bettingData || bettingData.length === 0) {
+                gridEl.innerHTML = '<div style="text-align: center; padding: 40px; color: #6b7280;">No Ranked Wars available</div>';
+                return;
+            }
+
+            // Display statistics
+            displayBettingStats();
+
+            // Display betting cards with current filter
+            displayFilteredBettingCards();
+        }
+        
+        function displayFilteredBettingCards() {
+            const gridEl = document.getElementById('betting-grid');
+            
+            if (!bettingData) return;
+            
+            let filteredData = bettingData;
+            
+            // Apply current filter
+            if (currentFilter !== 'all') {
+                filteredData = bettingData.filter(market => {
+                    if (currentFilter === 'active') {
+                        return market.status === 'active';
+                    } else if (currentFilter === 'upcoming') {
+                        return market.status === 'preparing';
+                    } else if (currentFilter === 'finished') {
+                        return market.status === 'finished';
+                    }
+                    return true;
+                });
+            }
+            
+            // Apply search filter
+            if (currentSearch.trim() !== '') {
+                const searchTerm = currentSearch.toLowerCase().trim();
+                filteredData = filteredData.filter(market => {
+                    return market.options.some(option => 
+                        option.name.toLowerCase().includes(searchTerm)
+                    );
+                });
+            }
+            
+            if (filteredData.length === 0) {
+                let message = 'No Ranked Wars available';
+                if (currentFilter !== 'all') {
+                    message = `No ${currentFilter} Ranked Wars available`;
+                }
+                if (currentSearch.trim() !== '') {
+                    message = `No Ranked Wars found for "${currentSearch}"`;
+                }
+                gridEl.innerHTML = `<div style="text-align: center; padding: 40px; color: #6b7280;">${message}</div>`;
+                return;
+            }
+            
+            gridEl.innerHTML = filteredData.map(market => createBettingCard(market)).join('');
+        }
+
+        function displayBettingStats() {
+            const statsEl = document.getElementById('betting-stats');
+            
+            if (!bettingData) return;
+
+            const stats = {
+                total: bettingData.length,
+                active: bettingData.filter(market => market.status === 'active').length,
+                finished: bettingData.filter(market => market.status === 'finished').length
+            };
+
+            statsEl.innerHTML = `
+                <div class="betting-stat-card">
+                    <h3>Total Wars</h3>
+                    <div class="value">${stats.total}</div>
+                </div>
+                <div class="betting-stat-card">
+                    <h3>Active Wars</h3>
+                    <div class="value">${stats.active}</div>
+                </div>
+                <div class="betting-stat-card">
+                    <h3>Finished Wars</h3>
+                    <div class="value">${stats.finished}</div>
+                </div>
+            `;
+        }
+
+        function createBettingCard(market) {
+            const status = getBettingStatus(market.status);
+            const startTime = formatTimestamp(market.startTime);
+            const timerHtml = generateTimerHtml(market);
+            
+            return `
+                <div class="betting-card" data-market-id="${market.id}">
+                    <div class="betting-card-header">
+                        <div class="betting-card-title">${market.title}</div>
+                        <div class="betting-card-subtitle">
+                            <span>${market.subtitle}</span>
+                            <span class="betting-card-status ${status.class}">${status.text}</span>
+                        </div>
+                        ${timerHtml}
+                    </div>
+                    
+                    <div class="betting-card-content">
+                        <div class="betting-options">
+                            ${market.options.map(option => `
+                                <div class="betting-option" onclick="selectBettingOption('${market.id}', '${option.id}')">
+                                    <div class="betting-option-left">
+                                        <div class="betting-option-name">
+                                            <a href="https://www.torn.com/factions.php?step=profile&ID=${option.id}" target="_blank" onclick="event.stopPropagation()">
+                                                ${option.name}
+                                            </a>
+                                </div>
+                                <div class="betting-option-details">
+                                    Score: ${option.score.toLocaleString()} | Chain: ${option.chain}${option.respect ? ` | Respect: ${option.respect.toLocaleString()}` : ''}${option.rank ? ` | Rank: ${option.rank}` : ''}
+                                </div>
+                        </div>
+                                    <div class="betting-option-right">
+                                        <div class="betting-odds">${option.odds}%</div>
+                                        <div class="betting-returns">$${Math.round(XANAX_PRICE * (100 / option.odds))}</div>
+                    </div>
+                        </div>
+                            `).join('')}
+                    </div>
+            </div>
+                    
+                    <div class="betting-card-footer">
+                        <div class="betting-volume">${market.totalVolume > 0 ? `Volume: $${(market.totalVolume / 1000000).toFixed(1)}M` : 'No bets placed'}</div>
+                        <div class="betting-actions">
+                            ${market.status === 'finished' ? 
+                                `<a href="https://www.torn.com/war.php?step=rankreport&rankID=${market.id}" target="_blank" class="betting-report-link">📊 View Report</a>` : 
+                                canPlaceBet(market) ? 
+                                    `<button class="betting-action-btn" onclick="placeBet('${market.id}')">Place Bet</button>` :
+                                    `<button class="betting-action-btn" disabled>Coming Soon</button>`
+                            }
+                        </div>
+                    </div>
+                    </div>
+                `;
+        }
+
+        function getBettingStatus(status) {
+            switch (status) {
+                case 'active':
+                    return { text: 'Active', class: 'active' };
+                case 'finished':
+                    return { text: 'Finished', class: 'finished' };
+                case 'preparing':
+                    return { text: 'Upcoming', class: 'preparing' };
+                default:
+                    return { text: 'Unknown', class: 'finished' };
+            }
+        }
+
+        function generateTimerHtml(market) {
+            const now = Math.floor(Date.now() / 1000);
+            const startTime = market.startTime;
+            const endTime = market.endTime || 0;
+            
+            // Determine actual status based on current time
+            let actualStatus = market.status;
+            if (market.status === 'preparing' && startTime <= now) {
+                actualStatus = 'active';
+            }
+            
+            if (actualStatus === 'finished') {
+                const duration = endTime > startTime ? endTime - startTime : 0;
+                return `
+                    <div class="betting-timer finished">
+                        <span class="betting-timer-icon">🏁</span>
+                        <span>${formatDuration(duration)}</span>
+                    </div>
+                `;
+            } else if (actualStatus === 'active') {
+                const duration = now - startTime;
+                return `
+                    <div class="betting-timer duration" data-start-time="${startTime}">
+                        <span class="betting-timer-icon">⏱️</span>
+                        <span class="timer-text">${formatDuration(duration)}</span>
+                    </div>
+                `;
+            } else {
+                // Preparing - countdown to start
+                const timeUntilStart = startTime - now;
+                if (timeUntilStart > 0) {
+                    return `
+                        <div class="betting-timer countdown" data-start-time="${startTime}">
+                            <span class="betting-timer-icon">⏳</span>
+                            <span class="timer-text">${formatCountdown(timeUntilStart)}</span>
+                        </div>
+                    `;
+                } else {
+                    // Should be active but marked as preparing
+                    const duration = Math.abs(now - startTime);
+                    return `
+                        <div class="betting-timer duration" data-start-time="${startTime}">
+                            <span class="betting-timer-icon">⏱️</span>
+                            <span class="timer-text">${formatDuration(duration)}</span>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        function formatDuration(seconds) {
+            if (seconds < 60) {
+                return `${seconds}s`;
+            } else if (seconds < 3600) {
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                return `${minutes}m ${remainingSeconds}s`;
+            } else if (seconds < 86400) {
+                const hours = Math.floor(seconds / 3600);
+                const minutes = Math.floor((seconds % 3600) / 60);
+                const remainingSeconds = seconds % 60;
+                return `${hours}h ${minutes}m ${remainingSeconds}s`;
+            } else {
+                const days = Math.floor(seconds / 86400);
+                const hours = Math.floor((seconds % 86400) / 3600);
+                const minutes = Math.floor((seconds % 3600) / 60);
+                return `${days}d ${hours}h ${minutes}m`;
+            }
+        }
+
+        function formatCountdown(seconds) {
+            if (seconds < 60) {
+                return `${seconds}s`;
+            } else if (seconds < 3600) {
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                return `${minutes}m ${remainingSeconds}s`;
+            } else if (seconds < 86400) {
+                const hours = Math.floor(seconds / 3600);
+                const minutes = Math.floor((seconds % 3600) / 60);
+                const remainingSeconds = seconds % 60;
+                return `${hours}h ${minutes}m ${remainingSeconds}s`;
+                    } else {
+                const days = Math.floor(seconds / 86400);
+                const hours = Math.floor((seconds % 86400) / 3600);
+                const minutes = Math.floor((seconds % 3600) / 60);
+                return `${days}d ${hours}h ${minutes}m`;
+            }
+        }
+
+        function selectBettingOption(marketId, optionId) {
+            // Remove previous selections
+            document.querySelectorAll('.betting-option.selected').forEach(el => {
+                el.classList.remove('selected');
+            });
+            
+            // Add selection to clicked option
+            const optionEl = document.querySelector(`[onclick="selectBettingOption('${marketId}', '${optionId}')"]`);
+            if (optionEl) {
+                optionEl.classList.add('selected');
+            }
+        }
+
+        function placeBet(marketId) {
+            const market = bettingData.find(m => m.id === marketId);
+            if (!market || !canPlaceBet(market)) return;
+
+            selectedBet = { marketId, market };
+            openBettingModal();
+        }
+
+        function openBettingModal() {
+            const modal = document.getElementById('betting-modal');
+            const modalBody = document.getElementById('betting-modal-body');
+            
+            if (!selectedBet) return;
+
+            const { market, marketId } = selectedBet;
+            
+            modalBody.innerHTML = `
+                <div class="betting-message">
+                    Minimum bet: 1 Xanax ($${XANAX_PRICE.toLocaleString()})
+                    ${market.status === 'preparing' ? '<br>⏰ This war starts soon - bet will be active when war begins!' : ''}
+                </div>
+                
+                <div class="betting-form-group">
+                    <label class="betting-form-label">Select Faction:</label>
+                    <select id="betting-faction-select" class="betting-form-input">
+                        ${market.options.map(option => `
+                            <option value="${option.id}">${option.name} (${option.odds}%)</option>
+                        `).join('')}
+                    </select>
+                </div>
+                
+                <div class="betting-form-group">
+                    <label class="betting-form-label">Xanax Amount:</label>
+                    <input type="number" id="betting-xanax-amount" class="betting-form-input" 
+                           min="1" step="1" value="1" placeholder="Enter Xanax amount">
+                </div>
+                
+                <div class="betting-form-group">
+                    <label class="betting-form-label">Bet Value:</label>
+                    <div style="padding: 12px; background: #f8fafc; border-radius: 6px; font-weight: 600;">
+                        $<span id="betting-value-display">${XANAX_PRICE.toLocaleString()}</span>
+                        </div>
+                        </div>
+                
+                <div class="betting-form-group">
+                    <label class="betting-form-label">Potential Return:</label>
+                    <div style="padding: 12px; background: #f0fdf4; border-radius: 6px; font-weight: 600; color: #059669;">
+                        $<span id="betting-return-display">${XANAX_PRICE.toLocaleString()}</span>
+                        </div>
+                    </div>
+                
+                <div class="betting-form-actions">
+                    <button class="betting-form-btn betting-form-btn-secondary" onclick="closeBettingModal()">Cancel</button>
+                    <button class="betting-form-btn betting-form-btn-primary" onclick="placeBetNow()">Place Bet</button>
+                </div>
+                `;
+            
+            modal.style.display = 'flex';
+            
+            // Add event listeners for real-time calculations
+            document.getElementById('betting-xanax-amount').addEventListener('input', updateBettingCalculations);
+            document.getElementById('betting-faction-select').addEventListener('change', updateBettingCalculations);
+            
+            // Initialize calculations
+            updateBettingCalculations();
+        }
+
+        function updateBettingCalculations() {
+            const xanaxAmount = parseInt(document.getElementById('betting-xanax-amount').value) || 1;
+            const factionId = document.getElementById('betting-faction-select').value;
+            const faction = selectedBet.market.options.find(opt => opt.id === factionId);
+            
+            if (!faction) return;
+            
+            const betValue = xanaxAmount * XANAX_PRICE;
+            const potentialReturn = Math.round(betValue * (100 / faction.odds));
+            
+            document.getElementById('betting-value-display').textContent = betValue.toLocaleString();
+            document.getElementById('betting-return-display').textContent = potentialReturn.toLocaleString();
+        }
+
+        function placeBetNow() {
+            const xanaxAmount = parseInt(document.getElementById('betting-xanax-amount').value) || 1;
+            const factionId = document.getElementById('betting-faction-select').value;
+            const faction = selectedBet.market.options.find(opt => opt.id === factionId);
+            
+            if (!faction || xanaxAmount < 1) {
+                alert('Please enter a valid Xanax amount (minimum 1)');
+                return;
+            }
+            
+            // Save bet to localStorage for tracking immediately
+            const betResult = saveBetToTracking(selectedBet.marketId, factionId, xanaxAmount, faction.name);
+            
+            if (!betResult) {
+                alert('Error saving bet. Please try again.');
+                return;
+            }
+            
+            // Show success message and bet details
+            const betMessage = `BET:${selectedBet.marketId}:${factionId}:${xanaxAmount}:${betResult.betId}`;
+            
+            const modalBody = document.getElementById('betting-modal-body');
+            modalBody.innerHTML = `
+                <div class="betting-message" style="background: #dcfce7; border-color: #bbf7d0; color: #166534;">
+                    ✅ Bet placed successfully! Your bet has been recorded and is now pending confirmation.
+                </div>
+                
+                <div class="betting-form-group">
+                    <label class="betting-form-label">Bet Details:</label>
+                    <div style="padding: 12px; background: #f8fafc; border-radius: 6px; font-size: 0.9rem; line-height: 1.5;">
+                        <strong>War:</strong> ${selectedBet.market.title}<br>
+                        <strong>Faction:</strong> ${faction.name}<br>
+                                                        <strong>Xanax Amount:</strong> ${xanaxAmount}<br>
+                        <strong>Bet Value:</strong> $${(xanaxAmount * XANAX_PRICE).toLocaleString()}<br>
+                        <strong>Status:</strong> <span style="color: #f59e0b; font-weight: 600;">Pending</span>
+                        </div>
+                    </div>
+                
+                <div class="betting-form-group">
+                    <label class="betting-form-label">Bet Message (for Torn City):</label>
+                    <div style="position: relative;">
+                        <textarea id="betting-message-text" class="betting-form-input" rows="3" readonly>${betMessage}</textarea>
+                        <button class="betting-copy-btn" onclick="copyBetMessage()" style="position: absolute; top: 8px; right: 8px;">
+                            📋 Copy
+                        </button>
+                        </div>
+                            </div>
+                
+                                        <div class="betting-form-group">
+                            <label class="betting-form-label">Bookie:</label>
+                            <div style="position: relative;">
+                                <input type="text" value="VanillaScoop [3520571]" readonly class="betting-form-input" style="background: #f8fafc;">
+                                <button class="betting-copy-btn" onclick="copyBookieName()" style="position: absolute; top: 8px; right: 8px;">
+                                    Copy
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="betting-form-group">
+                            <label class="betting-form-label">Next Steps:</label>
+                            <div style="padding: 12px; background: #f0fdf4; border-radius: 6px; font-size: 0.9rem; line-height: 1.5;">
+                                1. Copy the bet message above<br>
+                                2. Go to Torn City and send ${xanaxAmount} Xanax to VanillaScoop [3520571]<br>
+                                3. Paste the bet message in the item transfer message<br>
+                                4. Your bet will be confirmed when the transfer is processed<br>
+                                5. Check the Bet Tracking page to monitor your bet status
+                            </div>
+                        </div>
+                
+                <div class="betting-form-actions">
+                    <button class="betting-form-btn betting-form-btn-secondary" onclick="closeBettingModal()">Close</button>
+                    <button class="betting-form-btn betting-form-btn-primary" onclick="openBetTracking()">View Bet Tracking</button>
+                    </div>
+                `;
+
+            // Show success notification
+            showBetPlacedNotification(xanaxAmount, faction.name, selectedBet.market.title);
+        }
+        
+        function generateBetMessage() {
+            const xanaxAmount = parseInt(document.getElementById('betting-xanax-amount').value) || 1;
+            const factionId = document.getElementById('betting-faction-select').value;
+            const faction = selectedBet.market.options.find(opt => opt.id === factionId);
+            
+            if (!faction || xanaxAmount < 1) {
+                alert('Please enter a valid Xanax amount (minimum 1)');
+                return;
+            }
+            
+            const betMessage = `BET:${selectedBet.marketId}:${factionId}:${xanaxAmount}`;
+            
+            const modalBody = document.getElementById('betting-modal-body');
+            modalBody.innerHTML = `
+                <div class="betting-message">
+                    ✅ Bet message generated! Copy the message below and paste it when sending Xanax in Torn City.
+                </div>
+                
+                <div class="betting-form-group">
+                    <label class="betting-form-label">Bet Message:</label>
+                    <div style="position: relative;">
+                        <textarea id="betting-message-text" class="betting-form-input" rows="3" readonly>${betMessage}</textarea>
+                        <button class="betting-copy-btn" onclick="copyBetMessage()" style="position: absolute; top: 8px; right: 8px;">
+                            📋 Copy
+                        </button>
+                        </div>
+                    </div>
+                
+                <div class="betting-form-group">
+                    <label class="betting-form-label">Instructions:</label>
+                    <div style="padding: 12px; background: #f8fafc; border-radius: 6px; font-size: 0.9rem; line-height: 1.5;">
+                        1. Copy the bet message above<br>
+                        2. Go to Torn City and send ${xanaxAmount} Xanax to the bookie<br>
+                        3. Paste the bet message in the item transfer message<br>
+                        4. Your bet will be confirmed when the transfer is processed
+                        </div>
+                        </div>
+                
+                <div class="betting-form-actions">
+                    <button class="betting-form-btn betting-form-btn-secondary" onclick="closeBettingModal()">Close</button>
+                    </div>
+                `;
+        }
+        
+        // Generate unique bet ID
+        function generateBetId() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 8; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+        
+        // Check if bet ID already exists
+        function isBetIdUnique(betId) {
+            const existingBets = localStorage.getItem('tornBets');
+            if (!existingBets) return true;
+            
+            try {
+                const bets = JSON.parse(existingBets);
+                return !bets.some(bet => bet.betId === betId);
+            } catch (error) {
+                console.error('Error checking bet ID uniqueness:', error);
+                return true;
+            }
+        }
+        
+        // Save bet to tracking system
+        function saveBetToTracking(warId, factionId, xanaxAmount, factionName) {
+            // Get existing bets from localStorage
+            const existingBets = localStorage.getItem('tornBets');
+            let bets = [];
+            
+            if (existingBets) {
+                try {
+                    bets = JSON.parse(existingBets);
+                } catch (error) {
+                    console.error('Error parsing existing bets:', error);
+                    bets = [];
+                }
+            }
+            
+            // Generate unique bet ID
+            let betId;
+            do {
+                betId = generateBetId();
+            } while (!isBetIdUnique(betId));
+            
+            // Create new bet entry
+            const newBet = {
+                id: Date.now(), // Internal tracking ID
+                betId: betId, // Unique bet ID for message
+                playerId: userData?.player_id || 'Unknown', // Use actual player ID if available
+                warId: warId,
+                factionId: factionId,
+                factionName: factionName,
+                xanaxAmount: xanaxAmount,
+                betAmount: xanaxAmount * XANAX_PRICE,
+                timestamp: Date.now(),
+                status: 'pending'
+            };
+            
+            // Add to beginning of array (most recent first)
+            bets.unshift(newBet);
+            
+            // Save back to localStorage
+            try {
+                localStorage.setItem('tornBets', JSON.stringify(bets));
+                console.log('Bet saved to tracking:', newBet);
+                return { id: newBet.id, betId: newBet.betId }; // Return both IDs
+            } catch (error) {
+                console.error('Error saving bet to tracking:', error);
+                return null;
+            }
+        }
+        
+        // Show bet placed notification
+        function showBetPlacedNotification(xanaxAmount, factionName, warTitle) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #059669, #047857);
+                color: white;
+                padding: 16px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 1000;
+                max-width: 350px;
+                animation: slideIn 0.3s ease-out;
+            `;
+            
+            notification.innerHTML = `
+                <div style="font-weight: 600; margin-bottom: 8px; font-size: 1.1rem;">
+                    🎯 Bet Placed Successfully!
+                                </div>
+                <div style="font-size: 0.9rem; line-height: 1.4;">
+                    <strong>${xanaxAmount}</strong> on <strong>${factionName}</strong><br>
+                    <span style="opacity: 0.9;">${warTitle}</span><br>
+                    <span style="color: #fbbf24; font-weight: 600;">Status: Pending</span>
+                                </div>
+            `;
+            
+            // Add CSS animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => notification.remove(), 300);
+            }, 5000);
+            
+            // Add slideOut animation
+            const slideOutStyle = document.createElement('style');
+            slideOutStyle.textContent = `
+                @keyframes slideOut {
+                    from {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                    to {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(slideOutStyle);
+        }
+
+        function copyBetMessage() {
+            const messageText = document.getElementById('betting-message-text');
+            messageText.select();
+            document.execCommand('copy');
+            
+            const copyBtn = document.querySelector('.betting-copy-btn');
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = '✅ Copied!';
+            copyBtn.style.background = '#059669';
+            
+            setTimeout(() => {
+                copyBtn.textContent = originalText;
+                copyBtn.style.background = '#3b82f6';
+            }, 2000);
+        }
+
+        function copyBookieName() {
+            const bookieInput = document.querySelector('input[value="VanillaScoop [3520571]"]');
+            if (bookieInput) {
+                bookieInput.select();
+                document.execCommand('copy');
+                
+                const copyBtn = document.querySelector('button[onclick="copyBookieName()"]');
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = '✅ Copied!';
+                copyBtn.style.background = '#059669';
+                
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                    copyBtn.style.background = '#3b82f6';
+                }, 2000);
+            }
+        }
+
+        function closeBettingModal() {
+            const modal = document.getElementById('betting-modal');
+            modal.style.display = 'none';
+            selectedBet = null;
+        }
+
+        function updateBettingLastUpdated() {
+            const lastUpdatedEl = document.getElementById('betting-last-updated');
+            const now = new Date();
+            
+            // Format with user's local timezone
+            const options = {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                timeZoneName: 'short'
+            };
+            
+            lastUpdatedEl.textContent = `Last updated: ${now.toLocaleString(undefined, options)}`;
+        }
+
+        // Start automatic refresh for betting
+        function startAutoRefreshBetting() {
+            if (autoRefreshBettingInterval) {
+                clearInterval(autoRefreshBettingInterval);
+            }
+            autoRefreshBettingInterval = setInterval(loadBettingInterface, 30000); // Refresh every 30 seconds
+            isAutoRefreshBettingEnabled = true;
+        }
+        
+        // Stop automatic refresh for betting
+        function stopAutoRefreshBetting() {
+            if (autoRefreshBettingInterval) {
+                clearInterval(autoRefreshBettingInterval);
+                autoRefreshBettingInterval = null;
+            }
+            isAutoRefreshBettingEnabled = false;
+        }
+
+        // Timer update functionality
+        function updateTimers() {
+            const now = Math.floor(Date.now() / 1000);
+            
+            // Update countdown timers
+            document.querySelectorAll('.betting-timer.countdown[data-start-time]').forEach(timer => {
+                const startTime = parseInt(timer.getAttribute('data-start-time'));
+                const timeUntilStart = startTime - now;
+                
+                if (timeUntilStart > 0) {
+                    const timerText = timer.querySelector('.timer-text');
+                    if (timerText) {
+                        timerText.textContent = formatCountdown(timeUntilStart);
+                    }
+                        } else {
+                    // War has started, update to duration
+                    timer.className = 'betting-timer duration';
+                    timer.setAttribute('data-start-time', startTime);
+                    timer.innerHTML = `
+                        <span class="betting-timer-icon">⏱️</span>
+                        <span class="timer-text">${formatDuration(0)}</span>
+                    `;
+                }
+            });
+            
+            // Update duration timers
+            document.querySelectorAll('.betting-timer.duration[data-start-time]').forEach(timer => {
+                const startTime = parseInt(timer.getAttribute('data-start-time'));
+                const duration = Math.abs(now - startTime);
+                const timerText = timer.querySelector('.timer-text');
+                if (timerText) {
+                    timerText.textContent = formatDuration(duration);
+                }
+            });
+            
+            // Update any timers that might have wrong status
+            document.querySelectorAll('.betting-timer').forEach(timer => {
+                const startTime = parseInt(timer.getAttribute('data-start-time'));
+                if (startTime) {
+                    const timeUntilStart = startTime - now;
+                    const currentClass = timer.className;
+                    
+                    if (timeUntilStart > 0 && !currentClass.includes('countdown')) {
+                        // Should be countdown
+                        timer.className = 'betting-timer countdown';
+                        timer.innerHTML = `
+                            <span class="betting-timer-icon">⏳</span>
+                            <span class="timer-text">${formatCountdown(timeUntilStart)}</span>
+                        `;
+                    } else if (timeUntilStart <= 0 && !currentClass.includes('duration')) {
+                        // Should be duration
+                        timer.className = 'betting-timer duration';
+                        const duration = Math.abs(now - startTime);
+                        timer.innerHTML = `
+                            <span class="betting-timer-icon">⏱️</span>
+                            <span class="timer-text">${formatDuration(duration)}</span>
+                        `;
+                    }
+                }
+            });
+        }
+
+        // Start timer updates
+        setInterval(updateTimers, 1000); // Update every second
+        
+        // Start odds updates
+        setInterval(updateOdds, 5000); // Update odds every 5 seconds
+        
+        // Update odds in real-time
+        async function updateOdds() {
+            if (!bettingData || !oddsAPI.calculateOdds) return;
+            
+            // Update odds for all Ranked Wars
+            for (const market of bettingData) {
+                if (market.options.length === 2) {
+                    try {
+                        const faction1Id = market.options[0].id;
+                        const faction2Id = market.options[1].id;
+                        
+                        // Calculate new odds using API
+                        const newOdds = await oddsAPI.calculateOdds(faction1Id, faction2Id);
+                        
+                        // Update market odds
+                        market.options[0].odds = newOdds[faction1Id] || 50;
+                        market.options[1].odds = newOdds[faction2Id] || 50;
+                        
+                    } catch (error) {
+                        console.error(`Failed to update odds for market ${market.id}:`, error);
+                        // Keep existing odds on error
+                    }
+                }
+            }
+            
+            // Refresh display if betting interface is active
+            if (document.getElementById('betting-content').style.display !== 'none') {
+                displayBettingInterface();
+            }
+        }
+
+        // Close modal when clicking outside
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('betting-modal');
+            if (event.target === modal) {
+                closeBettingModal();
+            }
+        });
+        
+        // Open bet tracking dashboard
+        function openBetTracking() {
+            // Switch to bet tracking tab
+            const betTrackingTab = document.querySelector('[data-tab="bettracking"]');
+            if (betTrackingTab) {
+                betTrackingTab.click();
+            }
+        }
+        
+        // Log Monitoring System
+        function startLogMonitoring() {
+            console.log('Starting log monitoring...');
+            
+            // Check logs immediately
+            checkLogsForBets();
+            
+            // Set up interval to check logs every 30 seconds
+            logMonitoringInterval = setInterval(checkLogsForBets, 30000);
+        }
+        
+        function stopLogMonitoring() {
+            if (logMonitoringInterval) {
+                clearInterval(logMonitoringInterval);
+                logMonitoringInterval = null;
+                console.log('Log monitoring stopped');
+            }
+        }
+        
+        async function checkLogsForBets() {
+            if (!apiKey) {
+                console.log('No API key available for log monitoring');
+                return;
+            }
+            
+            try {
+                console.log('Checking logs for bet confirmations...');
+                
+                const response = await fetch(`https://api.torn.com/user/?selections=log&key=${apiKey}`);
+                const data = await response.json();
+                
+                if (data.error) {
+                    console.error('Error fetching logs:', data.error);
+                    return;
+                }
+                
+                if (!data.log) {
+                    console.log('No logs found');
+                    return;
+                }
+                
+                // Process each log entry
+                Object.entries(data.log).forEach(([logId, logEntry]) => {
+                    // Skip if we've already processed this log
+                    if (processedLogs.has(logId)) {
+                        return;
+                    }
+                    
+                    // Check if this is an item receive log
+                    if (logEntry.title === 'Item receive' && logEntry.category === 'Item sending') {
+                        processBetLog(logId, logEntry);
+                    }
+                });
+                
+                // Update last check time
+                lastLogCheck = Date.now();
+                
+            } catch (error) {
+                console.error('Error checking logs:', error);
+            }
+        }
+        
+        function processBetLog(logId, logEntry) {
+            try {
+                const { sender, items, message, timestamp } = logEntry.data;
+                
+                // Check if this is a Xanax item (ID: 206)
+                const xanaxItem = items.find(item => item.id === 206);
+                if (!xanaxItem) {
+                    console.log(`Log ${logId}: Not a Xanax item`);
+                    return;
+                }
+                
+                // Check if message matches bet format
+                if (!message || !message.startsWith('BET:')) {
+                    console.log(`Log ${logId}: Not a bet message`);
+                    return;
+                }
+                
+                // Parse bet message: BET:warId:factionId:amount:betId
+                const betParts = message.split(':');
+                if (betParts.length !== 5) {
+                    console.log(`Log ${logId}: Invalid bet message format (expected 5 parts, got ${betParts.length})`);
+                    return;
+                }
+                
+                const [, warId, factionId, betAmount, betId] = betParts;
+                const xanaxAmount = parseInt(betAmount);
+                const actualXanaxAmount = xanaxItem.qty;
+                
+                // Validate amounts match
+                if (xanaxAmount !== actualXanaxAmount) {
+                    console.log(`Log ${logId}: Xanax amount mismatch. Expected: ${xanaxAmount}, Received: ${actualXanaxAmount}`);
+                    return;
+                }
+                
+                console.log(`Processing bet confirmation: Log ${logId}, Sender: ${sender}, War: ${warId}, Faction: ${factionId}, Amount: ${xanaxAmount}, Bet ID: ${betId}`);
+                console.log(`Looking for bet with: playerId=${sender} (${typeof sender}), warId=${warId} (${typeof warId}), factionId=${factionId} (${typeof factionId}), xanaxAmount=${xanaxAmount} (${typeof xanaxAmount}), betId=${betId} (${typeof betId})`);
+                
+                // Find and confirm the bet using unique bet ID
+                confirmBet(sender, warId, factionId, xanaxAmount, betId, logId, timestamp);
+                
+                // Mark this log as processed
+                processedLogs.add(logId);
+                
+            } catch (error) {
+                console.error(`Error processing bet log ${logId}:`, error);
+            }
+        }
+        
+        function confirmBet(senderId, warId, factionId, xanaxAmount, betId, logId, timestamp) {
+            // Get existing bets from localStorage
+            const existingBets = localStorage.getItem('tornBets');
+            if (!existingBets) {
+                console.log('No bets found in localStorage');
+                    return;
+                }
+
+            try {
+                let bets = JSON.parse(existingBets);
+                
+                // Find matching pending bet using unique bet ID
+                const betIndex = bets.findIndex(bet => 
+                    bet.betId === betId && 
+                    bet.status === 'pending'
+                );
+                
+                if (betIndex === -1) {
+                    console.log(`No matching pending bet found for Bet ID: ${betId}`);
+                    console.log('Available pending bets:', bets.filter(bet => bet.status === 'pending').map(bet => ({
+                        betId: bet.betId,
+                        playerId: bet.playerId,
+                        warId: bet.warId,
+                        factionId: bet.factionId,
+                        xanaxAmount: bet.xanaxAmount,
+                        status: bet.status
+                    })));
+                    return;
+                }
+                
+                // Update bet status to confirmed
+                bets[betIndex].status = 'confirmed';
+                bets[betIndex].logId = logId;
+                bets[betIndex].confirmedAt = timestamp * 1000; // Convert to milliseconds
+                bets[betIndex].senderId = senderId;
+                
+                // Save updated bets
+                localStorage.setItem('tornBets', JSON.stringify(bets));
+                
+                console.log(`Bet confirmed: ${bets[betIndex].id}`);
+                
+                // Show confirmation notification
+                showBetConfirmedNotification(xanaxAmount, bets[betIndex].factionName, warId);
+                
+                // Update bet tracking page if it's open
+                if (window.betTrackingWindow && !window.betTrackingWindow.closed) {
+                    window.betTrackingWindow.postMessage({
+                        type: 'BET_CONFIRMED',
+                        betId: bets[betIndex].id,
+                        logId: logId
+                    }, '*');
+                }
+                
+            } catch (error) {
+                console.error('Error confirming bet:', error);
+            }
+        }
+        
+        function showBetConfirmedNotification(xanaxAmount, factionName, warId) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #059669, #047857);
+                color: white;
+                padding: 16px;
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+                z-index: 1000;
+                max-width: 350px;
+                animation: slideIn 0.3s ease-out;
+            `;
+            
+            notification.innerHTML = `
+                <div style="font-weight: 600; margin-bottom: 8px; font-size: 1.1rem;">
+                    ✅ Bet Confirmed!
+                </div>
+                <div style="font-size: 0.9rem; line-height: 1.4;">
+                    <strong>${xanaxAmount}</strong> on <strong>${factionName}</strong><br>
+                    <span style="opacity: 0.9;">War #${warId}</span><br>
+                    <span style="color: #10b981; font-weight: 600;">Status: Confirmed</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => notification.remove(), 300);
+            }, 5000);
+        }
+        
+
+
+        // Check if betting is allowed for a war
+        function canPlaceBet(market) {
+            const now = Math.floor(Date.now() / 1000);
+            const warStartTime = market.startTime;
+            const fiveDaysInSeconds = 5 * 24 * 60 * 60; // 5 days in seconds
+            
+            // Allow betting if:
+            // 1. War is active (has started but not finished)
+            // 2. War is upcoming but within 5 days of starting
+            if (market.status === 'active') {
+                return true;
+            } else if (market.status === 'preparing') {
+                const timeUntilStart = warStartTime - now;
+                return timeUntilStart <= fiveDaysInSeconds && timeUntilStart > 0;
+            }
+            
+            return false;
+        }
+        
+        // Update openBetTracking to store window reference
+        function openBetTracking() {
+            // Switch to bet tracking tab
+            const betTrackingTab = document.querySelector('[data-tab="bettracking"]');
+            if (betTrackingTab) {
+                betTrackingTab.click();
+            }
+        }
+        
+        // Manual test function for log processing
+        function testLogProcessing() {
+            const testLog = {
+                "log": 4103,
+                "title": "Item receive",
+                "timestamp": 1753551889,
+                "category": "Item sending",
+                "data": {
+                    "sender": 3576736,
+                    "items": [
+                        {
+                            "id": 206,
+                            "uid": 15447039670,
+                            "qty": 1,
+                        },
+                    ],
+                    "message": "BET:28340:22631:1",
+                },
+                "params": {
+                    "italic": 1,
+                    "color": "green",
+                },
+            };
+            
+            console.log('Testing log processing with:', testLog);
+            console.log('This should only confirm bet for player ID 3576736');
+            processBetLog('test-log-id', testLog);
+        }
+        
+        // Expose test function globally
+        window.testLogProcessing = testLogProcessing;
+        
+        // Manual log check function
+        async function manualLogCheck() {
+            console.log('Manually checking logs...');
+            await checkLogsForBets();
+        }
+        
+        // Expose manual log check globally
+        window.manualLogCheck = manualLogCheck;
+
+        // User Bet Tracking System
+        let userBetsData = [];
+        let autoRefreshUserBetsInterval = null;
+        let isAutoRefreshUserBetsEnabled = false;
+
+        // Load user's bets
+        async function loadUserBets() {
+            const loadingEl = document.getElementById('user-bets-loading');
+            const contentEl = document.getElementById('user-bets-content');
+            
+            loadingEl.style.display = 'block';
+            contentEl.style.display = 'none';
+
+            try {
+                // Get bets from localStorage
+                const existingBets = localStorage.getItem('tornBets');
+                if (!existingBets) {
+                    userBetsData = [];
+                    displayUserBets();
+                    return;
+                }
+
+                const allBets = JSON.parse(existingBets);
+                
+                // Filter bets for current user (using player_id from userData)
+                const currentPlayerId = userData?.player_id || 'Unknown';
+                userBetsData = allBets.filter(bet => 
+                    bet.playerId.toString() === currentPlayerId.toString()
+                );
+
+                // Refresh live war data before displaying
+                await refreshLiveWarData();
+
+                displayUserBets();
+                updateUserBetsLastUpdated();
+                
+            } catch (error) {
+                console.error('Error loading user bets:', error);
+                loadingEl.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        // Display user's bets
+        function displayUserBets() {
+            const loadingEl = document.getElementById('user-bets-loading');
+            const contentEl = document.getElementById('user-bets-content');
+            const statsEl = document.getElementById('user-bets-stats');
+            const containerEl = document.getElementById('user-bets-container');
+
+            loadingEl.style.display = 'none';
+            contentEl.style.display = 'block';
+
+            if (!userBetsData || userBetsData.length === 0) {
+                containerEl.innerHTML = `
+                    <div class="no-bets-message">
+                        <h3>No bets placed yet</h3>
+                        <p>Start betting on faction wars to see your activity here!</p>
+                        <button class="btn btn-primary" onclick="switchToColosseum()">Go to Colosseum</button>
+                    </div>
+                `;
+                return;
+            }
+
+            // Display statistics
+            displayUserBetsStats();
+
+            // Display bet cards
+            containerEl.innerHTML = userBetsData.map(bet => createUserBetCard(bet)).join('');
+        }
+
+        // Display user betting statistics
+        function displayUserBetsStats() {
+            const statsEl = document.getElementById('user-bets-stats');
+            
+            if (!userBetsData) return;
+
+            const stats = {
+                total: userBetsData.length,
+                pending: userBetsData.filter(bet => bet.status === 'pending').length,
+                confirmed: userBetsData.filter(bet => bet.status === 'confirmed').length,
+                won: userBetsData.filter(bet => bet.status === 'won').length,
+                lost: userBetsData.filter(bet => bet.status === 'lost').length,
+                totalValue: userBetsData.reduce((sum, bet) => sum + bet.betAmount, 0),
+                totalPayouts: userBetsData
+                    .filter(bet => bet.status === 'won')
+                    .reduce((sum, bet) => sum + (bet.payoutAmount || 0), 0)
+            };
+
+            statsEl.innerHTML = `
+                <div class="user-bet-stat-card">
+                    <h3>Total Bets</h3>
+                    <div class="value">${stats.total}</div>
+                </div>
+                <div class="user-bet-stat-card">
+                    <h3>Total Value</h3>
+                    <div class="value">$${(stats.totalValue / 1000000).toFixed(1)}M</div>
+                </div>
+                <div class="user-bet-stat-card">
+                    <h3>Pending</h3>
+                    <div class="value">${stats.pending}</div>
+                </div>
+                <div class="user-bet-stat-card">
+                    <h3>Confirmed</h3>
+                    <div class="value">${stats.confirmed}</div>
+                </div>
+                <div class="user-bet-stat-card">
+                    <h3>Won</h3>
+                    <div class="value">${stats.won}</div>
+                </div>
+                <div class="user-bet-stat-card">
+                    <h3>Lost</h3>
+                    <div class="value">${stats.lost}</div>
+                </div>
+                <div class="user-bet-stat-card">
+                    <h3>Total Payouts</h3>
+                    <div class="value">$${(stats.totalPayouts / 1000000).toFixed(1)}M</div>
+                </div>
+            `;
+        }
+
+        // Create user bet card
+        function createUserBetCard(bet) {
+            const status = getUserBetStatus(bet.status);
+            const timePlaced = formatTimestamp(bet.timestamp);
+            const payoutAmount = calculatePayoutAmount(bet);
+            const payoutStatus = getPayoutStatus(bet);
+            const expectedWinPayout = calculateExpectedWinPayout(bet);
+            const expectedLossAmount = calculateExpectedLossAmount(bet);
+            
+            // Get live war data for this bet
+            const warData = getLiveWarData(bet.warId);
+            const warStatus = getWarStatus(warData);
+            const liveScores = getLiveScores(warData, bet.factionId);
+            
+            return `
+                <div class="user-bet-card">
+                    <div class="user-bet-header">
+                        <div class="user-bet-title">Bet ${bet.betId}</div>
+                        <span class="user-bet-status ${status.class}">${status.text}</span>
+                    </div>
+                    
+                    <div class="user-bet-content">
+                        <div class="user-bet-details">
+                            <div class="user-bet-detail">
+                                <div class="user-bet-detail-label">War</div>
+                                <div class="user-bet-detail-value">
+                                    <a href="https://www.torn.com/war.php?step=rankreport&rankID=${bet.warId}" target="_blank">
+                                        War #${bet.warId}
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <div class="user-bet-detail">
+                                <div class="user-bet-detail-label">Faction</div>
+                                <div class="user-bet-detail-value">
+                                    <a href="https://www.torn.com/factions.php?step=profile&ID=${bet.factionId}" target="_blank">
+                                        ${bet.factionName}
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <div class="user-bet-detail">
+                                <div class="user-bet-detail-label">Xanax Amount</div>
+                                <div class="user-bet-detail-value">${bet.xanaxAmount}</div>
+                            </div>
+                            
+                            <div class="user-bet-detail">
+                                <div class="user-bet-detail-label">Bet Value</div>
+                                <div class="user-bet-detail-value">$${(bet.betAmount / 1000000).toFixed(1)}M</div>
+                            </div>
+                            
+                            <div class="user-bet-detail">
+                                <div class="user-bet-detail-label">Expected Win</div>
+                                <div class="user-bet-detail-value" style="color: #059669;">$${(expectedWinPayout / 1000000).toFixed(1)}M</div>
+                            </div>
+                            
+                            <div class="user-bet-detail">
+                                <div class="user-bet-detail-label">Expected Loss</div>
+                                <div class="user-bet-detail-value" style="color: #dc2626;">-$${(expectedLossAmount / 1000000).toFixed(1)}M</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Live War Status -->
+                        <div class="user-bet-war-status">
+                            <div class="user-bet-war-status-header">
+                                <span class="user-bet-war-status-icon">⚔️</span>
+                                <span class="user-bet-war-status-text">${warStatus}</span>
+                            </div>
+                            ${liveScores}
+                        </div>
+                        
+                        ${bet.status === 'won' ? `
+                            <div class="user-bet-payout">
+                                <div class="user-bet-payout-title">🎉 Congratulations! You Won!</div>
+                                <div class="user-bet-payout-amount">$${(payoutAmount / 1000000).toFixed(1)}M</div>
+                                <div class="user-bet-payout-status ${payoutStatus.class}">${payoutStatus.text}</div>
+                            </div>
+                        ` : ''}
+                        
+                        ${bet.status === 'lost' ? `
+                            <div class="user-bet-payout" style="background: #fef2f2; border-color: #fecaca;">
+                                <div class="user-bet-payout-title" style="color: #dc2626;">❌ Better luck next time!</div>
+                                <div class="user-bet-payout-amount" style="color: #dc2626;">Lost ${bet.xanaxAmount}</div>
+                            </div>
+                        ` : ''}
+                        
+                        ${bet.status === 'pending' ? `
+                            <div class="user-bet-message">
+                                <strong>Bet Message:</strong><br>
+                                ${generateBetMessage(bet)}
+                            </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="user-bet-actions">
+                        <div class="user-bet-time">Placed: ${timePlaced}</div>
+                        <div class="user-bet-buttons">
+                            ${bet.status === 'pending' ? `
+                                <button class="user-bet-btn user-bet-btn-secondary" onclick="copyBetMessage('${bet.betId}')">📋 Copy Message</button>
+                            ` : ''}
+                            
+                            ${bet.status === 'won' && payoutStatus.text === 'Pending' ? `
+                                <button class="user-bet-btn user-bet-btn-primary" onclick="requestPayout('${bet.betId}')">💰 Request Payout</button>
+                            ` : ''}
+                            
+                            ${bet.status === 'confirmed' ? `
+                                <button class="user-bet-btn user-bet-btn-secondary" disabled>⏳ Waiting for War End</button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Get user bet status
+        function getUserBetStatus(status) {
+            switch (status) {
+                case 'pending':
+                    return { text: 'Pending', class: 'pending' };
+                case 'confirmed':
+                    return { text: 'Confirmed', class: 'confirmed' };
+                case 'won':
+                    return { text: 'Won', class: 'won' };
+                case 'lost':
+                    return { text: 'Lost', class: 'lost' };
+                case 'paid':
+                    return { text: 'Paid', class: 'paid' };
+                default:
+                    return { text: 'Unknown', class: 'pending' };
+            }
+        }
+
+        // Calculate expected win payout (based on odds)
+        function calculateExpectedWinPayout(bet) {
+            // This would normally come from the odds calculation
+            // For now, use a simple 2x payout for demonstration
+            // In a real system, this would be: bet.betAmount * (100 / odds)
+            return bet.betAmount * 2;
+        }
+
+        // Calculate expected loss amount (what they lose if they lose)
+        function calculateExpectedLossAmount(bet) {
+            // This is simply the bet amount they placed
+            return bet.betAmount;
+        }
+
+        // Calculate payout amount (for won bets)
+        function calculatePayoutAmount(bet) {
+            if (bet.status !== 'won') return 0;
+            
+            // Use the same calculation as expected win payout
+            return calculateExpectedWinPayout(bet);
+        }
+
+        // Get payout status
+        function getPayoutStatus(bet) {
+            if (bet.status !== 'won') {
+                return { text: 'N/A', class: '' };
+            }
+            
+            if (bet.payoutStatus === 'paid') {
+                return { text: '✅ Paid', class: 'paid' };
+            } else {
+                return { text: '⏳ Pending', class: 'pending' };
+            }
+        }
+
+        // Generate bet message for display
+        function generateBetMessage(bet) {
+            return `BET:${bet.warId}:${bet.factionId}:${bet.xanaxAmount}:${bet.betId}`;
+        }
+
+        // Copy bet message to clipboard
+        function copyBetMessage(betId) {
+            const bet = userBetsData.find(b => b.betId === betId);
+            if (!bet) return;
+            
+            const message = generateBetMessage(bet);
+            navigator.clipboard.writeText(message).then(() => {
+                showUserNotification('Message Copied', 'Bet message copied to clipboard!');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = message;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showUserNotification('Message Copied', 'Bet message copied to clipboard!');
+            });
+        }
+
+        // Request payout (placeholder function)
+        function requestPayout(betId) {
+            showUserNotification('Payout Requested', 'Your payout request has been submitted. You will be contacted soon!');
+        }
+
+        // Switch to Colosseum tab
+        function switchToColosseum() {
+            const colosseumTab = document.querySelector('[data-tab="colosseum"]');
+            if (colosseumTab) {
+                colosseumTab.click();
+            }
+        }
+
+        // Update user bets last updated timestamp
+        function updateUserBetsLastUpdated() {
+            const lastUpdatedEl = document.getElementById('user-bets-last-updated');
+            const now = new Date();
+            
+            // Format with user's local timezone
+            const options = {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                timeZoneName: 'short'
+            };
+            
+            lastUpdatedEl.textContent = `Last updated: ${now.toLocaleString(undefined, options)}`;
+        }
+
+        // Start automatic refresh for user bets
+        function startAutoRefreshUserBets() {
+            if (autoRefreshUserBetsInterval) {
+                clearInterval(autoRefreshUserBetsInterval);
+            }
+            autoRefreshUserBetsInterval = setInterval(async () => {
+                await refreshLiveWarData();
+                displayUserBets(); // Re-render with updated data
+            }, 30000); // Refresh every 30 seconds
+            isAutoRefreshUserBetsEnabled = true;
+        }
+        
+        // Stop automatic refresh for user bets
+        function stopAutoRefreshUserBets() {
+            if (autoRefreshUserBetsInterval) {
+                clearInterval(autoRefreshUserBetsInterval);
+                autoRefreshUserBetsInterval = null;
+            }
+            isAutoRefreshUserBetsEnabled = false;
+        }
+
+        // Get live war data from API cache
+        function getLiveWarData(warId) {
+            try {
+                const liveData = localStorage.getItem('liveWarData');
+                if (!liveData) return null;
+                
+                const parsed = JSON.parse(liveData);
+                if (!parsed.data || !parsed.data[warId]) return null;
+                
+                // Check if data is fresh (less than 5 minutes old)
+                const dataAge = Date.now() - parsed.timestamp;
+                if (dataAge > 5 * 60 * 1000) { // 5 minutes
+                    console.log('Live war data is stale, will refresh on next update');
+                }
+                
+                return parsed.data[warId] || null;
+            } catch (error) {
+                console.error('Error getting live war data:', error);
+                return null;
+            }
+        }
+
+        // Get war status text and class
+        function getWarStatus(warData) {
+            if (!warData || !warData.war) return 'Unknown';
+            
+            const now = Math.floor(Date.now() / 1000);
+            const startTime = warData.war.start;
+            const endTime = warData.war.end;
+            
+            if (endTime > 0) {
+                return 'Finished';
+            } else if (now < startTime) {
+                return 'Upcoming';
+            } else {
+                return 'Active';
+            }
+        }
+
+        // Refresh live war data from API
+        async function refreshLiveWarData() {
+            try {
+                console.log('Fetching live war data for user bets...');
+                
+                // Fetch current war data from Torn API
+                const response = await fetch('https://api.torn.com/torn/?selections=rankedwars&key=C0wctKtdsgjJYpWe');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Store the live data for use in bet cards
+                if (data.rankedwars) {
+                    localStorage.setItem('liveWarData', JSON.stringify({
+                        data: data.rankedwars,
+                        timestamp: Date.now()
+                    }));
+                    console.log('Live war data updated successfully');
+                }
+            } catch (error) {
+                console.error('Error fetching live war data:', error);
+            }
+        }
+
+        // Get live scores for the war
+        function getLiveScores(warData, userFactionId) {
+            if (!warData || !warData.factions) {
+                return '<div class="user-bet-scores">🔄 Fetching live data...</div>';
+            }
+            
+            const factions = Object.entries(warData.factions);
+            if (factions.length !== 2) {
+                return '<div class="user-bet-scores">Invalid war data</div>';
+            }
+            
+            const [faction1Id, faction1Data] = factions[0];
+            const [faction2Id, faction2Data] = factions[1];
+            
+            const isUserFaction1 = faction1Id === userFactionId.toString();
+            const userFaction = isUserFaction1 ? faction1Data : faction2Data;
+            const opponentFaction = isUserFaction1 ? faction2Data : faction1Data;
+            
+            const userScore = userFaction.score || 0;
+            const opponentScore = opponentFaction.score || 0;
+            const target = warData.war.target || 0;
+            
+            // Calculate lead percentages (target is the lead difference)
+            const scoreDifference = Math.abs(userScore - opponentScore);
+            const userLead = userScore > opponentScore ? scoreDifference : 0;
+            const opponentLead = opponentScore > userScore ? scoreDifference : 0;
+            
+            const userProgress = target > 0 ? Math.min((userLead / target) * 100, 100) : 0;
+            const opponentProgress = target > 0 ? Math.min((opponentLead / target) * 100, 100) : 0;
+            
+            return `
+                <div class="user-bet-scores">
+                    <div class="user-bet-score-row">
+                        <div class="user-bet-score-faction user-faction">
+                            <span class="user-bet-score-name">${userFaction.name}</span>
+                            <span class="user-bet-score-value">${userScore.toLocaleString()}</span>
+                        </div>
+                        <div class="user-bet-score-progress">
+                            <div class="user-bet-progress-bar">
+                                <div class="user-bet-progress-fill" style="width: ${userProgress}%; background: #059669;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="user-bet-score-row">
+                        <div class="user-bet-score-faction opponent-faction">
+                            <span class="user-bet-score-name">${opponentFaction.name}</span>
+                            <span class="user-bet-score-value">${opponentScore.toLocaleString()}</span>
+                        </div>
+                        <div class="user-bet-score-progress">
+                            <div class="user-bet-progress-bar">
+                                <div class="user-bet-progress-fill" style="width: ${opponentProgress}%; background: #dc2626;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="user-bet-target">
+                        <span class="user-bet-target-label">Lead Target:</span>
+                        <span class="user-bet-target-value">${target.toLocaleString()}</span>
+                    </div>
+                    
+                    <div class="user-bet-lead-info">
+                        <span class="user-bet-lead-info-text">${userLead > 0 ? `Your faction leads by ${userLead.toLocaleString()}` : opponentLead > 0 ? `Opponent leads by ${opponentLead.toLocaleString()}` : 'Scores are tied'}</span>
+                    </div>
+                    
+                    <div class="user-bet-live-timestamp">
+                        <span class="user-bet-live-timestamp-text">🔄 Live data updated: ${new Date().toLocaleTimeString()}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Show user notification
+        function showUserNotification(title, message) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #059669, #047857);
+                color: white;
+                padding: 16px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 1000;
+                max-width: 350px;
+                animation: slideIn 0.3s ease-out;
+            `;
+            
+            notification.innerHTML = `
+                <div style="font-weight: 600; margin-bottom: 8px;">${title}</div>
+                <div style="font-size: 0.9rem;">${message}</div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        async function fetchFactionRespectData(uniqueFactionIds) {
+            console.log('Fetching enhanced faction data for', uniqueFactionIds.size, 'factions...');
+            
+            // Initialize enhanced data object
+            const factionEnhancedData = {};
+            
+            // Fetch MongoDB faction data (respect, rank, etc.)
+            let mongoFactionData = {};
+            try {
+                console.log('Fetching faction data from MongoDB...');
+                const mongoResponse = await fetch('/api/factions');
+                const mongoResult = await mongoResponse.json();
+                
+                if (mongoResult.success) {
+                    mongoFactionData = mongoResult.data;
+                    console.log(`Loaded ${Object.keys(mongoFactionData).length} factions from MongoDB`);
+                } else {
+                    console.warn('Failed to fetch MongoDB faction data:', mongoResult.error);
+                }
+            } catch (error) {
+                console.warn('Error fetching MongoDB faction data:', error);
+            }
+            
+            // Use only MongoDB data to avoid rate limiting
+            Array.from(uniqueFactionIds).forEach((factionId) => {
+                const mongoData = mongoFactionData[factionId] || {};
+                
+                factionEnhancedData[factionId] = {
+                    chain: 0, // Default to 0 to avoid API calls
+                    respect: mongoData.respect || null,
+                    rank: mongoData.rank || null,
+                    members: mongoData.members || null,
+                    position: mongoData.position || null
+                };
+            });
+            
+            console.log('Fetched enhanced faction data from MongoDB:', factionEnhancedData);
+            console.log('Total factions with enhanced data:', Object.keys(factionEnhancedData).length);
+            console.log('Sample enhanced data:', Object.entries(factionEnhancedData).slice(0, 3));
+            
+            // Log factions with respect data
+            const factionsWithRespect = Object.entries(factionEnhancedData)
+                .filter(([id, data]) => data.respect !== null)
+                .length;
+            console.log(`Factions with respect data: ${factionsWithRespect}/${Object.keys(factionEnhancedData).length}`);
+            
+            return factionEnhancedData;
+        }
+
+        // Bet Tracking Functions
+        let allBets = [];
+        let filteredBets = [];
+        let betTrackingActive = false;
+
+        // Toggle bet tracking section
+        function toggleBetTracking() {
+            const content = document.getElementById('bet-tracking-content');
+            const toggle = document.querySelector('.bet-tracking-toggle');
+            
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                toggle.textContent = '📊 Show Tracking';
+                betTrackingActive = false;
+            } else {
+                content.classList.add('active');
+                toggle.textContent = '📊 Hide Tracking';
+                betTrackingActive = true;
+                loadBetData();
+            }
+        }
+
+        // Load bet data
+        async function loadBetData() {
+            try {
+                // Get bets from localStorage (shared with betting interface)
+                const storedBets = localStorage.getItem('tornBets');
+                if (storedBets) {
+                    allBets = JSON.parse(storedBets);
+                } else {
+                    allBets = [];
+                }
+                
+                filteredBets = [...allBets];
+                updateBetStats();
+                updateBetTable();
+                updateBetFilters();
+                
+            } catch (error) {
+                console.error('Error loading bet data:', error);
+            }
+        }
+
+        // Update bet statistics
+        function updateBetStats() {
+            const stats = {
+                total: allBets.length,
+                totalVolume: allBets.reduce((sum, bet) => sum + bet.betAmount, 0),
+                active: allBets.filter(bet => bet.status === 'confirmed').length,
+                pending: allBets.filter(bet => bet.status === 'pending').length,
+                won: allBets.filter(bet => bet.status === 'won').length,
+                lost: allBets.filter(bet => bet.status === 'lost').length,
+                totalPayouts: allBets.filter(bet => bet.status === 'won').reduce((sum, bet) => sum + calculatePayoutAmount(bet), 0),
+                totalProfit: allBets.filter(bet => bet.status === 'won').reduce((sum, bet) => sum + calculatePayoutAmount(bet), 0) - 
+                            allBets.filter(bet => bet.status === 'lost').reduce((sum, bet) => sum + bet.betAmount, 0)
+            };
+
+            document.getElementById('total-bets').textContent = stats.total;
+            document.getElementById('total-volume').textContent = `$${(stats.totalVolume / 1000000).toFixed(1)}M`;
+            document.getElementById('active-bets').textContent = stats.active;
+            document.getElementById('won-bets').textContent = stats.won;
+            document.getElementById('lost-bets').textContent = stats.lost;
+            document.getElementById('total-payouts').textContent = `$${(stats.totalPayouts / 1000000).toFixed(1)}M`;
+            document.getElementById('total-profit').textContent = `$${(stats.totalProfit / 1000000).toFixed(1)}M`;
+        }
+
+        // Update bet table
+        function updateBetTable() {
+            const tbody = document.getElementById('bet-table-body');
+            
+            if (filteredBets.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 40px; color: #64748b;">
+                            <div style="font-size: 1.1rem; margin-bottom: 8px;">📊 No bets found</div>
+                            <div style="font-size: 0.9rem;">Place some bets to see them here!</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = filteredBets.map(bet => {
+                const payoutAmount = calculatePayoutAmount(bet);
+                const profit = bet.status === 'won' ? payoutAmount - bet.betAmount : 
+                              bet.status === 'lost' ? -bet.betAmount : 0;
+                const betMessage = generateBetMessage(bet);
+                
+                return `
+                    <tr>
+                        <td>
+                            <div style="font-weight: 600; color: #1e293b;">${bet.playerId}</div>
+                            <div style="font-size: 0.75rem; color: #64748b;">ID: ${bet.playerId}</div>
+                        </td>
+                        <td>
+                            <div style="font-weight: 600; color: #1e293b;">War ${bet.warId}</div>
+                            <div style="font-size: 0.75rem; color: #64748b;">${formatTimestamp(bet.timePlaced)}</div>
+                        </td>
+                        <td>
+                            <div style="font-weight: 600; color: #1e293b;">Faction ${bet.factionId}</div>
+                            <div style="font-size: 0.75rem; color: #64748b;">${bet.xanaxAmount} Xanax</div>
+                        </td>
+                        <td>
+                            <div class="bet-amount">$${(bet.betAmount / 1000000).toFixed(1)}M</div>
+                        </td>
+                        <td>
+                            <div style="font-size: 0.8rem; color: #64748b;">${formatTimestamp(bet.timePlaced)}</div>
+                        </td>
+                        <td>
+                            <span class="bet-status-badge bet-status-${bet.status}">${bet.status}</span>
+                        </td>
+                        <td>
+                            <div class="bet-payout">${bet.status === 'won' ? `$${(payoutAmount / 1000000).toFixed(1)}M` : '-'}</div>
+                        </td>
+                        <td>
+                            <div class="bet-profit ${profit > 0 ? 'positive' : profit < 0 ? 'negative' : 'neutral'}">
+                                ${profit > 0 ? '+' : ''}$${(profit / 1000000).toFixed(1)}M
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div style="font-family: 'DM Sans', monospace; font-size: 0.8rem; color: #374151; background: #f8fafc; padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${betMessage}">${betMessage}</div>
+                                <button class="bet-action-btn view" onclick="copyBetMessage('${bet.betId}')" title="Copy Bet Message">📋</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Update bet filters
+        function updateBetFilters() {
+            const warFilter = document.getElementById('bet-war-filter');
+            const uniqueWars = [...new Set(allBets.map(bet => bet.warId))];
+            
+            warFilter.innerHTML = '<option value="">All Wars</option>' + 
+                uniqueWars.map(warId => `<option value="${warId}">War ${warId}</option>`).join('');
+        }
+
+        // Clear bet filters
+        function clearBetFilters() {
+            document.getElementById('bet-status-filter').value = '';
+            document.getElementById('bet-war-filter').value = '';
+            filteredBets = [...allBets];
+            updateBetTable();
+        }
+
+        // Copy bet message to clipboard
+        function copyBetMessage(betId) {
+            const bet = allBets.find(b => b.betId === betId);
+            if (!bet) return;
+            
+            const betMessage = generateBetMessage(bet);
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(betMessage).then(() => {
+                showUserNotification('Bet Message Copied', 'Bet message has been copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy bet message:', err);
+                // Fallback: show the message in an alert
+                alert(`Bet Message:\n${betMessage}\n\nCopy this message manually.`);
+            });
+        }
+
+        // Set up bet filter event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners for bet filters
+            const statusFilter = document.getElementById('bet-status-filter');
+            const warFilter = document.getElementById('bet-war-filter');
+            
+            if (statusFilter) {
+                statusFilter.addEventListener('change', filterBets);
+            }
+            if (warFilter) {
+                warFilter.addEventListener('change', filterBets);
+            }
+        });
+
+        // Filter bets based on current filters
+        function filterBets() {
+            const statusFilter = document.getElementById('bet-status-filter')?.value;
+            const warFilter = document.getElementById('bet-war-filter')?.value;
+            
+            filteredBets = allBets.filter(bet => {
+                const statusMatch = !statusFilter || bet.status === statusFilter;
+                const warMatch = !warFilter || bet.warId === warFilter;
+                
+                return statusMatch && warMatch;
+            });
+            
+            updateBetTable();
+        }
+    </script>
+</body>
+</html> 
