@@ -4,8 +4,8 @@
  */
 
 class TornOddsEngine {
-    constructor(mongoDb, options = {}) {
-        this.db = mongoDb;
+    constructor(options = {}) {
+        this.factionData = null;
         this.cache = new Map();
         
         // Simple configuration - only essentials
@@ -21,7 +21,35 @@ class TornOddsEngine {
             memberWeight: 0.15    // 15% - Least important
         };
         
-        console.log('TornOddsEngine initialized (simplified)');
+        console.log('TornOddsEngine initialized (JSON-based)');
+    }
+
+    /**
+     * Load faction data from JSON file
+     */
+    async loadFactionData() {
+        try {
+            const fs = require('fs');
+            const path = require('path');
+            
+            // Try to load from data/factions.json
+            const jsonPath = path.join(__dirname, '..', 'data', 'factions.json');
+            
+            if (fs.existsSync(jsonPath)) {
+                const data = fs.readFileSync(jsonPath, 'utf8');
+                this.factionData = JSON.parse(data);
+                console.log(`✅ Loaded ${this.factionData.factions.length} factions from JSON file`);
+                return true;
+            } else {
+                console.warn('⚠️ factions.json not found, using empty data');
+                this.factionData = { factions: [] };
+                return false;
+            }
+        } catch (error) {
+            console.error('❌ Failed to load faction data:', error.message);
+            this.factionData = { factions: [] };
+            return false;
+        }
     }
 
     /**
@@ -175,7 +203,7 @@ class TornOddsEngine {
     }
 
     /**
-     * Fetch faction data with simple caching
+     * Fetch faction data from JSON with simple caching
      */
     async getFactionData(factionId) {
         const cacheKey = `faction_${factionId}`;
@@ -187,13 +215,16 @@ class TornOddsEngine {
         }
 
         try {
-            // Fetch from MongoDB
-            const faction = await this.db.collection('factions').findOne({
-                id: parseInt(factionId)
-            });
+            // Load faction data if not already loaded
+            if (!this.factionData) {
+                await this.loadFactionData();
+            }
+
+            // Find faction in JSON data
+            const faction = this.factionData.factions.find(f => f.id.toString() === factionId.toString());
 
             if (!faction) {
-                console.warn(`Faction ${factionId} not found in database`);
+                console.warn(`Faction ${factionId} not found in JSON data`);
                 return null;
             }
 
@@ -254,21 +285,24 @@ class TornOddsEngine {
      */
     async healthCheck() {
         try {
-            // Test database connection
-            await this.db.collection('factions').findOne({}, { limit: 1 });
+            // Load faction data if not already loaded
+            if (!this.factionData) {
+                await this.loadFactionData();
+            }
             
             return {
                 status: 'healthy',
                 timestamp: new Date(),
                 cacheSize: this.cache.size,
-                dbConnected: true
+                factionsLoaded: this.factionData.factions.length,
+                lastUpdated: this.factionData.lastUpdated
             };
         } catch (error) {
             return {
                 status: 'unhealthy',
                 timestamp: new Date(),
                 error: error.message,
-                dbConnected: false
+                factionsLoaded: 0
             };
         }
     }

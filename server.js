@@ -35,10 +35,9 @@ async function connectToMongoDB() {
 async function initializeOddsEngine() {
     if (!oddsEngine) {
         try {
-            const client = await connectToMongoDB();
-            const db = client.db(DATABASE_NAME);
-            oddsEngine = new TornOddsEngine(db);
-            console.log('Odds engine initialized successfully');
+            oddsEngine = new TornOddsEngine();
+            await oddsEngine.loadFactionData();
+            console.log('Odds engine initialized successfully (JSON-based)');
         } catch (error) {
             console.error('Failed to initialize odds engine:', error);
             throw error;
