@@ -924,7 +924,7 @@
                 // Get API key from localStorage or use a default one for testing
                 const apiKey = localStorage.getItem('tornApiKey') || 'C0wctKtdsgjJYpWe';
                 
-                const response = await fetch(`https://api.torn.com/torn/?selections=rankedwars&key=${apiKey}`);
+                const response = await fetch(`/api/torn/rankedwars?key=${apiKey}`);
                 const data = await response.json();
                 
                 if (data.error) {

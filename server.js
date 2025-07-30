@@ -433,6 +433,78 @@ app.use((err, req, res, next) => {
     });
 });
 
+// Torn City API Proxy Endpoints
+app.get('/api/torn/user', async (req, res) => {
+    try {
+        const apiKey = req.query.key;
+        if (!apiKey) {
+            return res.status(400).json({ error: 'API key required' });
+        }
+
+        const response = await axios.get(`https://api.torn.com/user/?selections=profile&key=${apiKey}`);
+        res.json(response.data);
+    } catch (error) {
+        console.error('Torn API user error:', error.response?.data || error.message);
+        res.status(error.response?.status || 500).json({
+            error: error.response?.data?.error || 'Failed to fetch user data'
+        });
+    }
+});
+
+app.get('/api/torn/rankedwars', async (req, res) => {
+    try {
+        const apiKey = req.query.key;
+        if (!apiKey) {
+            return res.status(400).json({ error: 'API key required' });
+        }
+
+        const response = await axios.get(`https://api.torn.com/torn/?selections=rankedwars&key=${apiKey}`);
+        res.json(response.data);
+    } catch (error) {
+        console.error('Torn API rankedwars error:', error.response?.data || error.message);
+        res.status(error.response?.status || 500).json({
+            error: error.response?.data?.error || 'Failed to fetch ranked wars data'
+        });
+    }
+});
+
+app.get('/api/torn/faction/:factionId', async (req, res) => {
+    try {
+        const { factionId } = req.params;
+        const apiKey = req.query.key;
+        const selections = req.query.selections || 'chain';
+
+        if (!apiKey) {
+            return res.status(400).json({ error: 'API key required' });
+        }
+
+        const response = await axios.get(`https://api.torn.com/faction/${factionId}?selections=${selections}&key=${apiKey}`);
+        res.json(response.data);
+    } catch (error) {
+        console.error('Torn API faction error:', error.response?.data || error.message);
+        res.status(error.response?.status || 500).json({
+            error: error.response?.data?.error || 'Failed to fetch faction data'
+        });
+    }
+});
+
+app.get('/api/torn/user/log', async (req, res) => {
+    try {
+        const apiKey = req.query.key;
+        if (!apiKey) {
+            return res.status(400).json({ error: 'API key required' });
+        }
+
+        const response = await axios.get(`https://api.torn.com/user/?selections=log&key=${apiKey}`);
+        res.json(response.data);
+    } catch (error) {
+        console.error('Torn API user log error:', error.response?.data || error.message);
+        res.status(error.response?.status || 500).json({
+            error: error.response?.data?.error || 'Failed to fetch user log'
+        });
+    }
+});
+
 // 404 handler
 app.use((req, res) => {
     res.status(404).json({
