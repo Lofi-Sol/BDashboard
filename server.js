@@ -9,6 +9,11 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Rate limiting
+const requestCounts = new Map();
+const RATE_LIMIT = 50; // Max requests per minute per API key
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
+
 // MongoDB connection
 const MONGODB_URI = 'mongodb+srv://oowol003:TornData2341@torndata.vxouoj6.mongodb.net/?retryWrites=true&w=majority&appName=TornData';
 const DATABASE_NAME = 'torn_data';
@@ -44,6 +49,36 @@ async function initializeOddsEngine() {
         }
     }
     return oddsEngine;
+}
+
+// Rate limiting middleware
+function rateLimit(req, res, next) {
+    const apiKey = req.query.key;
+    if (!apiKey) {
+        return next();
+    }
+    
+    const now = Date.now();
+    const key = `${apiKey}_${req.path}`;
+    const requests = requestCounts.get(key) || [];
+    
+    // Remove old requests outside the window
+    const validRequests = requests.filter(time => now - time < RATE_LIMIT_WINDOW);
+    
+    if (validRequests.length >= RATE_LIMIT) {
+        return res.status(429).json({
+            error: {
+                code: 5,
+                error: 'Rate limit exceeded. Please wait before making more requests.'
+            }
+        });
+    }
+    
+    // Add current request
+    validRequests.push(now);
+    requestCounts.set(key, validRequests);
+    
+    next();
 }
 
 // Middleware
@@ -433,15 +468,33 @@ app.use((err, req, res, next) => {
     });
 });
 
+// Cache for Torn City API responses
+const tornApiCache = new Map();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
 // Torn City API Proxy Endpoints
-app.get('/api/torn/user', async (req, res) => {
+app.get('/api/torn/user', rateLimit, async (req, res) => {
     try {
         const apiKey = req.query.key;
         if (!apiKey) {
             return res.status(400).json({ error: 'API key required' });
         }
 
+        // Check cache first
+        const cacheKey = `user_${apiKey}`;
+        const cached = tornApiCache.get(cacheKey);
+        if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+            return res.json(cached.data);
+        }
+
         const response = await axios.get(`https://api.torn.com/user/?selections=profile&key=${apiKey}`);
+        
+        // Cache the response
+        tornApiCache.set(cacheKey, {
+            data: response.data,
+            timestamp: Date.now()
+        });
+        
         res.json(response.data);
     } catch (error) {
         console.error('Torn API user error:', error.response?.data || error.message);
@@ -451,14 +504,28 @@ app.get('/api/torn/user', async (req, res) => {
     }
 });
 
-app.get('/api/torn/rankedwars', async (req, res) => {
+app.get('/api/torn/rankedwars', rateLimit, async (req, res) => {
     try {
         const apiKey = req.query.key;
         if (!apiKey) {
             return res.status(400).json({ error: 'API key required' });
         }
 
+        // Check cache first
+        const cacheKey = `rankedwars_${apiKey}`;
+        const cached = tornApiCache.get(cacheKey);
+        if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+            return res.json(cached.data);
+        }
+
         const response = await axios.get(`https://api.torn.com/torn/?selections=rankedwars&key=${apiKey}`);
+        
+        // Cache the response
+        tornApiCache.set(cacheKey, {
+            data: response.data,
+            timestamp: Date.now()
+        });
+        
         res.json(response.data);
     } catch (error) {
         console.error('Torn API rankedwars error:', error.response?.data || error.message);
@@ -468,7 +535,7 @@ app.get('/api/torn/rankedwars', async (req, res) => {
     }
 });
 
-app.get('/api/torn/faction/:factionId', async (req, res) => {
+app.get('/api/torn/faction/:factionId', rateLimit, async (req, res) => {
     try {
         const { factionId } = req.params;
         const apiKey = req.query.key;
@@ -478,7 +545,21 @@ app.get('/api/torn/faction/:factionId', async (req, res) => {
             return res.status(400).json({ error: 'API key required' });
         }
 
+        // Check cache first
+        const cacheKey = `faction_${factionId}_${selections}_${apiKey}`;
+        const cached = tornApiCache.get(cacheKey);
+        if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+            return res.json(cached.data);
+        }
+
         const response = await axios.get(`https://api.torn.com/faction/${factionId}?selections=${selections}&key=${apiKey}`);
+        
+        // Cache the response
+        tornApiCache.set(cacheKey, {
+            data: response.data,
+            timestamp: Date.now()
+        });
+        
         res.json(response.data);
     } catch (error) {
         console.error('Torn API faction error:', error.response?.data || error.message);
@@ -488,14 +569,28 @@ app.get('/api/torn/faction/:factionId', async (req, res) => {
     }
 });
 
-app.get('/api/torn/user/log', async (req, res) => {
+app.get('/api/torn/user/log', rateLimit, async (req, res) => {
     try {
         const apiKey = req.query.key;
         if (!apiKey) {
             return res.status(400).json({ error: 'API key required' });
         }
 
+        // Check cache first
+        const cacheKey = `userlog_${apiKey}`;
+        const cached = tornApiCache.get(cacheKey);
+        if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+            return res.json(cached.data);
+        }
+
         const response = await axios.get(`https://api.torn.com/user/?selections=log&key=${apiKey}`);
+        
+        // Cache the response
+        tornApiCache.set(cacheKey, {
+            data: response.data,
+            timestamp: Date.now()
+        });
+        
         res.json(response.data);
     } catch (error) {
         console.error('Torn API user log error:', error.response?.data || error.message);

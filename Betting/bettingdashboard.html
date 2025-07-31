@@ -3056,55 +3056,15 @@
                 console.warn('Error loading local faction data:', error);
             }
             
-            // Fetch chain data for each faction from Torn API
-            const fetchPromises = Array.from(uniqueFactionIds).map(async (factionId) => {
-                try {
-                    const response = await fetch(`http://localhost:3000/api/torn/faction/${factionId}?selections=chain&key=${apiKey}`);
-                    const data = await response.json();
-                    
-                    if (data.error) {
-                        console.warn(`Error fetching chain data for faction ${factionId}:`, data.error);
-                        return { factionId, chain: 0, respect: null, rank: null };
-                    }
-                    
-                    // Get local data for this faction
-                    const localData = localFactionData[factionId] || {};
-                    
-                    return { 
-                        factionId, 
-                        chain: data.chain?.current || 0,
-                        respect: localData.respect || null,
-                        rank: localData.rank || null,
-                        members: localData.members || null,
-                        position: localData.position || null
-                    };
-                } catch (error) {
-                    console.warn(`Failed to fetch chain data for faction ${factionId}:`, error);
-                    
-                    // Still try to get local data even if chain fetch fails
-                    const localData = localFactionData[factionId] || {};
-                    return { 
-                        factionId, 
-                        chain: 0,
-                        respect: localData.respect || null,
-                        rank: localData.rank || null,
-                        members: localData.members || null,
-                        position: localData.position || null
-                    };
-                }
-            });
-            
-            // Wait for all requests to complete
-            const results = await Promise.all(fetchPromises);
-            
-            // Convert to lookup object with enhanced data
-            results.forEach(({ factionId, chain, respect, rank, members, position }) => {
+            // Use only local faction data to avoid rate limiting
+            Array.from(uniqueFactionIds).forEach((factionId) => {
+                const localData = localFactionData[factionId] || {};
                 factionEnhancedData[factionId] = {
-                    chain,
-                    respect,
-                    rank,
-                    members,
-                    position
+                    chain: localData.chain || 0,
+                    respect: localData.respect || null,
+                    rank: localData.rank || null,
+                    members: localData.members || null,
+                    position: localData.position || null
                 };
             });
             
