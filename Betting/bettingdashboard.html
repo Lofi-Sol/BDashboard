@@ -162,11 +162,39 @@
         }
         .dashboard-header {
             display: flex;
-            gap: 0;
+            justify-content: space-between;
+            align-items: center;
             background: #fff;
             box-shadow: 0 2px 8px rgba(35,37,38,0.04);
             border-bottom: 1px solid #ececec;
             padding: 0 0 0 0;
+        }
+
+        .dashboard-tabs {
+            display: flex;
+            gap: 0;
+        }
+
+        .dashboard-controls {
+            display: flex;
+            gap: 10px;
+            padding-right: 20px;
+        }
+
+        .logout-btn {
+            background: #ef4444;
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
         }
         .dashboard-tab {
             padding: 18px 36px;
@@ -2242,8 +2270,13 @@
     </div>
     <div id="dashboard" class="dashboard" style="display:none;">
         <div class="dashboard-header">
-            <button class="dashboard-tab active" data-tab="colosseum">Colosseum</button>
-            <button class="dashboard-tab" data-tab="bettracking">Bet Tracking</button>
+            <div class="dashboard-tabs">
+                <button class="dashboard-tab active" data-tab="colosseum">Colosseum</button>
+                <button class="dashboard-tab" data-tab="bettracking">Bet Tracking</button>
+            </div>
+            <div class="dashboard-controls">
+                <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+            </div>
         </div>
         <div class="dashboard-content">
             <div class="tab-content" id="tab-colosseum">
@@ -2425,6 +2458,11 @@
             
             apiKey = apiKeyInput.value.trim();
             
+            // Save API key to localStorage
+            if (apiKey) {
+                localStorage.setItem('tornApiKey', apiKey);
+            }
+            
             if (!apiKey) {
                 errorMsg.textContent = 'Please enter your API key';
                 return;
@@ -2490,6 +2528,40 @@
                         successMsg.textContent = '';
                     }
                 });
+        }
+
+        // Check for existing API key on page load
+        function checkExistingApiKey() {
+            const savedApiKey = localStorage.getItem('tornApiKey');
+            if (savedApiKey) {
+                document.getElementById('apiKey').value = savedApiKey;
+                apiKey = savedApiKey;
+                // Auto-connect if API key exists
+                connectAPI();
+            }
+        }
+
+        // Logout function
+        function logout() {
+            // Clear API key from localStorage
+            localStorage.removeItem('tornApiKey');
+            
+            // Reset variables
+            apiKey = null;
+            userData = null;
+            
+            // Show login screen
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('mainBox').style.display = 'flex';
+            
+            // Clear API key input
+            document.getElementById('apiKey').value = '';
+            
+            // Clear messages
+            document.getElementById('errorMsg').textContent = '';
+            document.getElementById('successMsg').textContent = '';
+            
+            console.log('Logged out successfully');
         }
 
         // Handle Enter key in API key input
@@ -5100,6 +5172,9 @@
 
         // Set up bet filter event listeners
         document.addEventListener('DOMContentLoaded', function() {
+            // Check for existing API key on page load
+            checkExistingApiKey();
+            
             // Add event listeners for bet filters
             const statusFilter = document.getElementById('bet-status-filter');
             const warFilter = document.getElementById('bet-war-filter');
