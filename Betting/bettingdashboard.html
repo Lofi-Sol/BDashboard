@@ -3068,10 +3068,14 @@
                     bettingWarsData = { weeks: [] }; // Empty weeks array will use all wars
                 }
                 
-                // Extract current week's wars from the new structure
+                // Extract war IDs from the betting-wars.json file
                 let currentWars = [];
-                if (bettingWarsData.weeks && bettingWarsData.weeks.length > 0) {
-                    // Get the most recent week's wars
+                if (bettingWarsData.warIds && bettingWarsData.warIds.length > 0) {
+                    // Use the warIds array from the JSON file
+                    currentWars = bettingWarsData.warIds;
+                    console.log(`Loaded ${currentWars.length} wars from betting-wars.json`);
+                } else if (bettingWarsData.weeks && bettingWarsData.weeks.length > 0) {
+                    // Fallback for weeks format
                     const currentWeek = bettingWarsData.weeks[bettingWarsData.weeks.length - 1];
                     currentWars = currentWeek.wars || [];
                     console.log(`Loaded ${currentWars.length} wars from current week (${bettingWarsData.weeks.length} weeks of history)`);
@@ -3095,7 +3099,7 @@
                 }
 
                 // Filter wars to only include the selected betting wars
-                const selectedWars = {};
+                let selectedWars = {};
                 if (currentWars.length === 0) {
                     // If no specific wars are selected, use all available wars
                     selectedWars = warsData.rankedwars;
