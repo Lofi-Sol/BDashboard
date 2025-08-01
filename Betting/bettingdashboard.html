@@ -2287,7 +2287,7 @@
                     </div>
                 </div>
                 <div class="betting-info">
-                    <p>💰 <strong>How Betting Works:</strong> Place bets on faction wars using Xanax as currency. Odds are calculated dynamically based on faction strength, historical performance, and current betting volume. Higher odds mean bigger potential returns, but lower probability of winning. Bet amounts are locked once the war starts, and payouts are calculated when the war ends.</p>
+                    <p>💰 <strong>How Betting Works:</strong> Place bets on faction wars using Xanax as currency. Odds are displayed in decimal format (e.g., 2.00, 1.50) and calculated dynamically based on faction strength, historical performance, and current betting volume. <strong>Decimal odds</strong> show your total return - multiply your bet by the odds to get your payout. For example, 2.00 odds means bet 1 Xanax → win 2 Xanax total (1 profit). Higher odds mean bigger potential returns, but lower probability of winning. Bet amounts are locked once the war starts, and payouts are calculated when the war ends.</p>
                 </div>
                     
                 <div id="betting-loading" class="inventory-loading">Loading Ranked Wars...</div>
@@ -2298,9 +2298,9 @@
                             <input type="text" id="faction-search" placeholder="Search faction name..." class="faction-search-input">
                         </div>
                         <div class="filter-tabs">
-                            <button class="filter-tab active" data-filter="all">All Wars</button>
+                            <button class="filter-tab" data-filter="all">All Wars</button>
                             <button class="filter-tab" data-filter="active">Active</button>
-                            <button class="filter-tab" data-filter="upcoming">Upcoming</button>
+                            <button class="filter-tab active" data-filter="upcoming">Upcoming</button>
                             <button class="filter-tab" data-filter="finished">Finished</button>
                         </div>
                     </div>
@@ -2325,14 +2325,6 @@
 
 
             <div class="tab-content" id="tab-bettracking" style="display:none;">
-                <!-- Bet Tracking Header -->
-                <div class="bet-tracking-header">
-                    <h2>🎯 Bet Tracking Dashboard</h2>
-                    <div style="display: flex; gap: 12px; align-items: center;">
-                        <span style="font-size: 0.9rem; color: rgba(255,255,255,0.8);">Auto-tracking active</span>
-                        <div style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: pulse 2s infinite;"></div>
-                    </div>
-                </div>
                 
                 <!-- Compact Stats Grid -->
                 <div class="compact-stats-grid">
@@ -2431,7 +2423,7 @@
         let autoRefreshBettingInterval = null;
         let isAutoRefreshBettingEnabled = false;
         let selectedBet = null;
-        const XANAX_PRICE = 700000; // $700,000 per Xanax
+        const XANAX_PRICE =744983; // $700,000 per Xanax
         
         // API-based odds system
         let oddsAPI = {
@@ -2443,7 +2435,7 @@
         let currentBettingVolume = {}; // Current betting volume data
         
         // Filter system
-        let currentFilter = 'all';
+        let currentFilter = 'upcoming';
         let currentSearch = '';
         
         // Log monitoring system
@@ -2477,7 +2469,7 @@
             successMsg.textContent = 'Connecting...';
             
             // Test the API key by fetching user data
-                            fetch(`http://localhost:3000/api/torn/user?key=${apiKey}`)
+                            fetch(`/api/torn/user?key=${apiKey}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.error) {
@@ -2635,7 +2627,7 @@
             contentEl.style.display = 'none';
 
             try {
-                const response = await fetch(`http://localhost:3000/api/torn/rankedwars?key=${apiKey}`);
+                const response = await fetch(`/api/torn/rankedwars?key=${apiKey}`);
                 const data = await response.json();
                 
                 if (data.error) {
@@ -2928,6 +2920,50 @@
         // Initialize sample betting volume data
         initializeBettingVolumeData();
         
+        // Helper function to format odds display
+        function formatOddsDisplay(odds) {
+            if (typeof odds === 'number' && odds >= 1) {
+                // Decimal odds format
+                return odds.toFixed(2);
+            } else if (typeof odds === 'string' && (odds.startsWith('+') || odds.startsWith('-'))) {
+                // American odds format (legacy)
+                return odds;
+            } else if (typeof odds === 'number') {
+                // Percentage format (legacy)
+                return `${odds}%`;
+            } else {
+                // Fallback to reasonable decimal odds
+                return '2.00';
+            }
+        }
+
+        // Helper function to calculate returns for decimal odds
+        function calculateReturns(odds, xanaxAmount = 1) {
+            if (typeof odds === 'number' && odds >= 1) {
+                // Decimal odds calculation
+                const totalReturnXanax = Math.round(xanaxAmount * odds);
+                return totalReturnXanax * XANAX_PRICE;
+            } else if (typeof odds === 'string' && (odds.startsWith('+') || odds.startsWith('-'))) {
+                // American odds calculation (legacy)
+                const oddsValue = parseInt(odds.replace('+', ''));
+                const betValue = xanaxAmount * XANAX_PRICE;
+                
+                if (oddsValue > 0) {
+                    // Positive odds: win $odds for every $100 bet
+                    return Math.round(betValue + (betValue * (oddsValue / 100)));
+                } else {
+                    // Negative odds: bet $|odds| to win $100
+                    return Math.round(betValue + (betValue * (100 / Math.abs(oddsValue))));
+                }
+            } else if (typeof odds === 'number') {
+                // Legacy percentage calculation
+                return Math.round(XANAX_PRICE * (100 / odds));
+            } else {
+                // Fallback
+                return XANAX_PRICE * 2;
+            }
+        }
+
         // Initialize API-based odds calculation
         function initializeOddsAPI() {
             // Calculate odds between two factions using the API
@@ -2958,8 +2994,24 @@
                     console.error('Error calculating odds:', error);
                     // Return fallback odds if API fails
                     return {
-                        [faction1Id]: 50,
-                        [faction2Id]: 50,
+                        [faction1Id]: {
+                            odds: 2.00,
+                            impliedProbability: 0.50,
+                            trueProbability: 0.485,
+                            format: 'decimal',
+                            bettingExamples: [
+                                { bet: 1, totalReturn: 2, profit: 1, description: 'Bet 1 Xanax → Win 2 Xanax total (1 profit)' }
+                            ]
+                        },
+                        [faction2Id]: {
+                            odds: 2.00,
+                            impliedProbability: 0.50,
+                            trueProbability: 0.515,
+                            format: 'decimal',
+                            bettingExamples: [
+                                { bet: 1, totalReturn: 2, profit: 1, description: 'Bet 1 Xanax → Win 2 Xanax total (1 profit)' }
+                            ]
+                        },
                         metadata: {
                             confidence: 0,
                             timestamp: new Date(),
@@ -3062,7 +3114,7 @@
 
             try {
                 // Fetch ranked wars data
-                const warsResponse = await fetch(`http://localhost:3000/api/torn/rankedwars?key=${apiKey}`);
+                const warsResponse = await fetch(`/api/torn/rankedwars?key=${apiKey}`);
                 const warsData = await warsResponse.json();
 
                 if (warsData.error) {
@@ -3207,8 +3259,8 @@
                 
                 // Calculate odds using the new API-based system
                 const calculatedOdds = await oddsAPI.calculateOdds(factionIds[0], factionIds[1]);
-                const odds1 = calculatedOdds[factionIds[0]] || 50;
-                const odds2 = calculatedOdds[factionIds[1]] || 50;
+                const odds1 = calculatedOdds[factionIds[0]]?.odds || 2.00;
+                const odds2 = calculatedOdds[factionIds[1]]?.odds || 2.00;
                 
                 // Determine actual status based on current time and war state
                 const now = Math.floor(Date.now() / 1000);
@@ -3281,9 +3333,10 @@
                     }
                 };
                 
-                // Generate random odds for sample data (no API call needed)
-                const odds1 = Math.floor(Math.random() * 60) + 20; // 20-80%
-                const odds2 = 100 - odds1; // Ensure they add up to 100%
+                // Generate random decimal odds for sample data (no API call needed)
+                const allowedOdds = [1.20, 1.25, 1.33, 1.50, 1.67, 2.00, 2.50, 3.00, 4.00, 5.00];
+                const odds1 = allowedOdds[Math.floor(Math.random() * allowedOdds.length)];
+                const odds2 = allowedOdds[Math.floor(Math.random() * allowedOdds.length)];
                 
                 // Create a mix of preparing, active, and finished wars
                 let status, startTime, endTime;
@@ -3461,12 +3514,12 @@
                                             </a>
                                 </div>
                                 <div class="betting-option-details">
-                                    Score: ${option.score.toLocaleString()} | Chain: ${option.chain}${option.respect ? ` | Respect: ${option.respect.toLocaleString()}` : ''}${option.rank ? ` | Rank: ${option.rank}` : ''}
+                                    Score: ${option.score.toLocaleString()} | Chain: ${option.chain}
                                 </div>
                         </div>
                                     <div class="betting-option-right">
-                                        <div class="betting-odds">${option.odds}%</div>
-                                        <div class="betting-returns">$${Math.round(XANAX_PRICE * (100 / option.odds))}</div>
+                                        <div class="betting-odds">${formatOddsDisplay(option.odds)}</div>
+                                        <div class="betting-returns">$${calculateReturns(option.odds).toLocaleString()}</div>
                     </div>
                         </div>
                             `).join('')}
@@ -3630,7 +3683,7 @@
                     <label class="betting-form-label">Select Faction:</label>
                     <select id="betting-faction-select" class="betting-form-input">
                         ${market.options.map(option => `
-                            <option value="${option.id}">${option.name} (${option.odds}%)</option>
+                                                            <option value="${option.id}">${option.name} (${formatOddsDisplay(option.odds)})</option>
                         `).join('')}
                     </select>
                 </div>
@@ -3679,10 +3732,34 @@
             if (!faction) return;
             
             const betValue = xanaxAmount * XANAX_PRICE;
-            const potentialReturn = Math.round(betValue * (100 / faction.odds));
+            
+            // Calculate total return using decimal odds
+            let totalReturn;
+            if (typeof faction.odds === 'number' && faction.odds >= 1) {
+                // Decimal odds calculation
+                const totalReturnXanax = Math.round(xanaxAmount * faction.odds);
+                totalReturn = totalReturnXanax * XANAX_PRICE;
+            } else if (typeof faction.odds === 'string' && (faction.odds.startsWith('+') || faction.odds.startsWith('-'))) {
+                // American odds calculation (legacy)
+                const oddsValue = parseInt(faction.odds.replace('+', ''));
+                
+                if (oddsValue > 0) {
+                    // Positive odds: win $odds for every $100 bet
+                    totalReturn = Math.round(betValue + (betValue * (oddsValue / 100)));
+                } else {
+                    // Negative odds: bet $|odds| to win $100
+                    totalReturn = Math.round(betValue + (betValue * (100 / Math.abs(oddsValue))));
+                }
+            } else if (typeof faction.odds === 'number') {
+                // Legacy percentage calculation
+                totalReturn = Math.round(betValue * (100 / faction.odds));
+            } else {
+                // Fallback
+                totalReturn = betValue * 2;
+            }
             
             document.getElementById('betting-value-display').textContent = betValue.toLocaleString();
-            document.getElementById('betting-return-display').textContent = potentialReturn.toLocaleString();
+            document.getElementById('betting-return-display').textContent = totalReturn.toLocaleString();
         }
 
         function placeBetNow() {
@@ -4014,7 +4091,7 @@
             if (autoRefreshBettingInterval) {
                 clearInterval(autoRefreshBettingInterval);
             }
-            autoRefreshBettingInterval = setInterval(loadBettingInterface, 30000); // Refresh every 30 seconds
+            autoRefreshBettingInterval = setInterval(loadBettingInterface, 120000); // Refresh every 2 minutes
             isAutoRefreshBettingEnabled = true;
         }
         
@@ -4093,7 +4170,7 @@
         setInterval(updateTimers, 1000); // Update every second
         
         // Start odds updates
-        setInterval(updateOdds, 5000); // Update odds every 5 seconds
+        setInterval(updateOdds, 15000); // Update odds every 15 seconds
         
         // Update odds in real-time
         async function updateOdds() {
@@ -4109,9 +4186,26 @@
                         // Calculate new odds using API
                         const newOdds = await oddsAPI.calculateOdds(faction1Id, faction2Id);
                         
-                        // Update market odds
-                        market.options[0].odds = newOdds[faction1Id] || 50;
-                        market.options[1].odds = newOdds[faction2Id] || 50;
+                        // Update market odds - handle new sportsbook format
+                        if (newOdds[faction1Id] && typeof newOdds[faction1Id] === 'object') {
+                            // New sportsbook format
+                            market.options[0].odds = newOdds[faction1Id].odds;
+                            market.options[0].impliedProbability = newOdds[faction1Id].impliedProbability;
+                            market.options[0].trueProbability = newOdds[faction1Id].trueProbability;
+                        } else {
+                            // Fallback to reasonable decimal odds instead of percentage
+                            market.options[0].odds = newOdds[faction1Id] || 2.00;
+                        }
+                        
+                        if (newOdds[faction2Id] && typeof newOdds[faction2Id] === 'object') {
+                            // New decimal format
+                            market.options[1].odds = newOdds[faction2Id].odds;
+                            market.options[1].impliedProbability = newOdds[faction2Id].impliedProbability;
+                            market.options[1].trueProbability = newOdds[faction2Id].trueProbability;
+                        } else {
+                            // Fallback to reasonable decimal odds instead of percentage
+                            market.options[1].odds = newOdds[faction2Id] || 2.00;
+                        }
                         
                     } catch (error) {
                         console.error(`Failed to update odds for market ${market.id}:`, error);
@@ -4171,7 +4265,7 @@
             try {
                 console.log('Checking logs for bet confirmations...');
                 
-                const response = await fetch(`http://localhost:3000/api/torn/user/log?key=${apiKey}`);
+                const response = await fetch(`/api/torn/user/log?key=${apiKey}`);
                 const data = await response.json();
                 
                 if (data.error) {
@@ -4771,7 +4865,7 @@
             autoRefreshUserBetsInterval = setInterval(async () => {
                 await refreshLiveWarData();
                 displayUserBets(); // Re-render with updated data
-            }, 30000); // Refresh every 30 seconds
+            }, 120000); // Refresh every 2 minutes
             isAutoRefreshUserBetsEnabled = true;
         }
         
@@ -4829,7 +4923,7 @@
                 console.log('Fetching live war data for user bets...');
                 
                 // Fetch current war data from Torn API
-                const response = await fetch('http://localhost:3000/api/torn/rankedwars?key=C0wctKtdsgjJYpWe');
+                const response = await fetch('/api/torn/rankedwars?key=C0wctKtdsgjJYpWe');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }

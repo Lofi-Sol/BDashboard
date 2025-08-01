@@ -1,27 +1,42 @@
 /**
- * Simplified Torn City Faction War Odds Engine
- * Clean, focused implementation without over-engineering
+ * Decimal Odds Engine for Torn City Faction War Betting
+ * Optimized for whole Xanax betting with clean payouts
  */
 
-class TornOddsEngine {
+class TornDecimalOddsEngine {
     constructor(options = {}) {
         this.factionData = null;
         this.cache = new Map();
         
-        // Simple configuration - only essentials
+        // Decimal odds configuration
         this.config = {
-            houseEdge: options.houseEdge || 0.06,        // 6%
+            houseEdge: options.houseEdge || 0.06,        // 6% house edge
             cacheTime: options.cacheTime || 300000,      // 5 minutes
-            maxOdds: options.maxOdds || 90,              // 90%
-            minOdds: options.minOdds || 10,              // 10%
+            maxProbability: 0.80,                        // 80% max (allows more extreme odds)
+            minProbability: 0.20,                        // 20% min (allows more extreme odds)
+            xanaxPrice: options.xanaxPrice || 744983,    // Current Xanax market price
             
             // Probability weights
-            rankWeight: 0.50,     // 50% - Most important
-            respectWeight: 0.35,  // 35% - Secondary
-            memberWeight: 0.15    // 15% - Least important
+            rankWeight: 0.50,
+            respectWeight: 0.35,
+            memberWeight: 0.15,
+            
+            // Clean decimal odds that work with whole Xanax
+            allowedOdds: [
+                1.20,  // Bet 5 Xanax → Win 6 Xanax total (1 profit)
+                1.25,  // Bet 4 Xanax → Win 5 Xanax total (1 profit)
+                1.33,  // Bet 3 Xanax → Win 4 Xanax total (1 profit)
+                1.50,  // Bet 2 Xanax → Win 3 Xanax total (1 profit)
+                1.67,  // Bet 3 Xanax → Win 5 Xanax total (2 profit)
+                2.00,  // Bet 1 Xanax → Win 2 Xanax total (1 profit) - EVEN MONEY
+                2.50,  // Bet 2 Xanax → Win 5 Xanax total (3 profit)
+                3.00,  // Bet 1 Xanax → Win 3 Xanax total (2 profit)
+                4.00,  // Bet 1 Xanax → Win 4 Xanax total (3 profit)
+                5.00   // Bet 1 Xanax → Win 5 Xanax total (4 profit)
+            ]
         };
         
-        console.log('TornOddsEngine initialized (JSON-based)');
+        console.log('TornDecimalOddsEngine initialized with Xanax-friendly odds');
     }
 
     /**
@@ -32,7 +47,6 @@ class TornOddsEngine {
             const fs = require('fs');
             const path = require('path');
             
-            // Try to load from data/factions.json
             const jsonPath = path.join(__dirname, '..', 'data', 'factions.json');
             
             if (fs.existsSync(jsonPath)) {
@@ -53,11 +67,11 @@ class TornOddsEngine {
     }
 
     /**
-     * Main odds calculation method
+     * Main odds calculation method - returns decimal odds
      */
     async calculateOdds(faction1Id, faction2Id) {
         try {
-            console.log(`Calculating odds for factions ${faction1Id} vs ${faction2Id}`);
+            console.log(`Calculating decimal odds for factions ${faction1Id} vs ${faction2Id}`);
             
             // Fetch faction data
             const [faction1, faction2] = await Promise.all([
@@ -70,60 +84,226 @@ class TornOddsEngine {
                 throw new Error('Faction data not found');
             }
 
-            console.log(`Faction data loaded: ${faction1.name} (${faction1.rank}, ${faction1.respect}) vs ${faction2.name} (${faction2.rank}, ${faction2.respect})`);
+            // Calculate true probabilities
+            const trueProbability1 = this.calculateWinProbability(faction1, faction2);
+            const trueProbability2 = 1 - trueProbability1;
 
-            // Calculate base probabilities
-            const probability1 = this.calculateWinProbability(faction1, faction2);
-            const probability2 = 1 - probability1;
+            // Apply house edge
+            const bettingOdds = this.applyHouseEdge(trueProbability1, trueProbability2);
 
-            // Apply house edge and convert to odds
-            const odds1 = this.probabilityToOdds(probability1);
-            const odds2 = this.probabilityToOdds(probability2);
+            // Convert to clean decimal odds
+            const odds1 = this.convertToCleanDecimalOdds(bettingOdds.prob1);
+            const odds2 = this.convertToCleanDecimalOdds(bettingOdds.prob2);
 
-            console.log(`Calculated odds: ${odds1}% vs ${odds2}% (probability: ${(probability1 * 100).toFixed(1)}% vs ${(probability2 * 100).toFixed(1)}%)`);
+            console.log(`True probabilities: ${(trueProbability1 * 100).toFixed(1)}% vs ${(trueProbability2 * 100).toFixed(1)}%`);
+            console.log(`Decimal odds: ${odds1} vs ${odds2}`);
+            console.log(`House edge: ${((bettingOdds.totalImpliedProb - 1) * 100).toFixed(2)}%`);
 
             return {
-                [faction1Id]: odds1,
-                [faction2Id]: odds2,
+                [faction1Id]: {
+                    odds: odds1,
+                    impliedProbability: 1 / odds1,
+                    trueProbability: trueProbability1,
+                    format: 'decimal',
+                    bettingExamples: this.getBettingExamples(odds1)
+                },
+                [faction2Id]: {
+                    odds: odds2,
+                    impliedProbability: 1 / odds2,
+                    trueProbability: trueProbability2,
+                    format: 'decimal',
+                    bettingExamples: this.getBettingExamples(odds2)
+                },
                 metadata: {
-                    confidence: this.calculateConfidence(probability1),
+                    houseEdge: (bettingOdds.totalImpliedProb - 1) * 100,
+                    totalImpliedProbability: bettingOdds.totalImpliedProb,
+                    confidence: this.calculateConfidence(trueProbability1),
                     timestamp: new Date()
                 }
             };
 
         } catch (error) {
-            console.error('Odds calculation failed:', error.message);
+            console.error('Decimal odds calculation failed:', error.message);
             throw error;
         }
     }
 
     /**
-     * Calculate win probability for faction1 vs faction2
+     * Convert probability to nearest clean decimal odds with better differentiation
      */
+    convertToCleanDecimalOdds(probability) {
+        // Convert probability to ideal decimal odds
+        const idealOdds = 1 / probability;
+        
+        // Use a more focused set of odds that work well with Xanax betting
+        const allowedOdds = [
+            1.25, 1.33, 1.50, 1.67, 1.75, 1.80, 1.90, 2.00, 2.10, 2.20, 2.30, 2.40, 2.50, 2.60, 2.70, 2.80, 2.90, 3.00, 3.25, 3.50, 4.00, 5.00
+        ];
+        
+        // Find the closest allowed odds
+        let closestOdds = allowedOdds[0];
+        let smallestDiff = Math.abs(idealOdds - closestOdds);
+        
+        for (const odds of allowedOdds) {
+            const diff = Math.abs(idealOdds - odds);
+            if (diff < smallestDiff) {
+                smallestDiff = diff;
+                closestOdds = odds;
+            }
+        }
+        
+        // Add some variation to avoid too many identical odds
+        // If the probability is very close to 0.5 (50%), add some randomness
+        if (Math.abs(probability - 0.5) < 0.05) {
+            // For close matches, use odds around 2.00 with some variation
+            const closeMatchOdds = [1.90, 2.00, 2.10, 1.80, 2.20];
+            closestOdds = closeMatchOdds[Math.floor(Math.random() * closeMatchOdds.length)];
+        }
+        
+        return closestOdds;
+    }
+
+    /**
+     * Get betting examples for decimal odds
+     */
+    getBettingExamples(odds) {
+        const examples = [];
+        
+        // Generate practical betting examples
+        for (let bet = 1; bet <= 5; bet++) {
+            const totalReturn = bet * odds;
+            const profit = totalReturn - bet;
+            
+            // Only show if total return is a whole number
+            if (Number.isInteger(totalReturn)) {
+                examples.push({
+                    bet: bet,
+                    totalReturn: totalReturn,
+                    profit: profit,
+                    description: `Bet ${bet} Xanax → Win ${totalReturn} Xanax total (${profit} profit)`
+                });
+            }
+        }
+        
+        // If no clean examples, show the simplest one
+        if (examples.length === 0) {
+            const bet = 1;
+            const totalReturn = Math.round(bet * odds);
+            const profit = totalReturn - bet;
+            examples.push({
+                bet: bet,
+                totalReturn: totalReturn,
+                profit: profit,
+                description: `Bet ${bet} Xanax → Win ~${totalReturn} Xanax total (~${profit} profit)`
+            });
+        }
+        
+        return examples.slice(0, 3); // Return top 3 examples
+    }
+
+    /**
+     * Calculate payout for decimal odds
+     */
+    calculatePayout(xanaxAmount, decimalOdds) {
+        if (xanaxAmount <= 0) throw new Error('Invalid Xanax amount');
+        if (decimalOdds <= 1) throw new Error('Invalid decimal odds');
+        
+        const totalReturnXanax = Math.round(xanaxAmount * decimalOdds);
+        const profitXanax = totalReturnXanax - xanaxAmount;
+        
+        return {
+            xanaxStake: xanaxAmount,
+            xanaxTotalReturn: totalReturnXanax,
+            xanaxProfit: profitXanax,
+            dollarStake: xanaxAmount * this.config.xanaxPrice,
+            dollarTotalReturn: totalReturnXanax * this.config.xanaxPrice,
+            dollarProfit: profitXanax * this.config.xanaxPrice,
+            odds: decimalOdds,
+            description: `Bet ${xanaxAmount} Xanax → Win ${totalReturnXanax} Xanax total (${profitXanax} profit)`
+        };
+    }
+
+    /**
+     * Get all possible clean bets for given odds
+     */
+    getAllPossibleBets(decimalOdds, maxXanax = 10) {
+        const possibleBets = [];
+        
+        for (let bet = 1; bet <= maxXanax; bet++) {
+            const totalReturn = bet * decimalOdds;
+            const profit = totalReturn - bet;
+            
+            // Check if total return is a whole number (or very close)
+            if (Math.abs(totalReturn - Math.round(totalReturn)) < 0.01) {
+                const roundedReturn = Math.round(totalReturn);
+                const roundedProfit = roundedReturn - bet;
+                
+                possibleBets.push({
+                    bet: bet,
+                    totalReturn: roundedReturn,
+                    profit: roundedProfit,
+                    dollarStake: bet * this.config.xanaxPrice,
+                    dollarReturn: roundedReturn * this.config.xanaxPrice,
+                    dollarProfit: roundedProfit * this.config.xanaxPrice
+                });
+            }
+        }
+        
+        return possibleBets;
+    }
+
+    // ... (keeping the same helper methods from the previous engine)
     calculateWinProbability(faction1, faction2) {
-        // Rank probability
         const rankProb = this.calculateRankProbability(faction1.rank, faction2.rank);
-        
-        // Respect probability  
         const respectProb = this.calculateRespectProbability(faction1.respect, faction2.respect);
-        
-        // Member probability
         const memberProb = this.calculateMemberProbability(faction1.members, faction2.members);
         
-        // Weighted combination
-        const totalProbability = (
+        // Calculate weighted probability
+        let totalProbability = (
             (rankProb * this.config.rankWeight) +
             (respectProb * this.config.respectWeight) + 
             (memberProb * this.config.memberWeight)
         );
         
-        // Ensure reasonable bounds (factions are matched, so shouldn't be too extreme)
-        return Math.max(0.15, Math.min(0.85, totalProbability));
+        // Add some variation based on faction differences
+        const respectDiff = Math.abs((faction1.respect || 0) - (faction2.respect || 0));
+        const memberDiff = Math.abs((faction1.members || 0) - (faction2.members || 0));
+        
+        // If there are significant differences, amplify the probability
+        if (respectDiff > 1000000 || memberDiff > 10) {
+            const amplification = Math.min(0.1, (respectDiff / 10000000) + (memberDiff / 100));
+            if (totalProbability > 0.5) {
+                totalProbability += amplification;
+            } else {
+                totalProbability -= amplification;
+            }
+        }
+        
+        return Math.max(this.config.minProbability, Math.min(this.config.maxProbability, totalProbability));
     }
 
-    /**
-     * Calculate rank-based probability
-     */
+    applyHouseEdge(prob1, prob2) {
+        const overround = 1 + this.config.houseEdge;
+        const impliedProb1 = prob1 * overround;
+        const impliedProb2 = prob2 * overround;
+        
+        const maxProb = Math.max(impliedProb1, impliedProb2);
+        if (maxProb > this.config.maxProbability) {
+            const scaleFactor = this.config.maxProbability / maxProb;
+            return {
+                prob1: impliedProb1 * scaleFactor,
+                prob2: impliedProb2 * scaleFactor,
+                totalImpliedProb: (impliedProb1 + impliedProb2) * scaleFactor
+            };
+        }
+        
+        return {
+            prob1: impliedProb1,
+            prob2: impliedProb2,
+            totalImpliedProb: impliedProb1 + impliedProb2
+        };
+    }
+
     calculateRankProbability(rank1, rank2) {
         const rankValues = {
             'Diamond I': 15, 'Diamond II': 14, 'Diamond III': 13, 'Diamond': 12,
@@ -141,25 +321,18 @@ class TornOddsEngine {
         return total > 0 ? value1 / total : 0.5;
     }
 
-    /**
-     * Calculate respect-based probability
-     */
     calculateRespectProbability(respect1, respect2) {
         if (!respect1 && !respect2) return 0.5;
         
-        // Use square root to reduce extreme differences
-        const sqrt1 = Math.sqrt(respect1 || 0);
-        const sqrt2 = Math.sqrt(respect2 || 0);
+        // Use cube root for better differentiation of large respect differences
+        const cubeRoot1 = Math.pow(respect1 || 0, 1/3);
+        const cubeRoot2 = Math.pow(respect2 || 0, 1/3);
         
-        const total = sqrt1 + sqrt2;
-        return total > 0 ? sqrt1 / total : 0.5;
+        const total = cubeRoot1 + cubeRoot2;
+        return total > 0 ? cubeRoot1 / total : 0.5;
     }
 
-    /**
-     * Calculate member-based probability with diminishing returns
-     */
     calculateMemberProbability(members1, members2) {
-        // Efficiency curve - optimal around 25-30 members
         const efficiency1 = this.getMemberEfficiency(members1 || 0);
         const efficiency2 = this.getMemberEfficiency(members2 || 0);
         
@@ -167,11 +340,7 @@ class TornOddsEngine {
         return total > 0 ? efficiency1 / total : 0.5;
     }
 
-    /**
-     * Member efficiency with diminishing returns
-     */
     getMemberEfficiency(members) {
-        // Peak efficiency around 25-30 members, then diminishing returns
         if (members <= 25) {
             return members;
         } else {
@@ -179,48 +348,24 @@ class TornOddsEngine {
         }
     }
 
-    /**
-     * Convert probability to odds with house edge
-     */
-    probabilityToOdds(probability) {
-        // Apply house edge
-        const adjustedProbability = probability * (1 - this.config.houseEdge);
-        
-        // Convert to percentage
-        const odds = adjustedProbability * 100;
-        
-        // Apply min/max limits
-        return Math.round(Math.max(this.config.minOdds, Math.min(this.config.maxOdds, odds)));
-    }
-
-    /**
-     * Calculate confidence based on how close to 50/50 the odds are
-     */
     calculateConfidence(probability) {
-        // More extreme probabilities = higher confidence
         const deviation = Math.abs(probability - 0.5);
-        return Math.round(deviation * 200); // 0-100 scale
+        return Math.round(deviation * 200);
     }
 
-    /**
-     * Fetch faction data from JSON with simple caching
-     */
     async getFactionData(factionId) {
         const cacheKey = `faction_${factionId}`;
         
-        // Check cache first
         const cached = this.cache.get(cacheKey);
         if (cached && Date.now() - cached.timestamp < this.config.cacheTime) {
             return cached.data;
         }
 
         try {
-            // Load faction data if not already loaded
             if (!this.factionData) {
                 await this.loadFactionData();
             }
 
-            // Find faction in JSON data
             const faction = this.factionData.factions.find(f => f.id.toString() === factionId.toString());
 
             if (!faction) {
@@ -228,7 +373,6 @@ class TornOddsEngine {
                 return null;
             }
 
-            // Transform to expected format with better defaults
             const factionData = {
                 id: faction.id.toString(),
                 name: faction.name || 'Unknown Faction',
@@ -238,7 +382,6 @@ class TornOddsEngine {
                 position: faction.position || 999
             };
 
-            // Cache the result
             this.cache.set(cacheKey, {
                 data: factionData,
                 timestamp: Date.now()
@@ -253,39 +396,41 @@ class TornOddsEngine {
     }
 
     /**
-     * Calculate payout for a bet
+     * Update Xanax market price
      */
-    calculatePayout(betAmount, odds) {
-        if (betAmount <= 0) throw new Error('Invalid bet amount');
-        if (odds <= 0 || odds >= 100) throw new Error('Invalid odds');
-        
-        return Math.round(betAmount * (100 / odds));
+    updateXanaxPrice(newPrice) {
+        if (newPrice <= 0) throw new Error('Invalid Xanax price');
+        this.config.xanaxPrice = newPrice;
+        console.log(`Xanax price updated to $${newPrice.toLocaleString()}`);
     }
 
     /**
-     * Get basic stats
+     * Get current Xanax price
+     */
+    getXanaxPrice() {
+        return this.config.xanaxPrice;
+    }
+
+    /**
+     * Get engine statistics
      */
     getStats() {
         return {
             cacheSize: this.cache.size,
             config: { ...this.config },
-            version: '2.0.0-simplified'
+            version: '3.0.0-decimal',
+            oddsFormat: 'decimal',
+            houseEdge: `${(this.config.houseEdge * 100).toFixed(1)}%`,
+            allowedOdds: this.config.allowedOdds
         };
     }
 
-    /**
-     * Clear cache
-     */
     clearCache() {
         this.cache.clear();
     }
 
-    /**
-     * Health check
-     */
     async healthCheck() {
         try {
-            // Load faction data if not already loaded
             if (!this.factionData) {
                 await this.loadFactionData();
             }
@@ -295,6 +440,9 @@ class TornOddsEngine {
                 timestamp: new Date(),
                 cacheSize: this.cache.size,
                 factionsLoaded: this.factionData.factions.length,
+                oddsFormat: 'decimal',
+                houseEdge: `${(this.config.houseEdge * 100).toFixed(1)}%`,
+                allowedOdds: this.config.allowedOdds,
                 lastUpdated: this.factionData.lastUpdated
             };
         } catch (error) {
@@ -310,7 +458,7 @@ class TornOddsEngine {
 
 // Export for Node.js and browser compatibility
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = TornOddsEngine;
+    module.exports = TornDecimalOddsEngine;
 } else if (typeof window !== 'undefined') {
-    window.TornOddsEngine = TornOddsEngine;
+    window.TornDecimalOddsEngine = TornDecimalOddsEngine;
 }

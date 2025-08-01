@@ -3,7 +3,7 @@ const path = require('path');
 const axios = require('axios');
 const cors = require('cors');
 const { MongoClient } = require('mongodb');
-const TornOddsEngine = require('./Betting/odds-engine.js');
+const TornDecimalOddsEngine = require('./Betting/odds-engine.js');
 require('dotenv').config();
 
 const app = express();
@@ -20,7 +20,7 @@ const DATABASE_NAME = 'torn_data';
 const COLLECTION_NAME = 'factions';
 
 let mongoClient = null;
-let oddsEngine = null; // Singleton odds engine instance
+let oddsEngine = null; // Singleton decimal odds engine instance
 
 async function connectToMongoDB() {
     try {
@@ -36,15 +36,15 @@ async function connectToMongoDB() {
     }
 }
 
-// Initialize odds engine singleton
+// Initialize decimal odds engine singleton
 async function initializeOddsEngine() {
     if (!oddsEngine) {
         try {
-            oddsEngine = new TornOddsEngine();
+            oddsEngine = new TornDecimalOddsEngine();
             await oddsEngine.loadFactionData();
-            console.log('Odds engine initialized successfully (JSON-based)');
+            console.log('Decimal odds engine initialized successfully');
         } catch (error) {
-            console.error('Failed to initialize odds engine:', error);
+            console.error('Failed to initialize decimal odds engine:', error);
             throw error;
         }
     }
@@ -83,12 +83,19 @@ function rateLimit(req, res, next) {
 
 // Middleware
 app.use(express.json());
+
+// Enhanced CORS configuration for development
 app.use(cors({
-    origin: true, // Allow all origins for development
+    origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://localhost:8080', 'http://127.0.0.1:8080', 'file://'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    optionsSuccessStatus: 200
 }));
+
+// Add preflight handler for all routes
+app.options('*', cors());
+
 app.use(express.static('.')); // Serve static files from current directory
 
 // API Routes
