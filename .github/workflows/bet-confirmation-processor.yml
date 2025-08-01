@@ -39,43 +39,9 @@ jobs:
       run: |
         echo "📊 Creating confirmation summary..."
         
-        # Load the processed data
+        # Simple summary without complex JSON parsing
         if [ -f "data/bets.json" ]; then
-          SUMMARY=$(node -e "
-          try {
-            const data = JSON.parse(require('fs').readFileSync('data/bets.json', 'utf8'));
-            
-            const pendingBets = data.active_bets.filter(bet => bet.status === 'pending');
-            const confirmedBets = data.active_bets.filter(bet => bet.status === 'confirmed');
-            const recentConfirmations = confirmedBets
-              .sort((a, b) => b.confirmedAt - a.confirmedAt)
-              .slice(0, 5);
-            
-            const summary = {
-              total_bets: data.statistics.total_bets,
-              pending_bets: pendingBets.length,
-              confirmed_bets: confirmedBets.length,
-              total_volume: data.statistics.total_volume,
-              total_users: data.metadata.total_users,
-              recent_confirmations: recentConfirmations.map(bet => ({
-                betId: bet.betId,
-                warId: bet.warId,
-                factionId: bet.factionId,
-                xanaxAmount: bet.xanaxAmount,
-                playerId: bet.playerId,
-                confirmedAt: new Date(bet.confirmedAt).toISOString()
-              }))
-            };
-            
-            console.log(JSON.stringify(summary, null, 2));
-          } catch (error) {
-            console.error('Error creating summary:', error);
-          }
-          ")
-          
-          echo "confirmation_summary<<EOF" >> $GITHUB_OUTPUT
-          echo "$SUMMARY" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          echo "✅ Bets data file exists and has been processed"
         else
           echo "No bets.json found"
         fi
@@ -96,16 +62,7 @@ jobs:
           echo "No changes to commit"
         else
           # Commit changes
-          git commit -m "✅ Automated bet confirmation processing - $(date -u +'%Y-%m-%d %H:%M:%S UTC')
-          
-          📊 Summary:
-          - Confirmations processed: ${{ fromJson(steps.process-confirmations.outputs.summary).confirmations_processed || 0 }}
-          - New bets added: ${{ fromJson(steps.process-confirmations.outputs.summary).new_bets_added || 0 }}
-          - Total active bets: ${{ fromJson(steps.process-confirmations.outputs.summary).total_active_bets || 0 }}
-          - Pending bets: ${{ fromJson(steps.process-confirmations.outputs.summary).pending_bets || 0 }}
-          - Confirmed bets: ${{ fromJson(steps.process-confirmations.outputs.summary).confirmed_bets || 0 }}
-          
-          👥 Total users: ${{ fromJson(steps.process-confirmations.outputs.summary).total_users || 0 }}"
+          git commit -m "✅ Automated bet confirmation processing - $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
           
           # Push changes
           git push
@@ -117,31 +74,19 @@ jobs:
       uses: actions/github-script@v7
       with:
         script: |
-          const summary = ${{ fromJson(steps.create-summary.outputs.confirmation_summary) }};
+          console.log('✅ Bet confirmation processing completed successfully');
           
-          if (summary) {
-            const comment = `
-            ## ✅ Bet Confirmation Processing Summary
-            
-            **📊 Statistics:**
-            - Total bets: ${summary.total_bets}
-            - Pending bets: ${summary.pending_bets}
-            - Confirmed bets: ${summary.confirmed_bets}
-            - Total volume: ${(summary.total_volume / 1000000).toFixed(1)}M
-            - Total users: ${summary.total_users}
-            
-            **🕒 Recent Confirmations:**
-            ${summary.recent_confirmations.map(bet => `
-            - Bet ID: ${bet.betId} | War: ${bet.warId} | Faction: ${bet.factionId} | Xanax: ${bet.xanaxAmount} | Player: ${bet.playerId}
-            `).join('')}
-            
-            **✅ Status:** Confirmation processing completed successfully
-            `;
-            
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
-            });
+          // Simple comment without complex JSON parsing
+          const comment = `
+          ## ✅ Bet Confirmation Processing Summary
+          
+          **✅ Status:** Confirmation processing completed successfully
+          
+          The automated bet confirmation processor has run and updated the betting data.
+          Check the data/bets.json and data/bet-logs.json files for details.
+          `;
+          
+          // Only create comment if this is triggered manually
+          if (context.eventName === 'workflow_dispatch') {
+            console.log('Creating summary comment...');
           } 
