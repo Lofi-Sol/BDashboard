@@ -64,10 +64,12 @@ jobs:
           # Commit changes
           git commit -m "✅ Automated bet confirmation processing - $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
           
-          # Push changes
-          git push
+          # Push changes with proper authentication
+          git push origin HEAD:master
           echo "✅ Changes committed and pushed"
         fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
     - name: Create Summary Comment
       if: github.event_name == 'workflow_dispatch'
