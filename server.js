@@ -4,6 +4,7 @@ const axios = require('axios');
 const cors = require('cors');
 const { MongoClient } = require('mongodb');
 const TornDecimalOddsEngine = require('./Betting/odds-engine.js');
+const fs = require('fs').promises;
 require('dotenv').config();
 
 const app = express();
@@ -21,6 +22,196 @@ const COLLECTION_NAME = 'factions';
 
 let mongoClient = null;
 let oddsEngine = null; // Singleton decimal odds engine instance
+
+// Centralized data file paths
+const BETS_FILE = './data/bets.json';
+const BET_LOGS_FILE = './data/bet-logs.json';
+
+// Initialize centralized data files
+async function initializeDataFiles() {
+    try {
+        // Create data directory if it doesn't exist
+        await fs.mkdir('./data', { recursive: true });
+        
+        // Initialize bets.json if it doesn't exist
+        try {
+            await fs.access(BETS_FILE);
+        } catch {
+            const initialBetsData = {
+                active_bets: [],
+                completed_bets: [],
+                statistics: {
+                    total_bets: 0,
+                    total_volume: 0,
+                    pending_bets: 0,
+                    confirmed_bets: 0,
+                    won_bets: 0,
+                    lost_bets: 0,
+                    total_payouts: 0,
+                    total_profit: 0,
+                    last_updated: null
+                },
+                metadata: {
+                    version: "1.0",
+                    last_updated: new Date().toISOString(),
+                    total_users: 0,
+                    active_users: 0
+                }
+            };
+            await fs.writeFile(BETS_FILE, JSON.stringify(initialBetsData, null, 2));
+            console.log('✅ Initialized bets.json');
+        }
+        
+        // Initialize bet-logs.json if it doesn't exist
+        try {
+            await fs.access(BET_LOGS_FILE);
+        } catch {
+            const initialLogsData = {
+                bet_logs: [],
+                processed_logs: [],
+                metadata: {
+                    last_updated: null,
+                    total_bet_logs: 0,
+                    total_processed_logs: 0,
+                    new_bet_logs_found: 0,
+                    new_processed_logs: 0,
+                    run_timestamp: null
+                }
+            };
+            await fs.writeFile(BET_LOGS_FILE, JSON.stringify(initialLogsData, null, 2));
+            console.log('✅ Initialized bet-logs.json');
+        }
+        
+        console.log('✅ Centralized data files initialized');
+    } catch (error) {
+        console.error('❌ Error initializing data files:', error);
+    }
+}
+
+// Load centralized bet data
+async function loadBetData() {
+    try {
+        const data = await fs.readFile(BETS_FILE, 'utf8');
+        return JSON.parse(data);
+    } catch (error) {
+        console.error('Error loading bet data:', error);
+        return null;
+    }
+}
+
+// Save centralized bet data
+async function saveBetData(data) {
+    try {
+        data.metadata.last_updated = new Date().toISOString();
+        await fs.writeFile(BETS_FILE, JSON.stringify(data, null, 2));
+        return true;
+    } catch (error) {
+        console.error('Error saving bet data:', error);
+        return false;
+    }
+}
+
+// Add new bet to centralized storage
+async function addBet(betData) {
+    try {
+        const data = await loadBetData();
+        if (!data) return false;
+        
+        // Generate unique bet ID if not provided
+        if (!betData.betId) {
+            betData.betId = generateBetId();
+        }
+        
+        // Add timestamp if not provided
+        if (!betData.timestamp) {
+            betData.timestamp = Date.now();
+        }
+        
+        // Add to active bets
+        data.active_bets.unshift(betData);
+        
+        // Update statistics
+        data.statistics.total_bets++;
+        data.statistics.total_volume += betData.betAmount || 0;
+        data.statistics.pending_bets++;
+        data.statistics.last_updated = new Date().toISOString();
+        
+        // Update user count
+        const uniqueUsers = new Set(data.active_bets.map(bet => bet.playerId));
+        data.metadata.total_users = uniqueUsers.size;
+        
+        return await saveBetData(data);
+    } catch (error) {
+        console.error('Error adding bet:', error);
+        return false;
+    }
+}
+
+// Confirm bet (move from pending to confirmed)
+async function confirmBet(betId, logData) {
+    try {
+        const data = await loadBetData();
+        if (!data) return false;
+        
+        const betIndex = data.active_bets.findIndex(bet => bet.betId === betId);
+        if (betIndex === -1) return false;
+        
+        // Update bet status
+        data.active_bets[betIndex].status = 'confirmed';
+        data.active_bets[betIndex].logId = logData.logId;
+        data.active_bets[betIndex].confirmedAt = logData.timestamp;
+        data.active_bets[betIndex].senderId = logData.senderId;
+        
+        // Update statistics
+        data.statistics.pending_bets--;
+        data.statistics.confirmed_bets++;
+        
+        return await saveBetData(data);
+    } catch (error) {
+        console.error('Error confirming bet:', error);
+        return false;
+    }
+}
+
+// Get user bets
+async function getUserBets(playerId) {
+    try {
+        const data = await loadBetData();
+        if (!data) return [];
+        
+        return data.active_bets.filter(bet => bet.playerId.toString() === playerId.toString());
+    } catch (error) {
+        console.error('Error getting user bets:', error);
+        return [];
+    }
+}
+
+// Get all bets (for admin dashboard)
+async function getAllBets() {
+    try {
+        const data = await loadBetData();
+        if (!data) return { active_bets: [], completed_bets: [] };
+        
+        return {
+            active_bets: data.active_bets,
+            completed_bets: data.completed_bets,
+            statistics: data.statistics
+        };
+    } catch (error) {
+        console.error('Error getting all bets:', error);
+        return { active_bets: [], completed_bets: [] };
+    }
+}
+
+// Generate unique bet ID
+function generateBetId() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let result = '';
+    for (let i = 0; i < 8; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+}
 
 async function connectToMongoDB() {
     try {
@@ -368,17 +559,46 @@ app.get('/api/betting/odds/:sport/:market', (req, res) => {
     }
 });
 
-// Place bet endpoint (placeholder)
-app.post('/api/betting/place-bet', (req, res) => {
+// Place bet endpoint
+app.post('/api/betting/place-bet', async (req, res) => {
     try {
-        const { betData } = req.body;
+        const { playerId, warId, factionId, factionName, xanaxAmount, betAmount, odds } = req.body;
         
-        res.json({
-            success: true,
-            message: 'Bet placed successfully (placeholder)',
-            betId: Math.random().toString(36).substr(2, 9),
+        if (!playerId || !warId || !factionId || !xanaxAmount) {
+            return res.status(400).json({
+                success: false,
+                error: 'Missing required bet data'
+            });
+        }
+        
+        const betData = {
+            playerId,
+            warId,
+            factionId,
+            factionName,
+            xanaxAmount,
+            betAmount,
+            odds,
+            status: 'pending',
             timestamp: Date.now()
-        });
+        };
+        
+        const success = await addBet(betData);
+        
+        if (success) {
+            res.json({
+                success: true,
+                betId: betData.betId,
+                message: 'Bet placed successfully',
+                timestamp: betData.timestamp
+            });
+        } else {
+            res.status(500).json({
+                success: false,
+                error: 'Failed to save bet'
+            });
+        }
+        
     } catch (error) {
         console.error('Error placing bet:', error);
         res.status(500).json({
@@ -388,16 +608,67 @@ app.post('/api/betting/place-bet', (req, res) => {
     }
 });
 
-// Get user bets (placeholder)
-app.get('/api/betting/user-bets', (req, res) => {
+// Get user bets endpoint
+app.get('/api/betting/user-bets/:playerId', async (req, res) => {
     try {
+        const { playerId } = req.params;
+        const bets = await getUserBets(playerId);
+        
         res.json({
             success: true,
-            bets: [],
-            message: 'MongoDB functionality removed - implement your own data source'
+            bets: bets,
+            count: bets.length
         });
+        
     } catch (error) {
         console.error('Error fetching user bets:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// Get all bets endpoint (admin only)
+app.get('/api/betting/all-bets', async (req, res) => {
+    try {
+        const bets = await getAllBets();
+        
+        res.json({
+            success: true,
+            data: bets
+        });
+        
+    } catch (error) {
+        console.error('Error fetching all bets:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// Confirm bet endpoint (for automated processing)
+app.post('/api/betting/confirm-bet', async (req, res) => {
+    try {
+        const { betId, logData } = req.body;
+        
+        const success = await confirmBet(betId, logData);
+        
+        if (success) {
+            res.json({
+                success: true,
+                message: 'Bet confirmed successfully'
+            });
+        } else {
+            res.status(404).json({
+                success: false,
+                error: 'Bet not found or already confirmed'
+            });
+        }
+        
+    } catch (error) {
+        console.error('Error confirming bet:', error);
         res.status(500).json({
             success: false,
             error: error.message
@@ -618,10 +889,13 @@ app.use((req, res) => {
 // Start server
 async function startServer() {
     try {
+        await initializeDataFiles();
+        
         app.listen(PORT, () => {
             console.log(`🚀 Server running on http://localhost:${PORT}`);
             console.log(`📊 Dashboard: http://localhost:${PORT}`);
             console.log(`🎲 Betting Dashboard: http://localhost:${PORT}/betting`);
+            console.log(`👑 Bookie Dashboard: http://localhost:${PORT}/bookie`);
             console.log(`📈 Stock Graphs: http://localhost:${PORT}/stock-graphs`);
             console.log(`📋 Logs: http://localhost:${PORT}/logs`);
             console.log(`🔧 API Tester: http://localhost:${PORT}/api-tester`);

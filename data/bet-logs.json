@@ -1,0 +1,33 @@
+{
+  "bet_logs": [
+    {
+      "logId": "YUeFY9g65nzh975KQTEP",
+      "timestamp": 1754074055,
+      "sender": 3566110,
+      "warId": 28667,
+      "factionId": 8076,
+      "xanaxAmount": 1,
+      "betId": "VW7VAC60",
+      "message": "BET:28667:8076:1:VW7VAC60",
+      "processed": true
+    }
+  ],
+  "processed_logs": [
+    {
+      "logId": "YUeFY9g65nzh975KQTEP",
+      "timestamp": 1754074055,
+      "title": "Item receive",
+      "category": "Item sending"
+    }
+  ],
+  "metadata": {
+    "last_updated": "2025-08-01T18:58:03.277Z",
+    "total_bet_logs": 1,
+    "total_processed_logs": 1,
+    "new_bet_logs_found": 1,
+    "new_processed_logs": 1,
+    "run_timestamp": "2025-08-01T18:58:03.277Z",
+    "confirmations_processed": 1,
+    "new_bets_added": 0
+  }
+}

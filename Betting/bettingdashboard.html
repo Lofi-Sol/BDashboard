@@ -2287,7 +2287,7 @@
                     </div>
                 </div>
                 <div class="betting-info">
-                    <p>💰 <strong>How Betting Works:</strong> Place bets on faction wars using Xanax as currency. Odds are displayed in decimal format (e.g., 2.00, 1.50) and calculated dynamically based on faction strength, historical performance, and current betting volume. <strong>Decimal odds</strong> show your total return - multiply your bet by the odds to get your payout. For example, 2.00 odds means bet 1 Xanax → win 2 Xanax total (1 profit). Higher odds mean bigger potential returns, but lower probability of winning. Bet amounts are locked once the war starts, and payouts are calculated when the war ends.</p>
+                    <p>💰 <strong>How Betting Works:</strong> Place bets on faction wars using Xanax as currency. Odds are displayed in decimal format (e.g., 2.00, 1.50) and calculated dynamically based on faction strength, historical performance, and current betting volume. <strong>Decimal odds</strong> show your total return - multiply your bet by the odds to get your payout. For example, 2.00 odds means bet 1 Xanax → win 2 Xanax total (1 profit). Higher odds mean bigger potential returns, but lower probability of winning. Bet amounts are locked once the war starts, and payouts are calculated when the war ends. <strong>Selected Wars:</strong> Only the most interesting faction wars are available for betting, curated by our odds engine.</p>
                 </div>
                     
                 <div id="betting-loading" class="inventory-loading">Loading Ranked Wars...</div>
@@ -2915,10 +2915,7 @@
         initializeOddsAPI();
         
         // Initialize sample historical data
-        initializeHistoricalData();
-        
-        // Initialize sample betting volume data
-        initializeBettingVolumeData();
+        // Sample data initialization removed - using real data only
         
         // Helper function to format odds display
         function formatOddsDisplay(odds) {
@@ -2940,9 +2937,8 @@
         // Helper function to calculate returns for decimal odds
         function calculateReturns(odds, xanaxAmount = 1) {
             if (typeof odds === 'number' && odds >= 1) {
-                // Decimal odds calculation
-                const totalReturnXanax = Math.round(xanaxAmount * odds);
-                return totalReturnXanax * XANAX_PRICE;
+                // Decimal odds calculation - FIXED: Don't round Xanax amount, round final dollar amount
+                return Math.round(xanaxAmount * odds * XANAX_PRICE);
             } else if (typeof odds === 'string' && (odds.startsWith('+') || odds.startsWith('-'))) {
                 // American odds calculation (legacy)
                 const oddsValue = parseInt(odds.replace('+', ''));
@@ -3036,58 +3032,7 @@
             console.log('Odds API initialized');
         }
         
-        // Initialize sample historical data for factions
-        function initializeHistoricalData() {
-            const sampleFactions = [
-                { id: 1, name: "Bloodbath and Beyond" },
-                { id: 2, name: "Ara Pacis" },
-                { id: 3, name: "Nuclear Blast" },
-                { id: 4, name: "FLATLINE" },
-                { id: 5, name: "Leeches" },
-                { id: 6, name: "Premature Attackulation" },
-                { id: 7, name: "New Sith Order" },
-                { id: 8, name: "Naughty Souls" },
-                { id: 9, name: "LaFamilia" },
-                { id: 10, name: "Duck Around & Find Out" },
-                { id: 11, name: "Mana" },
-                { id: 12, name: "Golden Jackals" },
-                { id: 13, name: "The Shogunate" },
-                { id: 14, name: "The Classroom" },
-                { id: 15, name: "The Cut" },
-                { id: 16, name: "New Beginning" },
-                { id: 17, name: "NBA 4KT" },
-                { id: 18, name: "Lost Shinobi" },
-                { id: 19, name: "CottonTail Crew - Origin" },
-                { id: 20, name: "Battlefield Angels" }
-            ];
-            
-            sampleFactions.forEach(faction => {
-                historicalData[faction.id] = {
-                    winRate: Math.random() * 0.4 + 0.3, // 30-70% win rate
-                    avgScore: Math.random() * 5000 + 2000, // 2000-7000 avg score
-                    avgScoreBaseline: 4000, // Baseline for comparison
-                    totalWars: Math.floor(Math.random() * 50) + 10, // 10-60 total wars
-                    recentPerformance: Math.random() * 0.6 + 0.2 // 20-80% recent performance
-                };
-            });
-        }
-        
-        // Initialize sample betting volume data
-        function initializeBettingVolumeData() {
-            // This would normally come from the backend
-            // For now, create sample volume data
-            currentBettingVolume = {
-                // Sample war volumes
-                "28339": {
-                    "46166": Math.floor(Math.random() * 1000000) + 50000,
-                    "49862": Math.floor(Math.random() * 1000000) + 50000
-                },
-                "28340": {
-                    "22631": Math.floor(Math.random() * 1000000) + 50000,
-                    "51197": Math.floor(Math.random() * 1000000) + 50000
-                }
-            };
-        }
+        // Sample data functions removed - using real data only
 
         // Betting System Functions
         async function loadBettingInterface() {
@@ -3113,7 +3058,35 @@
             contentEl.style.display = 'none';
 
             try {
-                // Fetch ranked wars data
+                // Load selected betting wars from the JSON file
+                let bettingWarsData;
+                try {
+                    const bettingWarsResponse = await fetch('/data/betting-wars.json');
+                    bettingWarsData = await bettingWarsResponse.json();
+                } catch (error) {
+                    console.warn('Could not load betting-wars.json, using all available wars as fallback');
+                    bettingWarsData = { weeks: [] }; // Empty weeks array will use all wars
+                }
+                
+                // Extract current week's wars from the new structure
+                let currentWars = [];
+                if (bettingWarsData.weeks && bettingWarsData.weeks.length > 0) {
+                    // Get the most recent week's wars
+                    const currentWeek = bettingWarsData.weeks[bettingWarsData.weeks.length - 1];
+                    currentWars = currentWeek.wars || [];
+                    console.log(`Loaded ${currentWars.length} wars from current week (${bettingWarsData.weeks.length} weeks of history)`);
+                } else if (bettingWarsData.wars) {
+                    // Fallback for old format
+                    currentWars = bettingWarsData.wars;
+                    console.log(`Loaded ${currentWars.length} wars from legacy format`);
+                }
+                
+                if (currentWars.length === 0) {
+                    console.log('No betting wars specified, using all available wars');
+                    currentWars = []; // Empty array means use all wars
+                }
+
+                // Fetch all ranked wars data
                 const warsResponse = await fetch(`/api/torn/rankedwars?key=${apiKey}`);
                 const warsData = await warsResponse.json();
 
@@ -3121,11 +3094,30 @@
                     throw new Error(warsData.error.error);
                 }
 
-                // Fetch enhanced faction data (chain, respect, rank) for all factions in the wars
-                const factionEnhancedData = await fetchFactionChainData(warsData.rankedwars, apiKey);
+                // Filter wars to only include the selected betting wars
+                const selectedWars = {};
+                if (currentWars.length === 0) {
+                    // If no specific wars are selected, use all available wars
+                    selectedWars = warsData.rankedwars;
+                } else {
+                    // Use only the selected wars
+                    currentWars.forEach(warId => {
+                        if (warsData.rankedwars[warId]) {
+                            selectedWars[warId] = warsData.rankedwars[warId];
+                        }
+                    });
+                }
 
-                // Transform war data into betting format with enhanced faction data
-                bettingData = await transformWarDataToBetting(warsData.rankedwars, factionEnhancedData);
+                // Fetch enhanced faction data for selected wars only
+                const factionEnhancedData = await fetchFactionChainData(selectedWars, apiKey);
+
+                // Transform selected war data into betting format
+                bettingData = await transformWarDataToBetting(selectedWars, factionEnhancedData);
+                
+                console.log(`Loaded ${Object.keys(selectedWars).length} wars for betting (${currentWars.length} selected from betting-wars.json)`);
+                
+                // Store the count of selected betting wars for UI display
+                window.bettingWarsCount = currentWars.length;
                 
                 // Cache the data
                 bettingCache.save(bettingData);
@@ -3208,44 +3200,50 @@
         async function transformWarDataToBetting(warData, factionEnhancedData = {}) {
             const bettingMarkets = [];
             
-            // Create 20 sample factions for prototype
-            const sampleFactions = [
-                { id: 1, name: "Bloodbath and Beyond", score: 8145, chain: 621 },
-                { id: 2, name: "Ara Pacis", score: 3266, chain: 368 },
-                { id: 3, name: "Nuclear Blast", score: 5212, chain: 522 },
-                { id: 4, name: "FLATLINE", score: 5065, chain: 0 },
-                { id: 5, name: "Leeches", score: 9791, chain: 528 },
-                { id: 6, name: "Premature Attackulation", score: 3043, chain: 0 },
-                { id: 7, name: "New Sith Order", score: 9423, chain: 801 },
-                { id: 8, name: "Naughty Souls", score: 1328, chain: 4 },
-                { id: 9, name: "LaFamilia", score: 4943, chain: 0 },
-                { id: 10, name: "Duck Around & Find Out", score: 1582, chain: 0 },
-                { id: 11, name: "Mana", score: 3031, chain: 0 },
-                { id: 12, name: "Golden Jackals", score: 1623, chain: 0 },
-                { id: 13, name: "The Shogunate", score: 1143, chain: 200 },
-                { id: 14, name: "The Classroom", score: 90, chain: 0 },
-                { id: 15, name: "The Cut", score: 2300, chain: 0 },
-                { id: 16, name: "New Beginning", score: 465, chain: 1 },
-                { id: 17, name: "NBA 4KT", score: 64, chain: 0 },
-                { id: 18, name: "Lost Shinobi", score: 1170, chain: 0 },
-                { id: 19, name: "CottonTail Crew - Origin", score: 1951, chain: 0 },
-                { id: 20, name: "Battlefield Angels", score: 1441, chain: 0 }
-            ];
-
-            // Create Ranked Wars from real war data with actual chain data
+            // Load real faction data for names
+            let realFactionData = {};
+            try {
+                const factionResponse = await fetch('/data/factions.json');
+                const factionResult = await factionResponse.json();
+                if (factionResult.factions) {
+                    realFactionData = factionResult.factions.reduce((acc, faction) => {
+                        acc[faction.id] = faction;
+                        return acc;
+                    }, {});
+                    console.log(`✅ Loaded ${Object.keys(realFactionData).length} real factions for names`);
+                    console.log('📊 Sample faction data:', Object.entries(realFactionData).slice(0, 3));
+                }
+            } catch (error) {
+                console.warn('❌ Error loading real faction data:', error);
+            }
+            
+            // Process only real war data - no sample data
             for (const [warId, war] of Object.entries(warData || {})) {
                 const factionIds = Object.keys(war.factions);
                 const faction1 = war.factions[factionIds[0]];
                 const faction2 = war.factions[factionIds[1]];
                 
+                console.log(`\n🔍 Processing War ${warId}:`);
+                console.log(`   Faction IDs: ${factionIds[0]} vs ${factionIds[1]}`);
+                console.log(`   Faction IDs type check: ${typeof factionIds[0]} vs ${typeof factionIds[1]}`);
+                
                 // Get enhanced faction data (chain, respect, rank, etc.)
                 const faction1Enhanced = factionEnhancedData[factionIds[0]] || { chain: 0, respect: null, rank: null, members: null, position: null };
                 const faction2Enhanced = factionEnhancedData[factionIds[1]] || { chain: 0, respect: null, rank: null, members: null, position: null };
                 
-                // Log enhanced data usage for debugging
-                console.log(`War ${warId}: Faction ${factionIds[0]} - Chain: ${faction1Enhanced.chain}, Respect: ${faction1Enhanced.respect?.toLocaleString() || 'N/A'}, Rank: ${faction1Enhanced.rank || 'N/A'}`);
-                console.log(`War ${warId}: Faction ${factionIds[1]} - Chain: ${faction2Enhanced.chain}, Respect: ${faction2Enhanced.respect?.toLocaleString() || 'N/A'}, Rank: ${faction2Enhanced.rank || 'N/A'}`);
+                // Get real faction names from factions.json
+                // Convert faction IDs to numbers for proper lookup
+                const faction1IdNum = parseInt(factionIds[0]);
+                const faction2IdNum = parseInt(factionIds[1]);
+                const realFaction1 = realFactionData[faction1IdNum] || {};
+                const realFaction2 = realFactionData[faction2IdNum] || {};
                 
+                console.log(`   Real faction 1 lookup: ID ${factionIds[0]} -> ${realFaction1.name || 'NOT FOUND'}`);
+                console.log(`   Real faction 2 lookup: ID ${factionIds[1]} -> ${realFaction2.name || 'NOT FOUND'}`);
+                
+                // Log enhanced data usage for debugging
+                console.log(`   Enhanced data 1: Chain: ${faction1Enhanced.chain}, Respect: ${faction1Enhanced.respect?.toLocaleString() || 'N/A'}, Rank: ${faction1Enhanced.rank || 'N/A'}, Members: ${faction1Enhanced.members || 'N/A'}`);
+                console.log(`   Enhanced data 2: Chain: ${faction2Enhanced.chain}, Respect: ${faction2Enhanced.respect?.toLocaleString() || 'N/A'}, Rank: ${faction2Enhanced.rank || 'N/A'}, Members: ${faction2Enhanced.members || 'N/A'}`);
                 
                 // Create war data with enhanced faction information
                 const warDataWithEnhancedInfo = {
@@ -3258,9 +3256,13 @@
                 };
                 
                 // Calculate odds using the new API-based system
+                console.log(`   🎯 Calculating odds for factions ${factionIds[0]} vs ${factionIds[1]}...`);
                 const calculatedOdds = await oddsAPI.calculateOdds(factionIds[0], factionIds[1]);
                 const odds1 = calculatedOdds[factionIds[0]]?.odds || 2.00;
                 const odds2 = calculatedOdds[factionIds[1]]?.odds || 2.00;
+                
+                console.log(`   ✅ Calculated odds: Faction ${factionIds[0]} = ${odds1}, Faction ${factionIds[1]} = ${odds2}`);
+                console.log(`   📊 Full odds response:`, calculatedOdds);
                 
                 // Determine actual status based on current time and war state
                 const now = Math.floor(Date.now() / 1000);
@@ -3285,7 +3287,7 @@
                     options: [
                         {
                             id: factionIds[0],
-                            name: faction1.name,
+                            name: realFaction1.name || `Faction ${factionIds[0]}`,
                             score: faction1.score,
                             chain: faction1Enhanced.chain,
                             respect: faction1Enhanced.respect,
@@ -3297,7 +3299,7 @@
                         },
                         {
                             id: factionIds[1],
-                            name: faction2.name,
+                            name: realFaction2.name || `Faction ${factionIds[1]}`,
                             score: faction2.score,
                             chain: faction2Enhanced.chain,
                             respect: faction2Enhanced.respect,
@@ -3312,84 +3314,7 @@
                 });
             }
 
-            // Add some sample Ranked Wars if we don't have enough real wars
-            while (bettingMarkets.length < 12) {
-                const index = bettingMarkets.length;
-                const faction1 = sampleFactions[index * 2];
-                const faction2 = sampleFactions[index * 2 + 1];
-                
-                // Calculate sophisticated odds using the odds engine
-                const sampleWarData = {
-                    id: `sample_${index}`,
-                    factions: {
-                        [faction1.id]: faction1,
-                        [faction2.id]: faction2
-                    },
-                    war: {
-                        start: startTime,
-                        end: endTime,
-                        target: Math.floor(Math.random() * 10000 + 2000),
-                        winner: status === 'finished' ? (Math.random() > 0.5 ? faction1.id : faction2.id) : 0
-                    }
-                };
-                
-                // Generate random decimal odds for sample data (no API call needed)
-                const allowedOdds = [1.20, 1.25, 1.33, 1.50, 1.67, 2.00, 2.50, 3.00, 4.00, 5.00];
-                const odds1 = allowedOdds[Math.floor(Math.random() * allowedOdds.length)];
-                const odds2 = allowedOdds[Math.floor(Math.random() * allowedOdds.length)];
-                
-                // Create a mix of preparing, active, and finished wars
-                let status, startTime, endTime;
-                const random = Math.random();
-                
-                if (random < 0.4) {
-                    // Preparing war (40% chance) - ensure future start time
-                    status = 'preparing';
-                    startTime = Math.floor(Date.now() / 1000) + Math.floor(Math.random() * 7200) + 300; // 5 minutes to 2 hours from now
-                    endTime = 0;
-                } else if (random < 0.8) {
-                    // Active war (40% chance) - ensure past start time
-                    status = 'active';
-                    startTime = Math.floor(Date.now() / 1000) - Math.floor(Math.random() * 3600) - 60; // Started 1 minute to 1 hour ago
-                    endTime = 0;
-                } else {
-                    // Finished war (20% chance) - ensure past start and end times
-                    status = 'finished';
-                    startTime = Math.floor(Date.now() / 1000) - Math.floor(Math.random() * 86400) - 3600; // Started 1-24 hours ago
-                    endTime = startTime + Math.floor(Math.random() * 7200) + 1800; // Lasted 30 minutes to 2 hours
-                }
-                
-                bettingMarkets.push({
-                    id: `sample_${index}`,
-                    title: `Sample War #${index + 1}`,
-                    subtitle: `Lead Target: ${(Math.random() * 10000 + 2000).toFixed(0)}`,
-                    status: status,
-                    startTime: startTime,
-                    endTime: endTime,
-                    target: Math.floor(Math.random() * 10000 + 2000),
-                    winner: status === 'finished' ? (Math.random() > 0.5 ? faction1.id : faction2.id) : 0,
-                    options: [
-                        {
-                            id: faction1.id,
-                            name: faction1.name,
-                            score: faction1.score,
-                            chain: faction1.chain,
-                            odds: odds1,
-                            volume: 0
-                        },
-                        {
-                            id: faction2.id,
-                            name: faction2.name,
-                            score: faction2.score,
-                            chain: faction2.chain,
-                            odds: odds2,
-                            volume: 0
-                        }
-                    ],
-                    totalVolume: Math.floor(Math.random() * 5000000) + 100000
-                });
-            }
-
+            console.log(`Processed ${bettingMarkets.length} real wars for betting`);
             return bettingMarkets;
         }
 
@@ -3471,7 +3396,14 @@
                 finished: bettingData.filter(market => market.status === 'finished').length
             };
 
+            // Check if we're using selected betting wars
+            const isUsingSelectedWars = window.bettingWarsCount && window.bettingWarsCount > 0;
+            const statusIndicator = isUsingSelectedWars ? 
+                '<div style="background: #dcfce7; color: #166534; padding: 8px 12px; border-radius: 6px; font-size: 0.8rem; margin-bottom: 12px;"><strong>🎯 Selected Wars:</strong> Using curated betting wars from betting-wars.json</div>' : 
+                '<div style="background: #fef3c7; color: #92400e; padding: 8px 12px; border-radius: 6px; font-size: 0.8rem; margin-bottom: 12px;"><strong>⚠️ All Wars:</strong> Using all available wars (betting-wars.json not found or empty)</div>';
+
             statsEl.innerHTML = `
+                ${statusIndicator}
                 <div class="betting-stat-card">
                     <h3>Total Wars</h3>
                     <div class="value">${stats.total}</div>
@@ -3519,7 +3451,7 @@
                         </div>
                                     <div class="betting-option-right">
                                         <div class="betting-odds">${formatOddsDisplay(option.odds)}</div>
-                                        <div class="betting-returns">$${calculateReturns(option.odds).toLocaleString()}</div>
+                                        <div class="betting-returns">$${calculateReturns(option.odds, 2).toLocaleString()}</div>
                     </div>
                         </div>
                             `).join('')}
@@ -3673,6 +3605,17 @@
 
             const { market, marketId } = selectedBet;
             
+            console.log('\n🎰 BETTING MODAL DEBUG:');
+            console.log('   Market ID:', marketId);
+            console.log('   Market options:', market.options.map(opt => `${opt.id}: ${opt.name} (odds: ${opt.odds})`));
+            console.log('   XANAX_PRICE:', XANAX_PRICE);
+            console.log('   Market options detailed:', market.options.map(opt => ({
+                id: opt.id,
+                name: opt.name,
+                odds: opt.odds,
+                oddsType: typeof opt.odds
+            })));
+            
             modalBody.innerHTML = `
                 <div class="betting-message">
                     Minimum bet: 1 Xanax ($${XANAX_PRICE.toLocaleString()})
@@ -3681,9 +3624,9 @@
                 
                 <div class="betting-form-group">
                     <label class="betting-form-label">Select Faction:</label>
-                    <select id="betting-faction-select" class="betting-form-input">
+                    <select id="betting-faction-select" class="betting-form-input" onchange="console.log('🎯 Faction selection changed to:', this.value); updateBettingCalculations();">
                         ${market.options.map(option => `
-                                                            <option value="${option.id}">${option.name} (${formatOddsDisplay(option.odds)})</option>
+                            <option value="${option.id}">${option.name} (${formatOddsDisplay(option.odds)})</option>
                         `).join('')}
                     </select>
                 </div>
@@ -3729,19 +3672,37 @@
             const factionId = document.getElementById('betting-faction-select').value;
             const faction = selectedBet.market.options.find(opt => opt.id === factionId);
             
-            if (!faction) return;
+            console.log('\n💰 BETTING CALCULATION DEBUG:');
+            console.log('   Selected faction ID:', factionId, '(type:', typeof factionId, ')');
+            console.log('   Available factions:', selectedBet.market.options.map(opt => `${opt.id} (${typeof opt.id}): ${opt.name} (${opt.odds})`));
+            console.log('   🔍 Faction lookup result:', faction ? 'FOUND' : 'NOT FOUND');
+            console.log('   🔍 Lookup comparison:', selectedBet.market.options.map(opt => `${opt.id} === ${factionId} = ${opt.id === factionId}`));
+            console.log('   🔍 SelectedBet market ID:', selectedBet.marketId);
+            console.log('   🔍 SelectedBet market options count:', selectedBet.market.options.length);
+            
+            if (!faction) {
+                console.error('❌ Faction not found for ID:', factionId);
+                return;
+            }
+            
+            console.log('   ✅ Found faction:', faction.name);
+            console.log('   📊 Faction data:', faction);
+            console.log('   🎯 Odds value:', faction.odds, '(type:', typeof faction.odds, ')');
             
             const betValue = xanaxAmount * XANAX_PRICE;
+            console.log('   💵 Bet value calculation:', xanaxAmount, 'x', XANAX_PRICE, '=', betValue);
             
             // Calculate total return using decimal odds
             let totalReturn;
             if (typeof faction.odds === 'number' && faction.odds >= 1) {
-                // Decimal odds calculation
-                const totalReturnXanax = Math.round(xanaxAmount * faction.odds);
-                totalReturn = totalReturnXanax * XANAX_PRICE;
+                // Decimal odds calculation - FIXED: Don't round Xanax amount, round final dollar amount
+                totalReturn = Math.round(xanaxAmount * faction.odds * XANAX_PRICE);
+                console.log('   🎲 Decimal odds calculation (FIXED):');
+                console.log('      Direct calculation:', xanaxAmount, 'x', faction.odds, 'x', XANAX_PRICE, '= $', totalReturn);
             } else if (typeof faction.odds === 'string' && (faction.odds.startsWith('+') || faction.odds.startsWith('-'))) {
                 // American odds calculation (legacy)
                 const oddsValue = parseInt(faction.odds.replace('+', ''));
+                console.log('   🎲 American odds calculation (legacy):', faction.odds);
                 
                 if (oddsValue > 0) {
                     // Positive odds: win $odds for every $100 bet
@@ -3753,13 +3714,20 @@
             } else if (typeof faction.odds === 'number') {
                 // Legacy percentage calculation
                 totalReturn = Math.round(betValue * (100 / faction.odds));
+                console.log('   🎲 Legacy percentage calculation:', faction.odds);
             } else {
                 // Fallback
                 totalReturn = betValue * 2;
+                console.log('   🎲 Fallback calculation (2x)');
             }
             
             document.getElementById('betting-value-display').textContent = betValue.toLocaleString();
             document.getElementById('betting-return-display').textContent = totalReturn.toLocaleString();
+            
+            console.log('   💰 Final result:');
+            console.log('      Bet Value: $', betValue.toLocaleString());
+            console.log('      Total Return: $', totalReturn.toLocaleString());
+            console.log('      Profit: $', (totalReturn - betValue).toLocaleString());
         }
 
         function placeBetNow() {
@@ -4767,10 +4735,10 @@
 
         // Calculate expected win payout (based on odds)
         function calculateExpectedWinPayout(bet) {
-            // This would normally come from the odds calculation
-            // For now, use a simple 2x payout for demonstration
-            // In a real system, this would be: bet.betAmount * (100 / odds)
-            return bet.betAmount * 2;
+            // Use the actual odds from the bet
+            const odds = bet.odds || 2.00;
+            // For decimal odds: payout = bet amount * odds
+            return Math.round(bet.betAmount * odds);
         }
 
         // Calculate expected loss amount (what they lose if they lose)

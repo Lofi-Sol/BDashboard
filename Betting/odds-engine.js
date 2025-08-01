@@ -79,9 +79,34 @@ class TornDecimalOddsEngine {
                 this.getFactionData(faction2Id)
             ]);
 
+            // If either faction is missing, return fallback odds
             if (!faction1 || !faction2) {
-                console.error(`Missing faction data: faction1=${!!faction1}, faction2=${!!faction2}`);
-                throw new Error('Faction data not found');
+                console.warn(`Missing faction data: faction1=${!!faction1}, faction2=${!!faction2}. Using fallback odds.`);
+                return {
+                    [faction1Id]: {
+                        odds: 2.00,
+                        impliedProbability: 0.50,
+                        trueProbability: 0.485,
+                        format: 'decimal',
+                        bettingExamples: this.getBettingExamples(2.00),
+                        fallback: true
+                    },
+                    [faction2Id]: {
+                        odds: 2.00,
+                        impliedProbability: 0.50,
+                        trueProbability: 0.515,
+                        format: 'decimal',
+                        bettingExamples: this.getBettingExamples(2.00),
+                        fallback: true
+                    },
+                    metadata: {
+                        houseEdge: 6.0,
+                        totalImpliedProbability: 1.06,
+                        confidence: 0,
+                        timestamp: new Date(),
+                        fallback: true
+                    }
+                };
             }
 
             // Calculate true probabilities
@@ -124,12 +149,37 @@ class TornDecimalOddsEngine {
 
         } catch (error) {
             console.error('Decimal odds calculation failed:', error.message);
-            throw error;
+            // Return fallback odds instead of throwing error
+            return {
+                [faction1Id]: {
+                    odds: 2.00,
+                    impliedProbability: 0.50,
+                    trueProbability: 0.485,
+                    format: 'decimal',
+                    bettingExamples: this.getBettingExamples(2.00),
+                    fallback: true
+                },
+                [faction2Id]: {
+                    odds: 2.00,
+                    impliedProbability: 0.50,
+                    trueProbability: 0.515,
+                    format: 'decimal',
+                    bettingExamples: this.getBettingExamples(2.00),
+                    fallback: true
+                },
+                metadata: {
+                    houseEdge: 6.0,
+                    totalImpliedProbability: 1.06,
+                    confidence: 0,
+                    timestamp: new Date(),
+                    fallback: true
+                }
+            };
         }
     }
 
     /**
-     * Convert probability to nearest clean decimal odds with better differentiation
+     * Convert probability to nearest clean decimal odds with consistent results
      */
     convertToCleanDecimalOdds(probability) {
         // Convert probability to ideal decimal odds
@@ -152,12 +202,10 @@ class TornDecimalOddsEngine {
             }
         }
         
-        // Add some variation to avoid too many identical odds
-        // If the probability is very close to 0.5 (50%), add some randomness
+        // Remove random variation - use consistent odds
+        // For close matches (around 50%), use 2.00 for consistency
         if (Math.abs(probability - 0.5) < 0.05) {
-            // For close matches, use odds around 2.00 with some variation
-            const closeMatchOdds = [1.90, 2.00, 2.10, 1.80, 2.20];
-            closestOdds = closeMatchOdds[Math.floor(Math.random() * closeMatchOdds.length)];
+            closestOdds = 2.00;
         }
         
         return closestOdds;
