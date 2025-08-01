@@ -10,6 +10,12 @@ on:
       - '.github/workflows/bet-confirmation-processor.yml'
       - 'data/bet-logs.json'
 
+# Add explicit permissions for the workflow
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
 jobs:
   process-bet-confirmations:
     runs-on: ubuntu-latest
@@ -65,7 +71,7 @@ jobs:
           git commit -m "✅ Automated bet confirmation processing - $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
           
           # Push changes with proper authentication
-          git push origin HEAD:master
+          git push
           echo "✅ Changes committed and pushed"
         fi
       env:

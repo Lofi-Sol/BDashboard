@@ -9,6 +9,12 @@ on:
     paths:
       - '.github/workflows/bet-log-processor.yml'
 
+# Add explicit permissions for the workflow
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
 jobs:
   process-bet-logs:
     runs-on: ubuntu-latest
@@ -84,7 +90,7 @@ jobs:
           git commit -m "🤖 Automated bet log processing - $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
           
           # Push changes with proper authentication
-          git push origin HEAD:master
+          git push
           echo "✅ Changes committed and pushed"
         fi
       env:
