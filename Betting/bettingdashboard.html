@@ -181,6 +181,53 @@
             padding-right: 20px;
         }
 
+        .user-info-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border-bottom: 1px solid #e2e8f0;
+            font-family: 'Inter', 'DM Sans', Arial, sans-serif;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 1rem;
+        }
+
+        .user-level {
+            font-size: 0.8rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .user-faction {
+            font-size: 0.8rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
         .logout-btn {
             background: #ef4444;
             border: none;
@@ -2278,6 +2325,19 @@
                 <button class="logout-btn" onclick="logout()">🚪 Logout</button>
             </div>
         </div>
+        
+        <!-- User Info Section -->
+        <div class="user-info-section" id="user-info-section" style="display: none;">
+            <div class="user-avatar" id="user-avatar">
+                👤
+            </div>
+            <div class="user-details">
+                <div class="user-name" id="user-name">Loading...</div>
+                <div class="user-level" id="user-level">Level: --</div>
+                <div class="user-faction" id="user-faction">Faction: --</div>
+            </div>
+        </div>
+        
         <div class="dashboard-content">
             <div class="tab-content" id="tab-colosseum">
                 <div class="betting-header">
@@ -2484,6 +2544,9 @@
                     userData = data.player;
                     successMsg.textContent = 'Connected successfully!';
                     
+                    // Update user info section
+                    updateUserInfo(userData);
+                    
                     // Show dashboard after a short delay
                     setTimeout(() => {
                         document.getElementById('mainBox').style.display = 'none';
@@ -2542,6 +2605,12 @@
             apiKey = null;
             userData = null;
             
+            // Hide user info section
+            const userInfoSection = document.getElementById('user-info-section');
+            if (userInfoSection) {
+                userInfoSection.style.display = 'none';
+            }
+            
             // Show login screen
             document.getElementById('dashboard').style.display = 'none';
             document.getElementById('mainBox').style.display = 'flex';
@@ -2554,6 +2623,39 @@
             document.getElementById('successMsg').textContent = '';
             
             console.log('Logged out successfully');
+        }
+
+        // Update user info section with player data
+        function updateUserInfo(playerData) {
+            const userInfoSection = document.getElementById('user-info-section');
+            const userName = document.getElementById('user-name');
+            const userLevel = document.getElementById('user-level');
+            const userFaction = document.getElementById('user-faction');
+            const userAvatar = document.getElementById('user-avatar');
+            
+            if (playerData && playerData.name) {
+                // Show the user info section
+                userInfoSection.style.display = 'flex';
+                
+                // Update user name
+                userName.textContent = playerData.name;
+                
+                // Update user level
+                userLevel.textContent = `Level: ${playerData.level || '--'}`;
+                
+                // Update user faction
+                userFaction.textContent = `Faction: ${playerData.faction || 'None'}`;
+                
+                // Update avatar with first letter of name
+                const firstLetter = playerData.name.charAt(0).toUpperCase();
+                userAvatar.textContent = firstLetter;
+                
+                console.log('✅ User info updated:', playerData.name);
+            } else {
+                // Hide the user info section if no data
+                userInfoSection.style.display = 'none';
+                console.log('⚠️  No user data available');
+            }
         }
 
         // Handle Enter key in API key input
