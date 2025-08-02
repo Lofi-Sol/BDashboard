@@ -1,0 +1,21 @@
+{
+  "active_bets": [],
+  "completed_bets": [],
+  "statistics": {
+    "total_bets": 0,
+    "total_volume": 0,
+    "pending_bets": 0,
+    "confirmed_bets": 0,
+    "won_bets": 0,
+    "lost_bets": 0,
+    "total_payouts": 0,
+    "total_profit": 0,
+    "last_updated": null
+  },
+  "metadata": {
+    "version": "1.0",
+    "last_updated": "2025-08-02T00:51:26.130Z",
+    "total_users": 0,
+    "active_users": 0
+  }
+}
