@@ -1,6 +1,30 @@
 {
   "active_bets": [
     {
+      "playerId": 3520571,
+      "warId": "28794",
+      "factionId": "41803",
+      "factionName": "THE TEABAGGERS",
+      "xanaxAmount": 1,
+      "betAmount": 744983,
+      "odds": 2.7,
+      "status": "pending",
+      "timestamp": 1754162361146,
+      "betId": "1X0WH2EG"
+    },
+    {
+      "playerId": 3566110,
+      "warId": "28732",
+      "factionId": "51541",
+      "factionName": "Static Disturbance",
+      "xanaxAmount": 1,
+      "betAmount": 744983,
+      "odds": 3.25,
+      "status": "pending",
+      "timestamp": 1754162220113,
+      "betId": "ZMGTHO1P"
+    },
+    {
       "playerId": 3576736,
       "warId": "28766",
       "factionId": "8989",
@@ -87,19 +111,19 @@
   ],
   "completed_bets": [],
   "statistics": {
-    "total_bets": 7,
-    "total_volume": 163151277,
-    "pending_bets": 7,
+    "total_bets": 9,
+    "total_volume": 164641243,
+    "pending_bets": 9,
     "confirmed_bets": 0,
     "won_bets": 0,
     "lost_bets": 0,
     "total_payouts": 0,
     "total_profit": 0,
-    "last_updated": "2025-08-02T19:08:44.548Z"
+    "last_updated": "2025-08-02T19:19:21.159Z"
   },
   "metadata": {
     "version": "1.0",
-    "last_updated": "2025-08-02T19:08:44.548Z",
+    "last_updated": "2025-08-02T19:19:21.159Z",
     "total_users": 3,
     "active_users": 0
   }

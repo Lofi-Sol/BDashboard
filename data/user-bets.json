@@ -1,5 +1,125 @@
 {
   "users": {
+    "3520571": {
+      "playerId": "3520571",
+      "username": "Player3520571",
+      "profile": {
+        "joinDate": "2025-08-02T19:19:21.162Z",
+        "totalBets": 1,
+        "totalVolume": 744983,
+        "totalWinnings": 0,
+        "totalLosses": 0,
+        "netProfit": 0,
+        "winRate": 0,
+        "averageBetSize": 744983,
+        "largestBet": 744983,
+        "favoriteFaction": "THE TEABAGGERS",
+        "lastActive": "2025-08-02T19:19:21.162Z"
+      },
+      "activeBets": [
+        {
+          "betId": "1X0WH2EG",
+          "warId": "28794",
+          "factionId": "41803",
+          "factionName": "THE TEABAGGERS",
+          "xanaxAmount": 1,
+          "betAmount": 744983,
+          "odds": 2.7,
+          "potentialPayout": 2011454,
+          "status": "pending",
+          "timestamp": 1754162361146,
+          "placedAt": "2025-08-02T19:19:21.146Z"
+        }
+      ],
+      "betHistory": [],
+      "statistics": {
+        "byWar": {},
+        "byFaction": {
+          "41803": {
+            "factionName": "THE TEABAGGERS",
+            "totalBets": 2,
+            "totalVolume": 1489966,
+            "wins": 0,
+            "losses": 0,
+            "winRate": 0
+          }
+        },
+        "byMonth": {},
+        "byWeek": {},
+        "byDay": {}
+      },
+      "preferences": {
+        "defaultBetSize": 1000000,
+        "favoriteFactions": [],
+        "riskTolerance": "medium",
+        "autoBetting": false,
+        "notifications": {
+          "betResults": true,
+          "newWars": true,
+          "oddsChanges": false
+        }
+      }
+    },
+    "3566110": {
+      "playerId": "3566110",
+      "username": "Player3566110",
+      "profile": {
+        "joinDate": "2025-08-02T19:17:00.120Z",
+        "totalBets": 1,
+        "totalVolume": 744983,
+        "totalWinnings": 0,
+        "totalLosses": 0,
+        "netProfit": 0,
+        "winRate": 0,
+        "averageBetSize": 744983,
+        "largestBet": 744983,
+        "favoriteFaction": "Static Disturbance",
+        "lastActive": "2025-08-02T19:17:00.120Z"
+      },
+      "activeBets": [
+        {
+          "betId": "ZMGTHO1P",
+          "warId": "28732",
+          "factionId": "51541",
+          "factionName": "Static Disturbance",
+          "xanaxAmount": 1,
+          "betAmount": 744983,
+          "odds": 3.25,
+          "potentialPayout": 2421195,
+          "status": "pending",
+          "timestamp": 1754162220113,
+          "placedAt": "2025-08-02T19:17:00.113Z"
+        }
+      ],
+      "betHistory": [],
+      "statistics": {
+        "byWar": {},
+        "byFaction": {
+          "51541": {
+            "factionName": "Static Disturbance",
+            "totalBets": 2,
+            "totalVolume": 1489966,
+            "wins": 0,
+            "losses": 0,
+            "winRate": 0
+          }
+        },
+        "byMonth": {},
+        "byWeek": {},
+        "byDay": {}
+      },
+      "preferences": {
+        "defaultBetSize": 1000000,
+        "favoriteFactions": [],
+        "riskTolerance": "medium",
+        "autoBetting": false,
+        "notifications": {
+          "betResults": true,
+          "newWars": true,
+          "oddsChanges": false
+        }
+      }
+    },
     "3576736": {
       "playerId": "3576736",
       "username": "FlowerJar",
@@ -64,11 +184,11 @@
   "metadata": {
     "version": "1.0",
     "created": "2025-08-02T18:00:00.000Z",
-    "lastUpdated": "2025-08-02T19:08:44.551Z",
-    "totalUsers": 1,
-    "activeUsers": 1,
-    "totalActiveBets": 1,
-    "totalVolume": 744983,
+    "lastUpdated": "2025-08-02T19:19:21.162Z",
+    "totalUsers": 3,
+    "activeUsers": 3,
+    "totalActiveBets": 3,
+    "totalVolume": 2234949,
     "schema": {
       "userProfile": {
         "playerId": "string",

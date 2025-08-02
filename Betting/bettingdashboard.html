@@ -3877,6 +3877,8 @@
                 betId = generateBetId();
             } while (!isBetIdUnique(betId));
             
+            console.log('🎯 Generated bet ID:', betId);
+            
             // Create new bet entry
             const newBet = {
                 id: Date.now(), // Internal tracking ID
@@ -3918,24 +3920,30 @@
                 const odds = faction?.odds || 2.0;
                 
                 console.log('🎯 Saving bet to server with odds:', odds, 'for faction:', faction?.name);
+                console.log('👤 User data available:', userData);
+                console.log('📝 Player name being sent:', userData?.name || 'Unknown');
+                
+                const requestBody = {
+                    playerId: betData.playerId,
+                    warId: betData.warId,
+                    factionId: betData.factionId,
+                    factionName: betData.factionName,
+                    xanaxAmount: betData.xanaxAmount,
+                    betAmount: betData.betAmount,
+                    betId: betData.betId, // Include the bet ID
+                    playerName: userData?.name || 'Unknown', // Include the real player name
+                    odds: odds,
+                    timestamp: betData.timestamp
+                };
+                
+                console.log('📤 Request body being sent to server:', requestBody);
                 
                 const response = await fetch('/api/betting/place-bet', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        playerId: betData.playerId,
-                        warId: betData.warId,
-                        factionId: betData.factionId,
-                        factionName: betData.factionName,
-                        xanaxAmount: betData.xanaxAmount,
-                        betAmount: betData.betAmount,
-                        betId: betData.betId, // Include the bet ID
-                        playerName: userData?.name || 'Unknown', // Include the real player name
-                        odds: odds,
-                        timestamp: betData.timestamp
-                    })
+                    body: JSON.stringify(requestBody)
                 });
                 
                 const result = await response.json();

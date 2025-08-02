@@ -177,6 +177,10 @@ async function addBetToUserProfile(betData) {
             if (betData.playerName && userBetsData.users[playerId].username !== betData.playerName) {
                 console.log(`🔄 Updating username for player ${playerId}: ${userBetsData.users[playerId].username} → ${betData.playerName}`);
                 userBetsData.users[playerId].username = betData.playerName;
+            } else {
+                console.log(`ℹ️  No username update needed for player ${playerId}:`);
+                console.log(`   - Current username: ${userBetsData.users[playerId].username}`);
+                console.log(`   - Received playerName: ${betData.playerName}`);
             }
         }
         
@@ -295,6 +299,13 @@ async function addBet(betData) {
         }
         
         console.log('📝 Using bet ID from frontend:', betData.betId);
+        console.log('📝 Bet data received:', {
+            betId: betData.betId,
+            playerId: betData.playerId,
+            playerName: betData.playerName,
+            warId: betData.warId,
+            factionId: betData.factionId
+        });
         
         // Add timestamp if not provided
         if (!betData.timestamp) {
@@ -898,6 +909,15 @@ app.get('/api/betting/odds/:sport/:market', (req, res) => {
 app.post('/api/betting/place-bet', async (req, res) => {
     try {
         const { playerId, warId, factionId, factionName, xanaxAmount, betAmount, odds, betId, playerName } = req.body;
+        
+        // Debug logging
+        console.log('📝 Received bet data:');
+        console.log('   - Player ID:', playerId);
+        console.log('   - Player Name:', playerName);
+        console.log('   - Bet ID:', betId);
+        console.log('   - War ID:', warId);
+        console.log('   - Faction ID:', factionId);
+        console.log('   - Xanax Amount:', xanaxAmount);
         
         if (!playerId || !warId || !factionId || !xanaxAmount) {
             return res.status(400).json({
