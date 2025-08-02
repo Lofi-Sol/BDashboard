@@ -1,96 +1,11 @@
 {
-  "logs": {
-    "REfKB3FGXR53i7TEOxgI": {
-      "log": 4103,
-      "title": "Item receive",
-      "timestamp": 1754158567,
-      "category": "Item sending",
-      "data": {
-        "sender": 3576736,
-        "items": [
-          {
-            "id": 206,
-            "uid": null,
-            "qty": 3
-          }
-        ],
-        "message": "BET:28656:45835:3:0EV17NMF"
-      },
-      "params": {
-        "italic": 1,
-        "color": "green"
-      }
-    },
-    "8l8AOQAqyepdOgfBhy3m": {
-      "log": 4103,
-      "title": "Item receive",
-      "timestamp": 1754156923,
-      "category": "Item sending",
-      "data": {
-        "sender": 3576736,
-        "items": [
-          {
-            "id": 206,
-            "uid": 15450147512,
-            "qty": 1
-          }
-        ],
-        "message": "BET:28732:51541:1:61F4UEYL"
-      },
-      "params": {
-        "italic": 1,
-        "color": "green"
-      }
-    },
-    "qCmH23ow8KgaThYA8zqy": {
-      "log": 4103,
-      "title": "Item receive",
-      "timestamp": 1754098283,
-      "category": "Item sending",
-      "data": {
-        "sender": 3576736,
-        "items": [
-          {
-            "id": 206,
-            "uid": 15450147511,
-            "qty": 1
-          }
-        ],
-        "message": "BET:28742:50257:1:BA2WCONV"
-      },
-      "params": {
-        "italic": 1,
-        "color": "green"
-      }
-    },
-    "RbX8rydVOK9R2GG8Ikuh": {
-      "log": 4103,
-      "title": "Item receive",
-      "timestamp": 1754165349,
-      "category": "Item sending",
-      "data": {
-        "sender": 3650929,
-        "items": [
-          {
-            "id": 66,
-            "uid": null,
-            "qty": 5
-          }
-        ],
-        "message": "For the waste. Sorry"
-      },
-      "params": {
-        "italic": 1,
-        "color": "green"
-      }
-    }
-  },
+  "logs": {},
   "metadata": {
-    "last_updated": "2025-08-02T20:38:30.813Z",
-    "total_logs": 4,
+    "last_updated": "2025-08-02T20:45:00.000Z",
+    "total_logs": 0,
     "new_logs_found": 0,
-    "run_timestamp": "2025-08-02T20:38:30.813Z",
-    "api_response_count": 100,
-    "filtered_count": 3
+    "run_timestamp": "2025-08-02T20:45:00.000Z",
+    "api_response_count": 0,
+    "filtered_count": 0
   }
 }
