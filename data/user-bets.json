@@ -2,7 +2,7 @@
   "users": {
     "3566110": {
       "playerId": "3566110",
-      "username": "TornPlayer1",
+      "username": "VanillaScoop",
       "profile": {
         "joinDate": "2025-08-02T18:11:12.269Z",
         "totalBets": 2,
@@ -83,7 +83,7 @@
     },
     "3576736": {
       "playerId": "3576736",
-      "username": "TornPlayer2",
+      "username": "RobBendetti",
       "profile": {
         "joinDate": "2025-08-02T18:11:12.274Z",
         "totalBets": 3,
@@ -187,7 +187,7 @@
   "metadata": {
     "version": "1.0",
     "created": "2025-08-02T18:00:00.000Z",
-    "lastUpdated": "2025-08-02T18:32:57.856Z",
+    "lastUpdated": "2025-08-02T18:42:49.713Z",
     "totalUsers": 2,
     "activeUsers": 2,
     "totalActiveBets": 5,

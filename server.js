@@ -137,7 +137,7 @@ async function addBetToUserProfile(betData) {
         if (!userBetsData.users[playerId]) {
             userBetsData.users[playerId] = {
                 playerId: playerId,
-                username: `Player${playerId}`,
+                username: betData.playerName || `Player${playerId}`, // Use real name if provided
                 profile: {
                     joinDate: new Date().toISOString(),
                     totalBets: 0,
@@ -891,7 +891,7 @@ app.get('/api/betting/odds/:sport/:market', (req, res) => {
 // Place bet endpoint
 app.post('/api/betting/place-bet', async (req, res) => {
     try {
-        const { playerId, warId, factionId, factionName, xanaxAmount, betAmount, odds, betId } = req.body;
+        const { playerId, warId, factionId, factionName, xanaxAmount, betAmount, odds, betId, playerName } = req.body;
         
         if (!playerId || !warId || !factionId || !xanaxAmount) {
             return res.status(400).json({
@@ -909,6 +909,7 @@ app.post('/api/betting/place-bet', async (req, res) => {
             betAmount,
             odds,
             betId, // Include the bet ID from frontend
+            playerName, // Include the real player name from frontend
             status: 'pending',
             timestamp: Date.now()
         };
