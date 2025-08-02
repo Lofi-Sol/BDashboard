@@ -1,0 +1,49 @@
+name: Sync Local Changes
+
+on:
+  schedule:
+    # Run every 2 minutes to sync local changes
+    - cron: '*/2 * * * *'
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  contents: write
+
+jobs:
+  sync-changes:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Check for local changes
+      id: check-changes
+      run: |
+        if git diff --quiet data/user-bets.json; then
+          echo "has_changes=false" >> $GITHUB_OUTPUT
+        else
+          echo "has_changes=true" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Commit and push changes
+      if: steps.check-changes.outputs.has_changes == 'true'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add data/user-bets.json
+        git commit -m "🤖 Auto-sync local bet changes - $(date)"
+        git push
+        
+    - name: No changes to sync
+      if: steps.check-changes.outputs.has_changes == 'false'
+      run: echo "No local changes to sync" 

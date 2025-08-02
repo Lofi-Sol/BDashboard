@@ -939,24 +939,24 @@ app.post('/api/betting/place-bet', async (req, res) => {
             timestamp: Date.now()
         };
         
-        // Use GitHub API to add bet
-        const GitHubBetsAPI = require('./scripts/github-bets-api.js');
-        const githubAPI = new GitHubBetsAPI();
+        // Use local storage (will be synced by GitHub Actions)
+        const GitHubActionsBets = require('./scripts/github-actions-bets.js');
+        const betsManager = new GitHubActionsBets();
         
         try {
-            const betObject = await githubAPI.addBet(betData);
+            const betObject = betsManager.addBet(betData);
             
             res.json({
                 success: true,
                 betId: betData.betId,
-                message: 'Bet placed successfully and saved to GitHub',
+                message: 'Bet placed successfully and saved locally (will sync to GitHub)',
                 timestamp: betData.timestamp
             });
-        } catch (githubError) {
-            console.error('❌ GitHub API error:', githubError.message);
+        } catch (error) {
+            console.error('❌ Error adding bet:', error.message);
             
-            // Fallback to local storage if GitHub fails
-            console.log('🔄 Falling back to local storage...');
+            // Fallback to original local storage
+            console.log('🔄 Falling back to original local storage...');
             const success = await addBet(betData);
             
             if (success) {
