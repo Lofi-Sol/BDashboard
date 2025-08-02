@@ -2,11 +2,11 @@
   "users": {
     "3520571": {
       "playerId": "3520571",
-      "username": "Player3520571",
+      "username": "VanillaScoop",
       "profile": {
         "joinDate": "2025-08-02T19:19:21.162Z",
-        "totalBets": 1,
-        "totalVolume": 744983,
+        "totalBets": 3,
+        "totalVolume": 2234949,
         "totalWinnings": 0,
         "totalLosses": 0,
         "netProfit": 0,
@@ -14,9 +14,35 @@
         "averageBetSize": 744983,
         "largestBet": 744983,
         "favoriteFaction": "THE TEABAGGERS",
-        "lastActive": "2025-08-02T19:19:21.162Z"
+        "lastActive": "2025-08-02T19:43:30.479Z"
       },
       "activeBets": [
+        {
+          "betId": "NUX769TI",
+          "warId": "28728",
+          "factionId": "54528",
+          "factionName": "The Mighty Diarrhea",
+          "xanaxAmount": 1,
+          "betAmount": 744983,
+          "odds": 2.2,
+          "potentialPayout": 1638963,
+          "status": "pending",
+          "timestamp": 1754163810474,
+          "placedAt": "2025-08-02T19:43:30.474Z"
+        },
+        {
+          "betId": "2CZ4CNGG",
+          "warId": "28742",
+          "factionId": "47615",
+          "factionName": "TORN’S NEW HITTERS",
+          "xanaxAmount": 1,
+          "betAmount": 744983,
+          "odds": 1.8,
+          "potentialPayout": 1340969,
+          "status": "pending",
+          "timestamp": 1754163540282,
+          "placedAt": "2025-08-02T19:39:00.282Z"
+        },
         {
           "betId": "1X0WH2EG",
           "warId": "28794",
@@ -39,6 +65,22 @@
             "factionName": "THE TEABAGGERS",
             "totalBets": 2,
             "totalVolume": 1489966,
+            "wins": 0,
+            "losses": 0,
+            "winRate": 0
+          },
+          "47615": {
+            "factionName": "TORN’S NEW HITTERS",
+            "totalBets": 2,
+            "totalVolume": 2234949,
+            "wins": 0,
+            "losses": 0,
+            "winRate": 0
+          },
+          "54528": {
+            "factionName": "The Mighty Diarrhea",
+            "totalBets": 2,
+            "totalVolume": 2979932,
             "wins": 0,
             "losses": 0,
             "winRate": 0
@@ -184,11 +226,11 @@
   "metadata": {
     "version": "1.0",
     "created": "2025-08-02T18:00:00.000Z",
-    "lastUpdated": "2025-08-02T19:19:21.162Z",
+    "lastUpdated": "2025-08-02T19:43:30.479Z",
     "totalUsers": 3,
     "activeUsers": 3,
-    "totalActiveBets": 3,
-    "totalVolume": 2234949,
+    "totalActiveBets": 5,
+    "totalVolume": 3724915,
     "schema": {
       "userProfile": {
         "playerId": "string",
