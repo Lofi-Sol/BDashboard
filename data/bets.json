@@ -1,21 +1,94 @@
 {
-  "active_bets": [],
+  "active_bets": [
+    {
+      "playerId": 3576736,
+      "warId": "28656",
+      "factionId": "45835",
+      "factionName": "Fallen Angels Syndicate",
+      "xanaxAmount": 3,
+      "betAmount": 2234949,
+      "odds": 2.3,
+      "status": "pending",
+      "timestamp": 1754158508628,
+      "betId": "H3FTS6FB"
+    },
+    {
+      "playerId": 3576736,
+      "warId": "28732",
+      "factionId": "51541",
+      "factionName": "Static Disturbance",
+      "xanaxAmount": 1,
+      "betAmount": 744983,
+      "odds": 3.25,
+      "status": "pending",
+      "timestamp": 1754156059664,
+      "betId": "HYAYOUPD"
+    },
+    {
+      "playerId": 3520571,
+      "warId": "28736",
+      "factionId": "15239",
+      "factionName": "DX Medical",
+      "xanaxAmount": 191,
+      "betAmount": 142291753,
+      "odds": 2.9,
+      "status": "pending",
+      "timestamp": 1754113072299,
+      "betId": "9FBPC3B6"
+    },
+    {
+      "playerId": 3520571,
+      "warId": "28747",
+      "factionId": "36421",
+      "factionName": "The Waystation",
+      "xanaxAmount": 16,
+      "betAmount": 11919728,
+      "odds": 2,
+      "status": "pending",
+      "timestamp": 1754112785669,
+      "betId": "X6SCFZKV"
+    },
+    {
+      "playerId": 3520571,
+      "warId": "28687",
+      "factionId": "52693",
+      "factionName": "FiveWill 1",
+      "xanaxAmount": 6,
+      "betAmount": 4469898,
+      "odds": 2,
+      "status": "pending",
+      "timestamp": 1754111792438,
+      "betId": "YU26F7IW"
+    },
+    {
+      "playerId": 3566110,
+      "warId": "28924",
+      "factionId": "8706",
+      "factionName": "Carbon",
+      "xanaxAmount": 1,
+      "betAmount": 744983,
+      "odds": 2.4,
+      "status": "pending",
+      "timestamp": 1754110273840,
+      "betId": "8FBD9F3I"
+    }
+  ],
   "completed_bets": [],
   "statistics": {
-    "total_bets": 0,
-    "total_volume": 0,
-    "pending_bets": 0,
+    "total_bets": 6,
+    "total_volume": 162406294,
+    "pending_bets": 6,
     "confirmed_bets": 0,
     "won_bets": 0,
     "lost_bets": 0,
     "total_payouts": 0,
     "total_profit": 0,
-    "last_updated": null
+    "last_updated": "2025-08-02T18:15:08.645Z"
   },
   "metadata": {
     "version": "1.0",
-    "last_updated": "2025-08-02T00:51:26.130Z",
-    "total_users": 0,
+    "last_updated": "2025-08-02T18:15:08.645Z",
+    "total_users": 3,
     "active_users": 0
   }
 }

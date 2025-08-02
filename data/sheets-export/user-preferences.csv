@@ -1,0 +1,3 @@
+playerId,username,defaultBetSize,favoriteFactions,riskTolerance,autoBetting,notifications_betResults,notifications_newWars,notifications_oddsChanges
+3520571,Player3520571,1000000,,medium,false,true,true,false
+3566110,Player3566110,1000000,,medium,false,true,true,false

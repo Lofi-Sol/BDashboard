@@ -1,0 +1,235 @@
+{
+  "users": {
+    "3566110": {
+      "playerId": "3566110",
+      "username": "TornPlayer1",
+      "profile": {
+        "joinDate": "2025-08-02T18:11:12.269Z",
+        "totalBets": 2,
+        "totalVolume": 3000000,
+        "totalWinnings": 0,
+        "totalLosses": 0,
+        "netProfit": 0,
+        "winRate": 0,
+        "averageBetSize": 1500000,
+        "largestBet": 2000000,
+        "favoriteFaction": "SMTH - November Chopin",
+        "lastActive": "2025-08-02T18:11:12.280Z"
+      },
+      "activeBets": [
+        {
+          "betId": "IU6M1PHZ",
+          "warId": "28672",
+          "factionId": "16335",
+          "factionName": "SMTH - November Chopin",
+          "xanaxAmount": 2,
+          "betAmount": 2000000,
+          "odds": "2.15",
+          "potentialPayout": 4297334,
+          "status": "pending",
+          "timestamp": 1754158272265,
+          "placedAt": "2025-08-02T18:11:12.265Z"
+        },
+        {
+          "betId": "SKKHT3D3",
+          "warId": "28667",
+          "factionId": "8076",
+          "factionName": "Order Through Chaos",
+          "xanaxAmount": 1,
+          "betAmount": 1000000,
+          "odds": "2.19",
+          "potentialPayout": 2194348,
+          "status": "pending",
+          "timestamp": 1754158272280,
+          "placedAt": "2025-08-02T18:11:12.280Z"
+        }
+      ],
+      "betHistory": [],
+      "statistics": {
+        "byWar": {},
+        "byFaction": {
+          "8076": {
+            "factionName": "Order Through Chaos",
+            "totalBets": 1,
+            "totalVolume": 1000000,
+            "wins": 0,
+            "losses": 0,
+            "winRate": 0
+          },
+          "16335": {
+            "factionName": "SMTH - November Chopin",
+            "totalBets": 1,
+            "totalVolume": 2000000,
+            "wins": 0,
+            "losses": 0,
+            "winRate": 0
+          }
+        },
+        "byMonth": {},
+        "byWeek": {},
+        "byDay": {}
+      },
+      "preferences": {
+        "defaultBetSize": 1000000,
+        "favoriteFactions": [],
+        "riskTolerance": "medium",
+        "autoBetting": false,
+        "notifications": {
+          "betResults": true,
+          "newWars": true,
+          "oddsChanges": false
+        }
+      }
+    },
+    "3576736": {
+      "playerId": "3576736",
+      "username": "TornPlayer2",
+      "profile": {
+        "joinDate": "2025-08-02T18:11:12.274Z",
+        "totalBets": 3,
+        "totalVolume": 4234949,
+        "totalWinnings": 0,
+        "totalLosses": 0,
+        "netProfit": 0,
+        "winRate": 0,
+        "averageBetSize": 1411650,
+        "largestBet": 2234949,
+        "favoriteFaction": "Fallen Angels Syndicate",
+        "lastActive": "2025-08-02T18:15:08.647Z"
+      },
+      "activeBets": [
+        {
+          "betId": "H3FTS6FB",
+          "warId": "28656",
+          "factionId": "45835",
+          "factionName": "Fallen Angels Syndicate",
+          "xanaxAmount": 3,
+          "betAmount": 2234949,
+          "odds": 2.3,
+          "potentialPayout": 5140383,
+          "status": "pending",
+          "timestamp": 1754158508628,
+          "placedAt": "2025-08-02T18:15:08.628Z"
+        },
+        {
+          "betId": "9NWMBP3B",
+          "warId": "28742",
+          "factionId": "50257",
+          "factionName": "Equilibrium",
+          "xanaxAmount": 1,
+          "betAmount": 1000000,
+          "odds": "2.09",
+          "potentialPayout": 2089853,
+          "status": "pending",
+          "timestamp": 1754158272274,
+          "placedAt": "2025-08-02T18:11:12.274Z"
+        },
+        {
+          "betId": "WV89KPQZ",
+          "warId": "28732",
+          "factionId": "51541",
+          "factionName": "Static Disturbance",
+          "xanaxAmount": 1,
+          "betAmount": 1000000,
+          "odds": "2.56",
+          "potentialPayout": 2562701,
+          "status": "pending",
+          "timestamp": 1754158272284,
+          "placedAt": "2025-08-02T18:11:12.284Z"
+        }
+      ],
+      "betHistory": [],
+      "statistics": {
+        "byWar": {},
+        "byFaction": {
+          "45835": {
+            "factionName": "Fallen Angels Syndicate",
+            "totalBets": 2,
+            "totalVolume": 6469898,
+            "wins": 0,
+            "losses": 0,
+            "winRate": 0
+          },
+          "50257": {
+            "factionName": "Equilibrium",
+            "totalBets": 1,
+            "totalVolume": 1000000,
+            "wins": 0,
+            "losses": 0,
+            "winRate": 0
+          },
+          "51541": {
+            "factionName": "Static Disturbance",
+            "totalBets": 1,
+            "totalVolume": 1000000,
+            "wins": 0,
+            "losses": 0,
+            "winRate": 0
+          }
+        },
+        "byMonth": {},
+        "byWeek": {},
+        "byDay": {}
+      },
+      "preferences": {
+        "defaultBetSize": 1000000,
+        "favoriteFactions": [],
+        "riskTolerance": "medium",
+        "autoBetting": false,
+        "notifications": {
+          "betResults": true,
+          "newWars": true,
+          "oddsChanges": false
+        }
+      }
+    }
+  },
+  "metadata": {
+    "version": "1.0",
+    "created": "2025-08-02T18:00:00.000Z",
+    "lastUpdated": "2025-08-02T18:23:25.473Z",
+    "totalUsers": 2,
+    "activeUsers": 2,
+    "totalActiveBets": 5,
+    "totalVolume": 7234949,
+    "schema": {
+      "userProfile": {
+        "playerId": "string",
+        "username": "string (real player name from API)",
+        "profile": {
+          "joinDate": "ISO date string",
+          "totalBets": "number",
+          "totalVolume": "number",
+          "totalWinnings": "number",
+          "totalLosses": "number",
+          "netProfit": "number",
+          "winRate": "number (0-1)",
+          "averageBetSize": "number",
+          "largestBet": "number",
+          "favoriteFaction": "string",
+          "lastActive": "ISO date string"
+        },
+        "activeBets": "array of bet objects",
+        "betHistory": "array of completed bet objects",
+        "statistics": "object with various betting statistics",
+        "preferences": "object with user betting preferences"
+      },
+      "betObject": {
+        "betId": "string",
+        "warId": "string",
+        "factionId": "string",
+        "factionName": "string",
+        "xanaxAmount": "number",
+        "betAmount": "number",
+        "odds": "number",
+        "potentialPayout": "number",
+        "status": "string (pending|won|lost|cancelled)",
+        "timestamp": "number",
+        "placedAt": "ISO date string",
+        "resolvedAt": "ISO date string (for completed bets)",
+        "actualPayout": "number (for completed bets)",
+        "profit": "number (for completed bets)"
+      }
+    }
+  }
+}

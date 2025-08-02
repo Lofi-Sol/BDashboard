@@ -2468,18 +2468,20 @@
             successMsg.textContent = 'Connecting...';
             
             // Test the API key by fetching user data
-                            fetch(`/api/torn/user?key=${apiKey}`)
+            fetch(`/api/auth/verify-key`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ apiKey: apiKey })
+            })
                 .then(response => response.json())
                 .then(data => {
-                    if (data.error) {
-                        // Handle specific rate limiting error
-                        if (data.error.error && data.error.error.includes('Too many requests')) {
-                            throw new Error('Rate limit exceeded. Please wait a few minutes before trying again.');
-                        }
-                        throw new Error(data.error.error);
+                    if (!data.success) {
+                        throw new Error(data.error || 'Authentication failed');
                     }
                     
-                    userData = data;
+                    userData = data.player;
                     successMsg.textContent = 'Connected successfully!';
                     
                     // Show dashboard after a short delay
@@ -3736,7 +3738,7 @@
             const newBet = {
                 id: Date.now(), // Internal tracking ID
                 betId: betId, // Unique bet ID for message
-                playerId: userData?.player_id || 'Unknown', // Use actual player ID if available
+                playerId: userData?.playerId || 'Unknown', // Use actual player ID if available
                 warId: warId,
                 factionId: factionId,
                 factionName: factionName,
@@ -3753,10 +3755,53 @@
             try {
                 localStorage.setItem('tornBets', JSON.stringify(bets));
                 console.log('Bet saved to tracking:', newBet);
-                return { id: newBet.id, betId: newBet.betId }; // Return both IDs
             } catch (error) {
                 console.error('Error saving bet to tracking:', error);
                 return null;
+            }
+            
+            // Also save to server API
+            saveBetToServer(newBet);
+            
+            return { id: newBet.id, betId: newBet.betId }; // Return both IDs
+        }
+        
+        // Save bet to server API
+        async function saveBetToServer(betData) {
+            try {
+                // Get the actual odds from the selected faction
+                const factionId = betData.factionId;
+                const faction = selectedBet?.market?.options?.find(opt => opt.id === factionId);
+                const odds = faction?.odds || 2.0;
+                
+                console.log('🎯 Saving bet to server with odds:', odds, 'for faction:', faction?.name);
+                
+                const response = await fetch('/api/betting/place-bet', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        playerId: betData.playerId,
+                        warId: betData.warId,
+                        factionId: betData.factionId,
+                        factionName: betData.factionName,
+                        xanaxAmount: betData.xanaxAmount,
+                        betAmount: betData.betAmount,
+                        odds: odds,
+                        timestamp: betData.timestamp
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    console.log('✅ Bet saved to server:', result);
+                } else {
+                    console.error('❌ Failed to save bet to server:', result.error);
+                }
+            } catch (error) {
+                console.error('❌ Error saving bet to server:', error);
             }
         }
         
@@ -4130,21 +4175,46 @@
             contentEl.style.display = 'none';
 
             try {
-                // Get bets from localStorage
-                const existingBets = localStorage.getItem('tornBets');
-                if (!existingBets) {
-                    userBetsData = [];
-                    displayUserBets();
-                    return;
-                }
+                // Check if user is authenticated
+                if (!userData || !userData.playerId || !apiKey) {
+                    console.log('User not authenticated, using localStorage fallback');
+                    // Fallback to localStorage for non-authenticated users
+                    const existingBets = localStorage.getItem('tornBets');
+                    if (!existingBets) {
+                        userBetsData = [];
+                        displayUserBets();
+                        return;
+                    }
 
-                const allBets = JSON.parse(existingBets);
-                
-                // Filter bets for current user (using player_id from userData)
-                const currentPlayerId = userData?.player_id || 'Unknown';
-                userBetsData = allBets.filter(bet => 
-                    bet.playerId.toString() === currentPlayerId.toString()
-                );
+                    const allBets = JSON.parse(existingBets);
+                    const currentPlayerId = userData?.playerId || 'Unknown';
+                    userBetsData = allBets.filter(bet => 
+                        bet.playerId.toString() === currentPlayerId.toString()
+                    );
+                } else {
+                    // Use server API for authenticated users
+                    console.log('Loading bets from server for player:', userData.playerId);
+                    const response = await fetch(`/api/betting/my-bets/${userData.playerId}?apiKey=${apiKey}`);
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Convert server data format to match local format
+                        userBetsData = [
+                            ...result.bets.activeBets.map(bet => ({
+                                ...bet,
+                                status: 'pending'
+                            })),
+                            ...result.bets.betHistory.map(bet => ({
+                                ...bet,
+                                status: bet.status || 'completed'
+                            }))
+                        ];
+                        console.log('Loaded bets from server:', userBetsData.length);
+                    } else {
+                        console.error('Failed to load bets from server:', result.error);
+                        userBetsData = [];
+                    }
+                }
 
                 // Refresh live war data before displaying
                 await refreshLiveWarData();
