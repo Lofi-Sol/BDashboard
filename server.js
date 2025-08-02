@@ -905,7 +905,7 @@ app.get('/api/betting/odds/:sport/:market', (req, res) => {
     }
 });
 
-// Place bet endpoint
+// Place bet endpoint - Now uses GitHub API
 app.post('/api/betting/place-bet', async (req, res) => {
     try {
         const { playerId, warId, factionId, factionName, xanaxAmount, betAmount, odds, betId, playerName } = req.body;
@@ -936,24 +936,42 @@ app.post('/api/betting/place-bet', async (req, res) => {
             odds,
             betId, // Include the bet ID from frontend
             playerName, // Include the real player name from frontend
-            status: 'pending',
             timestamp: Date.now()
         };
         
-        const success = await addBet(betData);
+        // Use GitHub API to add bet
+        const GitHubBetsAPI = require('./scripts/github-bets-api.js');
+        const githubAPI = new GitHubBetsAPI();
         
-        if (success) {
+        try {
+            const betObject = await githubAPI.addBet(betData);
+            
             res.json({
                 success: true,
                 betId: betData.betId,
-                message: 'Bet placed successfully',
+                message: 'Bet placed successfully and saved to GitHub',
                 timestamp: betData.timestamp
             });
-        } else {
-            res.status(500).json({
-                success: false,
-                error: 'Failed to save bet'
-            });
+        } catch (githubError) {
+            console.error('❌ GitHub API error:', githubError.message);
+            
+            // Fallback to local storage if GitHub fails
+            console.log('🔄 Falling back to local storage...');
+            const success = await addBet(betData);
+            
+            if (success) {
+                res.json({
+                    success: true,
+                    betId: betData.betId,
+                    message: 'Bet placed successfully (local storage)',
+                    timestamp: betData.timestamp
+                });
+            } else {
+                res.status(500).json({
+                    success: false,
+                    error: 'Failed to save bet'
+                });
+            }
         }
         
     } catch (error) {
