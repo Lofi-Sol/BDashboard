@@ -83,14 +83,35 @@
         "italic": 1,
         "color": "green"
       }
+    },
+    "REfKB3FGXR53i7TEOxgI": {
+      "log": 4103,
+      "title": "Item receive",
+      "timestamp": 1754158567,
+      "category": "Item sending",
+      "data": {
+        "sender": 3576736,
+        "items": [
+          {
+            "id": 206,
+            "uid": null,
+            "qty": 3
+          }
+        ],
+        "message": "BET:28656:45835:3:0EV17NMF"
+      },
+      "params": {
+        "italic": 1,
+        "color": "green"
+      }
     }
   },
   "metadata": {
-    "last_updated": "2025-08-02T17:52:33.511Z",
-    "total_logs": 4,
-    "new_logs_found": 0,
-    "run_timestamp": "2025-08-02T17:52:33.511Z",
+    "last_updated": "2025-08-02T18:30:24.173Z",
+    "total_logs": 5,
+    "new_logs_found": 1,
+    "run_timestamp": "2025-08-02T18:30:24.173Z",
     "api_response_count": 100,
     "filtered_count": 3
   }
-} 
+}
