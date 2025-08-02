@@ -282,10 +282,13 @@ async function addBet(betData) {
         // It should NOT be called from log processing scripts
         console.log('📝 Adding manual bet to user profile:', betData.betId);
         
-        // Generate unique bet ID if not provided
+        // Use the bet ID provided by the frontend (don't generate a new one)
         if (!betData.betId) {
-            betData.betId = generateBetId();
+            console.error('❌ No bet ID provided by frontend');
+            return false;
         }
+        
+        console.log('📝 Using bet ID from frontend:', betData.betId);
         
         // Add timestamp if not provided
         if (!betData.timestamp) {
@@ -888,7 +891,7 @@ app.get('/api/betting/odds/:sport/:market', (req, res) => {
 // Place bet endpoint
 app.post('/api/betting/place-bet', async (req, res) => {
     try {
-        const { playerId, warId, factionId, factionName, xanaxAmount, betAmount, odds } = req.body;
+        const { playerId, warId, factionId, factionName, xanaxAmount, betAmount, odds, betId } = req.body;
         
         if (!playerId || !warId || !factionId || !xanaxAmount) {
             return res.status(400).json({
@@ -905,6 +908,7 @@ app.post('/api/betting/place-bet', async (req, res) => {
             xanaxAmount,
             betAmount,
             odds,
+            betId, // Include the bet ID from frontend
             status: 'pending',
             timestamp: Date.now()
         };
