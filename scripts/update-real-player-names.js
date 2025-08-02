@@ -9,17 +9,8 @@
 
 const fs = require('fs').promises;
 
-// Sample player data from Torn API (you can replace with actual API calls)
-const playerData = {
-    "3566110": {
-        "name": "VanillaScoop",
-        "player_id": 3566110
-    },
-    "3576736": {
-        "name": "RobBendetti", 
-        "player_id": 3576736
-    }
-};
+// Player data will be fetched from Torn API
+const playerData = {};
 
 async function updateRealPlayerNames() {
     console.log('🔄 Updating Real Player Names');
@@ -122,18 +113,22 @@ async function main() {
     // Check if API key is provided
     const apiKey = process.argv[2];
     
-    if (apiKey) {
-        console.log('🔑 Using provided API key to fetch real names...');
-        const realNames = await fetchPlayerNames(apiKey);
-        
-        if (Object.keys(realNames).length > 0) {
-            // Update the playerData with real names
-            Object.assign(playerData, realNames);
-        }
-    } else {
-        console.log('ℹ️  No API key provided, using sample data');
-        console.log('💡 To fetch real names, run: node scripts/update-real-player-names.js YOUR_API_KEY');
+    if (!apiKey) {
+        console.log('❌ API key is required!');
+        console.log('💡 Usage: node scripts/update-real-player-names.js YOUR_API_KEY');
         console.log('');
+        return;
+    }
+    
+    console.log('🔑 Using provided API key to fetch real names...');
+    const realNames = await fetchPlayerNames(apiKey);
+    
+    if (Object.keys(realNames).length > 0) {
+        // Update the playerData with real names
+        Object.assign(playerData, realNames);
+    } else {
+        console.log('❌ No player names fetched from API');
+        return;
     }
     
     // Update the user data
