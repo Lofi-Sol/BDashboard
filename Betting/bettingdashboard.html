@@ -192,7 +192,8 @@
             border-radius: 8px;
             border: 1px solid #e2e8f0;
             font-family: 'Inter', 'DM Sans', Arial, sans-serif;
-            min-width: 200px;
+            min-width: 250px;
+            max-width: 350px;
         }
 
         .user-avatar {
@@ -218,8 +219,10 @@
         .user-name {
             font-weight: 600;
             color: #1e293b;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             line-height: 1.2;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .user-level {
@@ -2674,8 +2677,9 @@
                 // Show the user info section
                 userInfoSection.style.display = 'flex';
                 
-                // Update user name
-                userName.textContent = playerData.name;
+                // Update user name with player ID
+                const playerId = playerData.player_id || playerData.playerId || '--';
+                userName.textContent = `${playerData.name} (${playerId})`;
                 
                 // Update user level
                 userLevel.textContent = `Level: ${playerData.level || '--'}`;
@@ -2687,7 +2691,7 @@
                 const firstLetter = playerData.name.charAt(0).toUpperCase();
                 userAvatar.textContent = firstLetter;
                 
-                console.log('✅ User info updated:', playerData.name);
+                console.log('✅ User info updated:', playerData.name, 'ID:', playerId);
             } else {
                 // Hide the user info section if no data
                 userInfoSection.style.display = 'none';
