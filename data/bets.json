@@ -2,6 +2,18 @@
   "active_bets": [
     {
       "playerId": 3576736,
+      "warId": "28766",
+      "factionId": "8989",
+      "factionName": "JUX HQ",
+      "xanaxAmount": 1,
+      "betAmount": 744983,
+      "odds": 1.5,
+      "status": "pending",
+      "timestamp": 1754161724538,
+      "betId": "1GQK6L6I"
+    },
+    {
+      "playerId": 3576736,
       "warId": "28656",
       "factionId": "45835",
       "factionName": "Fallen Angels Syndicate",
@@ -75,19 +87,19 @@
   ],
   "completed_bets": [],
   "statistics": {
-    "total_bets": 6,
-    "total_volume": 162406294,
-    "pending_bets": 6,
+    "total_bets": 7,
+    "total_volume": 163151277,
+    "pending_bets": 7,
     "confirmed_bets": 0,
     "won_bets": 0,
     "lost_bets": 0,
     "total_payouts": 0,
     "total_profit": 0,
-    "last_updated": "2025-08-02T18:15:08.645Z"
+    "last_updated": "2025-08-02T19:08:44.548Z"
   },
   "metadata": {
     "version": "1.0",
-    "last_updated": "2025-08-02T18:15:08.645Z",
+    "last_updated": "2025-08-02T19:08:44.548Z",
     "total_users": 3,
     "active_users": 0
   }

@@ -172,6 +172,12 @@ async function addBetToUserProfile(betData) {
                     }
                 }
             };
+        } else {
+            // Update username for existing user if real name is provided
+            if (betData.playerName && userBetsData.users[playerId].username !== betData.playerName) {
+                console.log(`🔄 Updating username for player ${playerId}: ${userBetsData.users[playerId].username} → ${betData.playerName}`);
+                userBetsData.users[playerId].username = betData.playerName;
+            }
         }
         
         const user = userBetsData.users[playerId];

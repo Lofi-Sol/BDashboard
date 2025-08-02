@@ -1,13 +1,74 @@
 {
-  "users": {},
+  "users": {
+    "3576736": {
+      "playerId": "3576736",
+      "username": "FlowerJar",
+      "profile": {
+        "joinDate": "2025-08-02T19:08:44.551Z",
+        "totalBets": 1,
+        "totalVolume": 744983,
+        "totalWinnings": 0,
+        "totalLosses": 0,
+        "netProfit": 0,
+        "winRate": 0,
+        "averageBetSize": 744983,
+        "largestBet": 744983,
+        "favoriteFaction": "JUX HQ",
+        "lastActive": "2025-08-02T19:08:44.551Z"
+      },
+      "activeBets": [
+        {
+          "betId": "1GQK6L6I",
+          "warId": "28766",
+          "factionId": "8989",
+          "factionName": "JUX HQ",
+          "xanaxAmount": 1,
+          "betAmount": 744983,
+          "odds": 1.5,
+          "potentialPayout": 1117475,
+          "status": "pending",
+          "timestamp": 1754161724538,
+          "placedAt": "2025-08-02T19:08:44.538Z"
+        }
+      ],
+      "betHistory": [],
+      "statistics": {
+        "byWar": {},
+        "byFaction": {
+          "8989": {
+            "factionName": "JUX HQ",
+            "totalBets": 2,
+            "totalVolume": 1489966,
+            "wins": 0,
+            "losses": 0,
+            "winRate": 0
+          }
+        },
+        "byMonth": {},
+        "byWeek": {},
+        "byDay": {}
+      },
+      "preferences": {
+        "defaultBetSize": 1000000,
+        "favoriteFactions": [],
+        "riskTolerance": "medium",
+        "autoBetting": false,
+        "notifications": {
+          "betResults": true,
+          "newWars": true,
+          "oddsChanges": false
+        }
+      }
+    }
+  },
   "metadata": {
     "version": "1.0",
     "created": "2025-08-02T18:00:00.000Z",
-    "lastUpdated": "2025-08-02T18:46:33.512Z",
-    "totalUsers": 0,
-    "activeUsers": 0,
-    "totalActiveBets": 0,
-    "totalVolume": 0,
+    "lastUpdated": "2025-08-02T19:08:44.551Z",
+    "totalUsers": 1,
+    "activeUsers": 1,
+    "totalActiveBets": 1,
+    "totalVolume": 744983,
     "schema": {
       "userProfile": {
         "playerId": "string",
