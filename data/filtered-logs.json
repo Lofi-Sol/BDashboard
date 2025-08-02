@@ -65,10 +65,10 @@
     }
   },
   "metadata": {
-    "last_updated": "2025-08-02T18:47:28.070Z",
+    "last_updated": "2025-08-02T18:56:13.652Z",
     "total_logs": 3,
-    "new_logs_found": 3,
-    "run_timestamp": "2025-08-02T18:47:28.070Z",
+    "new_logs_found": 0,
+    "run_timestamp": "2025-08-02T18:56:13.652Z",
     "api_response_count": 100,
     "filtered_count": 3
   }
