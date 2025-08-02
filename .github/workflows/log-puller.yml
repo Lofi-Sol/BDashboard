@@ -1,0 +1,125 @@
+name: Log Puller
+
+on:
+  schedule:
+    # Run every 10 minutes
+    - cron: '*/10 * * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  pull-logs:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Install dependencies
+      run: npm install axios
+      
+    - name: Pull and filter logs
+      env:
+        TORN_API_KEY: ${{ secrets.BOOKIE_API_KEY }}
+      run: |
+        node -e "
+        const axios = require('axios');
+        const fs = require('fs');
+        const path = require('path');
+        
+        async function pullLogs() {
+          try {
+            console.log('🔍 Pulling logs from Torn API...');
+            
+            // Fetch logs from Torn API
+            const response = await axios.get(\`https://api.torn.com/user/?selections=log&key=\${process.env.TORN_API_KEY}\`);
+            
+            if (response.data.error) {
+              throw new Error(\`Torn API Error: \${response.data.error}\`);
+            }
+            
+            const logs = response.data.log || {};
+            console.log(\`📊 Found \${Object.keys(logs).length} total logs\`);
+            
+            // Filter for "Item receive" logs
+            const filteredLogs = {};
+            let itemReceiveCount = 0;
+            
+            Object.entries(logs).forEach(([logId, logEntry]) => {
+              if (logEntry.title === 'Item receive') {
+                filteredLogs[logId] = logEntry;
+                itemReceiveCount++;
+              }
+            });
+            
+            console.log(\`✅ Filtered \${itemReceiveCount} "Item receive" logs\`);
+            
+            // Create data directory if it doesn't exist
+            const dataDir = path.join(process.cwd(), 'data');
+            if (!fs.existsSync(dataDir)) {
+              fs.mkdirSync(dataDir, { recursive: true });
+            }
+            
+            // Load existing filtered logs
+            let existingData = { logs: {}, metadata: {} };
+            const logsFile = path.join(dataDir, 'filtered-logs.json');
+            
+            try {
+              if (fs.existsSync(logsFile)) {
+                const existingContent = fs.readFileSync(logsFile, 'utf8');
+                existingData = JSON.parse(existingContent);
+              }
+            } catch (error) {
+              console.log('No existing filtered-logs.json found, creating new file');
+            }
+            
+            // Merge new logs with existing logs (avoid duplicates)
+            const existingLogIds = new Set(Object.keys(existingData.logs));
+            let newLogsCount = 0;
+            
+            Object.entries(filteredLogs).forEach(([logId, logEntry]) => {
+              if (!existingLogIds.has(logId)) {
+                existingData.logs[logId] = logEntry;
+                newLogsCount++;
+              }
+            });
+            
+            // Update metadata
+            existingData.metadata = {
+              last_updated: new Date().toISOString(),
+              total_logs: Object.keys(existingData.logs).length,
+              new_logs_found: newLogsCount,
+              run_timestamp: new Date().toISOString(),
+              api_response_count: Object.keys(logs).length,
+              filtered_count: itemReceiveCount
+            };
+            
+            // Write updated data
+            fs.writeFileSync(logsFile, JSON.stringify(existingData, null, 2));
+            
+            console.log(\`✅ Successfully processed logs\`);
+            console.log(\`📊 Total logs in file: \${existingData.metadata.total_logs}\`);
+            console.log(\`🆕 New logs added: \${newLogsCount}\`);
+            console.log(\`📋 API response logs: \${existingData.metadata.api_response_count}\`);
+            console.log(\`🎯 Filtered "Item receive" logs: \${existingData.metadata.filtered_count}\`);
+            
+          } catch (error) {
+            console.error('❌ Error pulling logs:', error.message);
+            process.exit(1);
+          }
+        }
+        
+        pullLogs();
+        "
+        
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add data/filtered-logs.json
+        git diff --quiet && git diff --staged --quiet || git commit -m "Update filtered logs - $(date)"
+        git push 

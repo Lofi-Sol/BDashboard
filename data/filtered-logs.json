@@ -1,0 +1,33 @@
+{
+  "logs": {
+    "lTJEZP7w5PK3lPLtmffs": {
+      "log": 4103,
+      "title": "Item receive",
+      "timestamp": 1754096180,
+      "category": "Item sending",
+      "data": {
+        "sender": 3566110,
+        "items": [
+          {
+            "id": 206,
+            "uid": null,
+            "qty": 2
+          }
+        ],
+        "message": "BET:28672:16335:2:66U403P7"
+      },
+      "params": {
+        "italic": 1,
+        "color": "green"
+      }
+    }
+  },
+  "metadata": {
+    "last_updated": "2025-01-01T00:00:00.000Z",
+    "total_logs": 1,
+    "new_logs_found": 0,
+    "run_timestamp": "2025-01-01T00:00:00.000Z",
+    "api_response_count": 0,
+    "filtered_count": 0
+  }
+} 
