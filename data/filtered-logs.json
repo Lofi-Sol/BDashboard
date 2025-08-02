@@ -20,14 +20,56 @@
         "italic": 1,
         "color": "green"
       }
+    },
+    "qCmH23ow8KgaThYA8zqy": {
+      "log": 4103,
+      "title": "Item receive",
+      "timestamp": 1754098283,
+      "category": "Item sending",
+      "data": {
+        "sender": 3576736,
+        "items": [
+          {
+            "id": 206,
+            "uid": 15450147511,
+            "qty": 1
+          }
+        ],
+        "message": "BET:28742:50257:1:BA2WCONV"
+      },
+      "params": {
+        "italic": 1,
+        "color": "green"
+      }
+    },
+    "YUeFY9g65nzh975KQTEP": {
+      "log": 4103,
+      "title": "Item receive",
+      "timestamp": 1754074055,
+      "category": "Item sending",
+      "data": {
+        "sender": 3566110,
+        "items": [
+          {
+            "id": 206,
+            "uid": 15370893048,
+            "qty": 1
+          }
+        ],
+        "message": "BET:28667:8076:1:VW7VAC60"
+      },
+      "params": {
+        "italic": 1,
+        "color": "green"
+      }
     }
   },
   "metadata": {
-    "last_updated": "2025-01-01T00:00:00.000Z",
-    "total_logs": 1,
-    "new_logs_found": 0,
-    "run_timestamp": "2025-01-01T00:00:00.000Z",
-    "api_response_count": 0,
-    "filtered_count": 0
+    "last_updated": "2025-08-02T01:58:23.846Z",
+    "total_logs": 3,
+    "new_logs_found": 2,
+    "run_timestamp": "2025-08-02T01:58:23.846Z",
+    "api_response_count": 100,
+    "filtered_count": 3
   }
-} 
+}
