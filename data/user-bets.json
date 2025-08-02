@@ -5,22 +5,45 @@
       "username": "VanillaScoop",
       "profile": {
         "joinDate": "2025-08-02T19:19:21.162Z",
-        "totalBets": 0,
-        "totalVolume": 0,
+        "totalBets": 1,
+        "totalVolume": 744983,
         "totalWinnings": 0,
         "totalLosses": 0,
         "netProfit": 0,
         "winRate": 0,
-        "averageBetSize": 0,
-        "largestBet": 0,
-        "favoriteFaction": "",
-        "lastActive": "2025-08-02T20:41:10.330Z"
+        "averageBetSize": 744983,
+        "largestBet": 744983,
+        "favoriteFaction": "Lusty Love House",
+        "lastActive": "2025-08-02T20:51:05.798Z"
       },
-      "activeBets": [],
+      "activeBets": [
+        {
+          "betId": "YAMN33F0",
+          "warId": "28728",
+          "factionId": "46303",
+          "factionName": "Lusty Love House",
+          "xanaxAmount": 1,
+          "betAmount": 744983,
+          "odds": 1.67,
+          "potentialPayout": 1244122,
+          "status": "pending",
+          "timestamp": 1754167865797,
+          "placedAt": "2025-08-02T20:51:05.797Z"
+        }
+      ],
       "betHistory": [],
       "statistics": {
         "byWar": {},
-        "byFaction": {},
+        "byFaction": {
+          "46303": {
+            "factionName": "Lusty Love House",
+            "totalBets": 2,
+            "totalVolume": 1489966,
+            "wins": 0,
+            "losses": 0,
+            "winRate": 0
+          }
+        },
         "byMonth": {},
         "byWeek": {},
         "byDay": {}
@@ -79,22 +102,45 @@
       "username": "FlowerJar",
       "profile": {
         "joinDate": "2025-08-02T19:08:44.551Z",
-        "totalBets": 0,
-        "totalVolume": 0,
+        "totalBets": 1,
+        "totalVolume": 744983,
         "totalWinnings": 0,
         "totalLosses": 0,
         "netProfit": 0,
         "winRate": 0,
-        "averageBetSize": 0,
-        "largestBet": 0,
-        "favoriteFaction": "",
-        "lastActive": "2025-08-02T19:08:44.551Z"
+        "averageBetSize": 744983,
+        "largestBet": 744983,
+        "favoriteFaction": "The Shogunate Spy",
+        "lastActive": "2025-08-02T20:53:34.835Z"
       },
-      "activeBets": [],
+      "activeBets": [
+        {
+          "betId": "7GV49NG4",
+          "warId": "28736",
+          "factionId": "49695",
+          "factionName": "The Shogunate Spy",
+          "xanaxAmount": 1,
+          "betAmount": 744983,
+          "odds": 1.33,
+          "potentialPayout": 990827,
+          "status": "pending",
+          "timestamp": 1754168014832,
+          "placedAt": "2025-08-02T20:53:34.832Z"
+        }
+      ],
       "betHistory": [],
       "statistics": {
         "byWar": {},
-        "byFaction": {},
+        "byFaction": {
+          "49695": {
+            "factionName": "The Shogunate Spy",
+            "totalBets": 2,
+            "totalVolume": 1489966,
+            "wins": 0,
+            "losses": 0,
+            "winRate": 0
+          }
+        },
         "byMonth": {},
         "byWeek": {},
         "byDay": {}
@@ -115,11 +161,11 @@
   "metadata": {
     "version": "1.0",
     "created": "2025-08-02T18:00:00.000Z",
-    "lastUpdated": "2025-08-02T20:43:29.081Z",
+    "lastUpdated": "2025-08-02T20:53:34.835Z",
     "totalUsers": 3,
-    "activeUsers": 0,
-    "totalActiveBets": 0,
-    "totalVolume": 0,
+    "activeUsers": 2,
+    "totalActiveBets": 2,
+    "totalVolume": 1489966,
     "schema": {
       "userProfile": {
         "playerId": "string",
