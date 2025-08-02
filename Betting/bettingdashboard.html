@@ -2413,7 +2413,7 @@
     <script>
         let apiKey = '';
         let userData = null;
-        let warLogsData = null;
+
         let autoRefreshInterval = null;
         let isAutoRefreshEnabled = false;
         
@@ -2438,10 +2438,9 @@
         let currentFilter = 'upcoming';
         let currentSearch = '';
         
-        // Log monitoring system
-        let logMonitoringInterval = null;
-        let lastLogCheck = 0;
-        let processedLogs = new Set(); // Track processed log IDs to avoid duplicates
+
+
+
 
         function connectAPI() {
             const apiKeyInput = document.getElementById('apiKey');
@@ -2488,8 +2487,7 @@
                         document.getElementById('mainBox').style.display = 'none';
                         document.getElementById('dashboard').style.display = 'flex';
                         
-                        // Start log monitoring
-                        startLogMonitoring();
+                        
                         
                         // Automatically load betting interface since Colosseum tab is active by default
                         loadBettingInterface();
@@ -2613,183 +2611,15 @@
             }
         });
 
-        // War Logs Functions
-        async function fetchWarLogs() {
-            if (!apiKey) {
-                console.error('No API key available');
-                return;
-            }
 
-            const loadingEl = document.getElementById('warlogs-loading');
-            const contentEl = document.getElementById('warlogs-content');
-            
-            loadingEl.style.display = 'block';
-            contentEl.style.display = 'none';
 
-            try {
-                const response = await fetch(`/api/torn/rankedwars?key=${apiKey}`);
-                const data = await response.json();
-                
-                if (data.error) {
-                    throw new Error(data.error.error);
-                }
 
-                warLogsData = data.rankedwars;
-                displayWarLogs();
-                updateLastUpdated();
-                
-            } catch (error) {
-                console.error('Error fetching war logs:', error);
-                loadingEl.textContent = `Error: ${error.message}`;
-            }
-        }
 
-        function displayWarLogs() {
-            const loadingEl = document.getElementById('warlogs-loading');
-            const contentEl = document.getElementById('warlogs-content');
-            const statsEl = document.getElementById('warlogs-stats');
-            const containerEl = document.getElementById('warlogs-container');
 
-            loadingEl.style.display = 'none';
-            contentEl.style.display = 'block';
 
-            if (!warLogsData || Object.keys(warLogsData).length === 0) {
-                containerEl.innerHTML = '<div style="text-align: center; padding: 40px; color: #6b7280;">No war data available</div>';
-                return;
-            }
-            
-            // Display statistics
-            displayWarStats();
 
-            // Display war cards
-            const wars = Object.entries(warLogsData)
-                .sort(([,a], [,b]) => parseInt(b.war.start) - parseInt(a.war.start));
 
-            containerEl.innerHTML = wars.map(([warId, war]) => createWarCard(warId, war)).join('');
-        }
 
-        function displayWarStats() {
-            const statsEl = document.getElementById('warlogs-stats');
-            const wars = Object.values(warLogsData || {});
-
-            const stats = {
-                total: wars.length,
-                active: wars.filter(war => war.war.winner === 0).length,
-                finished: wars.filter(war => war.war.winner !== 0).length,
-                totalTarget: wars.reduce((sum, war) => sum + (war.war.target || 0), 0),
-                totalScore: wars.reduce((sum, war) => {
-                    const factionIds = Object.keys(war.factions);
-                    return sum + (war.factions[factionIds[0]]?.score || 0) + (war.factions[factionIds[1]]?.score || 0);
-                }, 0)
-            };
-
-            statsEl.innerHTML = `
-                <div class="stat-card">
-                    <h3>Total Wars</h3>
-                    <div class="value">${stats.total}</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Active Wars</h3>
-                    <div class="value">${stats.active}</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Finished Wars</h3>
-                    <div class="value">${stats.finished}</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Total Lead Target</h3>
-                    <div class="value">${stats.totalTarget.toLocaleString()}</div>
-                </div>
-                <div class="stat-card">
-                    <h3>Total Score</h3>
-                    <div class="value">${stats.totalScore.toLocaleString()}</div>
-                </div>
-            `;
-        }
-
-        function createWarCard(warId, war) {
-            const status = getWarStatus(war.war.winner);
-            const startTime = formatTimestamp(war.war.start);
-            const endTime = war.war.end ? formatTimestamp(war.war.end) : 'N/A';
-            const target = war.war.target;
-            
-            // Get faction data
-            const factionIds = Object.keys(war.factions);
-            const faction1 = war.factions[factionIds[0]];
-            const faction2 = war.factions[factionIds[1]];
-            
-            const winner = getWinner(war);
-
-            return `
-                <div class="war-card">
-                    <div class="war-header">
-                        <div class="war-id">War #${warId}</div>
-                        <span class="war-status ${status.class}">${status.text}</span>
-                    </div>
-                    
-                    <div class="war-factions">
-                        <div class="war-faction ${winner === faction1.name ? 'winner' : ''}">
-                            <div class="faction-name">${faction1.name || 'Unknown Faction'}</div>
-                            <div class="faction-score">${faction1.score || 0}</div>
-                            <div class="faction-details">
-                                Chain: ${faction1.chain || 0} | Faction ID: <a href="https://www.torn.com/factions.php?step=profile&ID=${factionIds[0]}" target="_blank" style="color: #059669; text-decoration: none;">${factionIds[0]}</a>
-                            </div>
-                        </div>
-                        
-                        <div class="war-faction ${winner === faction2.name ? 'winner' : ''}">
-                            <div class="faction-name">${faction2.name || 'Unknown Faction'}</div>
-                            <div class="faction-score">${faction2.score || 0}</div>
-                            <div class="faction-details">
-                                Chain: ${faction2.chain || 0} | Faction ID: <a href="https://www.torn.com/factions.php?step=profile&ID=${factionIds[1]}" target="_blank" style="color: #059669; text-decoration: none;">${factionIds[1]}</a>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="war-meta">
-                        <div class="war-meta-item">
-                            <span>🏁 Start:</span>
-                            <span>${startTime}</span>
-                        </div>
-                        <div class="war-meta-item">
-                            <span>🎯 Lead Target:</span>
-                            <span>${target.toLocaleString()}</span>
-                        </div>
-                        <div class="war-meta-item">
-                            <span>🏁 End:</span>
-                            <span>${endTime}</span>
-                        </div>
-                        <div class="war-meta-item">
-                            <span>🏆 Winner:</span>
-                            <span>${winner}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        function getWarStatus(winner) {
-            if (winner === 0) {
-                return { text: 'Active', class: 'active' };
-            } else {
-                return { text: 'Finished', class: 'finished' };
-            }
-        }
-
-        function getWinner(war) {
-            if (war.war.winner === 0) return 'N/A';
-            
-            const factionIds = Object.keys(war.factions);
-            const faction1 = war.factions[factionIds[0]];
-            const faction2 = war.factions[factionIds[1]];
-            
-            if (war.war.winner === parseInt(factionIds[0])) {
-                return faction1.name || 'Faction 1';
-            } else if (war.war.winner === parseInt(factionIds[1])) {
-                return faction2.name || 'Faction 2';
-            } else {
-                return 'Unknown';
-            }
-        }
 
         function formatTimestamp(timestamp) {
             if (!timestamp) return 'N/A';
@@ -2841,7 +2671,7 @@
                 toggleBtn.textContent = '▶️ Auto Refresh';
             } else {
                 // Enable auto refresh
-                autoRefreshInterval = setInterval(fetchWarLogs, 30000); // Refresh every 30 seconds
+    
                 isAutoRefreshEnabled = true;
                 toggleBtn.textContent = '⏸️ Auto Refresh';
             }
@@ -4209,173 +4039,13 @@
             }
         }
         
-        // Log Monitoring System
-        function startLogMonitoring() {
-            console.log('Starting log monitoring...');
-            
-            // Check logs immediately
-            checkLogsForBets();
-            
-            // Set up interval to check logs every 30 seconds
-            logMonitoringInterval = setInterval(checkLogsForBets, 30000);
-        }
-        
-        function stopLogMonitoring() {
-            if (logMonitoringInterval) {
-                clearInterval(logMonitoringInterval);
-                logMonitoringInterval = null;
-                console.log('Log monitoring stopped');
-            }
-        }
-        
-        async function checkLogsForBets() {
-            if (!apiKey) {
-                console.log('No API key available for log monitoring');
-                return;
-            }
-            
-            try {
-                console.log('Checking logs for bet confirmations...');
-                
-                const response = await fetch(`/api/torn/user/log?key=${apiKey}`);
-                const data = await response.json();
-                
-                if (data.error) {
-                    console.error('Error fetching logs:', data.error);
-                    return;
-                }
-                
-                if (!data.log) {
-                    console.log('No logs found');
-                    return;
-                }
-                
-                // Process each log entry
-                Object.entries(data.log).forEach(([logId, logEntry]) => {
-                    // Skip if we've already processed this log
-                    if (processedLogs.has(logId)) {
-                        return;
-                    }
-                    
-                    // Check if this is an item receive log
-                    if (logEntry.title === 'Item receive' && logEntry.category === 'Item sending') {
-                        processBetLog(logId, logEntry);
-                    }
-                });
-                
-                // Update last check time
-                lastLogCheck = Date.now();
-                
-            } catch (error) {
-                console.error('Error checking logs:', error);
-            }
-        }
-        
-        function processBetLog(logId, logEntry) {
-            try {
-                const { sender, items, message, timestamp } = logEntry.data;
-                
-                // Check if this is a Xanax item (ID: 206)
-                const xanaxItem = items.find(item => item.id === 206);
-                if (!xanaxItem) {
-                    console.log(`Log ${logId}: Not a Xanax item`);
-                    return;
-                }
-                
-                // Check if message matches bet format
-                if (!message || !message.startsWith('BET:')) {
-                    console.log(`Log ${logId}: Not a bet message`);
-                    return;
-                }
-                
-                // Parse bet message: BET:warId:factionId:amount:betId
-                const betParts = message.split(':');
-                if (betParts.length !== 5) {
-                    console.log(`Log ${logId}: Invalid bet message format (expected 5 parts, got ${betParts.length})`);
-                    return;
-                }
-                
-                const [, warId, factionId, betAmount, betId] = betParts;
-                const xanaxAmount = parseInt(betAmount);
-                const actualXanaxAmount = xanaxItem.qty;
-                
-                // Validate amounts match
-                if (xanaxAmount !== actualXanaxAmount) {
-                    console.log(`Log ${logId}: Xanax amount mismatch. Expected: ${xanaxAmount}, Received: ${actualXanaxAmount}`);
-                    return;
-                }
-                
-                console.log(`Processing bet confirmation: Log ${logId}, Sender: ${sender}, War: ${warId}, Faction: ${factionId}, Amount: ${xanaxAmount}, Bet ID: ${betId}`);
-                console.log(`Looking for bet with: playerId=${sender} (${typeof sender}), warId=${warId} (${typeof warId}), factionId=${factionId} (${typeof factionId}), xanaxAmount=${xanaxAmount} (${typeof xanaxAmount}), betId=${betId} (${typeof betId})`);
-                
-                // Find and confirm the bet using unique bet ID
-                confirmBet(sender, warId, factionId, xanaxAmount, betId, logId, timestamp);
-                
-                // Mark this log as processed
-                processedLogs.add(logId);
-                
-            } catch (error) {
-                console.error(`Error processing bet log ${logId}:`, error);
-            }
-        }
-        
-        function confirmBet(senderId, warId, factionId, xanaxAmount, betId, logId, timestamp) {
-            // Get existing bets from localStorage
-            const existingBets = localStorage.getItem('tornBets');
-            if (!existingBets) {
-                console.log('No bets found in localStorage');
-                    return;
-                }
 
-            try {
-                let bets = JSON.parse(existingBets);
-                
-                // Find matching pending bet using unique bet ID
-                const betIndex = bets.findIndex(bet => 
-                    bet.betId === betId && 
-                    bet.status === 'pending'
-                );
-                
-                if (betIndex === -1) {
-                    console.log(`No matching pending bet found for Bet ID: ${betId}`);
-                    console.log('Available pending bets:', bets.filter(bet => bet.status === 'pending').map(bet => ({
-                        betId: bet.betId,
-                        playerId: bet.playerId,
-                        warId: bet.warId,
-                        factionId: bet.factionId,
-                        xanaxAmount: bet.xanaxAmount,
-                        status: bet.status
-                    })));
-                    return;
-                }
-                
-                // Update bet status to confirmed
-                bets[betIndex].status = 'confirmed';
-                bets[betIndex].logId = logId;
-                bets[betIndex].confirmedAt = timestamp * 1000; // Convert to milliseconds
-                bets[betIndex].senderId = senderId;
-                
-                // Save updated bets
-                localStorage.setItem('tornBets', JSON.stringify(bets));
-                
-                console.log(`Bet confirmed: ${bets[betIndex].id}`);
-                
-                // Show confirmation notification
-                showBetConfirmedNotification(xanaxAmount, bets[betIndex].factionName, warId);
-                
-                // Update bet tracking page if it's open
-                if (window.betTrackingWindow && !window.betTrackingWindow.closed) {
-                    window.betTrackingWindow.postMessage({
-                        type: 'BET_CONFIRMED',
-                        betId: bets[betIndex].id,
-                        logId: logId
-                    }, '*');
-                }
-                
-            } catch (error) {
-                console.error('Error confirming bet:', error);
-            }
-        }
+        
+
+        
+
+        
+
         
         function showBetConfirmedNotification(xanaxAmount, factionName, warId) {
             // Create notification element
@@ -4444,46 +4114,7 @@
             }
         }
         
-        // Manual test function for log processing
-        function testLogProcessing() {
-            const testLog = {
-                "log": 4103,
-                "title": "Item receive",
-                "timestamp": 1753551889,
-                "category": "Item sending",
-                "data": {
-                    "sender": 3576736,
-                    "items": [
-                        {
-                            "id": 206,
-                            "uid": 15447039670,
-                            "qty": 1,
-                        },
-                    ],
-                    "message": "BET:28340:22631:1",
-                },
-                "params": {
-                    "italic": 1,
-                    "color": "green",
-                },
-            };
-            
-            console.log('Testing log processing with:', testLog);
-            console.log('This should only confirm bet for player ID 3576736');
-            processBetLog('test-log-id', testLog);
-        }
-        
-        // Expose test function globally
-        window.testLogProcessing = testLogProcessing;
-        
-        // Manual log check function
-        async function manualLogCheck() {
-            console.log('Manually checking logs...');
-            await checkLogsForBets();
-        }
-        
-        // Expose manual log check globally
-        window.manualLogCheck = manualLogCheck;
+
 
         // User Bet Tracking System
         let userBetsData = [];

@@ -13,13 +13,9 @@ async function setupDatabase() {
         const db = client.db('torn-betting');
         
         // Create collections
-        const logsCollection = db.collection('bookie-logs');
         const betsCollection = db.collection('confirmed-bets');
         
         // Create indexes for better performance
-        await logsCollection.createIndex({ logId: 1 }, { unique: true });
-        await logsCollection.createIndex({ timestamp: -1 });
-        await logsCollection.createIndex({ 'data.sender': 1 });
         
         await betsCollection.createIndex({ betId: 1 }, { unique: true });
         await betsCollection.createIndex({ senderId: 1 });
@@ -35,10 +31,8 @@ async function setupDatabase() {
         console.log(`📊 Database size: ${(stats.dataSize / 1024 / 1024).toFixed(2)} MB`);
         
         // Check collections
-        const logsCount = await logsCollection.countDocuments();
         const betsCount = await betsCollection.countDocuments();
         
-        console.log(`📋 Bookie logs: ${logsCount} entries`);
         console.log(`🎯 Confirmed bets: ${betsCount} entries`);
         
         await client.close();
@@ -56,37 +50,12 @@ async function setupDatabase() {
     }
 }
 
-// Test Torn API connection
-async function testTornAPI() {
-    try {
-        console.log('\nTesting Torn API connection...');
-        
-        const axios = require('axios');
-        const BOOKIE_API_KEY = process.env.BOOKIE_API_KEY || 'C0wctKtdsgjJYpWe';
-        
-        const response = await axios.get(
-            `https://api.torn.com/user/?selections=log&key=${BOOKIE_API_KEY}`
-        );
-        
-        if (response.data.error) {
-            throw new Error(response.data.error.error);
-        }
-        
-        const logs = response.data.log;
-        console.log(`✅ Torn API connected successfully`);
-        console.log(`📋 Found ${Object.keys(logs || {}).length} logs`);
-        
-    } catch (error) {
-        console.error('❌ Torn API test failed:', error.message);
-        console.log('⚠️  Make sure your BOOKIE_API_KEY is valid');
-    }
-}
+
 
 // Run setup
 async function main() {
     console.log('🚀 Torn Betting System Setup\n');
     
-    await testTornAPI();
     await setupDatabase();
 }
 

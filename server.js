@@ -25,7 +25,6 @@ let oddsEngine = null; // Singleton decimal odds engine instance
 
 // Centralized data file paths
 const BETS_FILE = './data/bets.json';
-const BET_LOGS_FILE = './data/bet-logs.json';
 
 // Initialize centralized data files
 async function initializeDataFiles() {
@@ -62,25 +61,7 @@ async function initializeDataFiles() {
             console.log('✅ Initialized bets.json');
         }
         
-        // Initialize bet-logs.json if it doesn't exist
-        try {
-            await fs.access(BET_LOGS_FILE);
-        } catch {
-            const initialLogsData = {
-                bet_logs: [],
-                processed_logs: [],
-                metadata: {
-                    last_updated: null,
-                    total_bet_logs: 0,
-                    total_processed_logs: 0,
-                    new_bet_logs_found: 0,
-                    new_processed_logs: 0,
-                    run_timestamp: null
-                }
-            };
-            await fs.writeFile(BET_LOGS_FILE, JSON.stringify(initialLogsData, null, 2));
-            console.log('✅ Initialized bet-logs.json');
-        }
+
         
         console.log('✅ Centralized data files initialized');
     } catch (error) {
@@ -847,36 +828,7 @@ app.get('/api/torn/faction/:factionId', rateLimit, async (req, res) => {
     }
 });
 
-app.get('/api/torn/user/log', rateLimit, async (req, res) => {
-    try {
-        const apiKey = req.query.key;
-        if (!apiKey) {
-            return res.status(400).json({ error: 'API key required' });
-        }
 
-        // Check cache first
-        const cacheKey = `userlog_${apiKey}`;
-        const cached = tornApiCache.get(cacheKey);
-        if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-            return res.json(cached.data);
-        }
-
-        const response = await axios.get(`https://api.torn.com/user/?selections=log&key=${apiKey}`);
-        
-        // Cache the response
-        tornApiCache.set(cacheKey, {
-            data: response.data,
-            timestamp: Date.now()
-        });
-        
-        res.json(response.data);
-    } catch (error) {
-        console.error('Torn API user log error:', error.response?.data || error.message);
-        res.status(error.response?.status || 500).json({
-            error: error.response?.data?.error || 'Failed to fetch user log'
-        });
-    }
-});
 
 // 404 handler
 app.use((req, res) => {
