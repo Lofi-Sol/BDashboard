@@ -16,6 +16,8 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch all history for better merge handling
       
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -42,7 +44,11 @@ jobs:
         git config --local user.name "GitHub Action"
         git add data/user-bets.json
         git commit -m "🤖 Auto-sync local bet changes - $(date)"
-        git push
+        git push origin master || {
+          echo "Push failed, trying to pull and push again"
+          git pull origin master --no-edit
+          git push origin master
+        }
         
     - name: No changes to sync
       if: steps.check-changes.outputs.has_changes == 'false'

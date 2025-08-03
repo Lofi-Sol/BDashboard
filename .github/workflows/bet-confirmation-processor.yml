@@ -16,6 +16,8 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch all history for better merge handling
       
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -39,6 +41,19 @@ jobs:
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add data/user-bets.json
-        git diff --quiet && git diff --staged --quiet || git commit -m "🤖 Auto-confirm bets - $(date)"
-        git push 
+        
+        # Check if there are changes to commit
+        if git diff --quiet data/user-bets.json; then
+          echo "No changes to commit"
+        else
+          # Stage and commit changes
+          git add data/user-bets.json
+          git commit -m "🤖 Auto-confirm bets - $(date)"
+          
+          # Try to push with force if needed (only for automated commits)
+          git push origin master || {
+            echo "Push failed, trying to pull and push again"
+            git pull origin master --no-edit
+            git push origin master
+          }
+        fi 
