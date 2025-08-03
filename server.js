@@ -1207,7 +1207,11 @@ app.get('/api/betting/my-bets/:playerId', async (req, res) => {
         // Get user's bets
         const userProfile = await getUserProfile(playerId);
         
+        console.log('🔍 Fetching bets for player:', playerId);
+        console.log('📊 User profile found:', !!userProfile);
+        
         if (!userProfile) {
+            console.log('❌ No user profile found for player:', playerId);
             return res.json({
                 success: true,
                 player: {
@@ -1234,6 +1238,12 @@ app.get('/api/betting/my-bets/:playerId', async (req, res) => {
                 }
             });
         }
+        
+        console.log('✅ User profile data:', {
+            activeBets: userProfile.activeBets.length,
+            betHistory: userProfile.betHistory.length,
+            profile: userProfile.profile
+        });
         
         res.json({
             success: true,

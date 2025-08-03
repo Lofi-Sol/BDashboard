@@ -2597,6 +2597,9 @@
                         // Automatically load betting interface since Colosseum tab is active by default
                         loadBettingInterface();
                         
+                        // Load user's existing bets
+                        loadUserBets();
+                        
                         // Enable automatic refresh for betting data
                         startAutoRefreshBetting();
                         
@@ -2729,7 +2732,7 @@
                     if (targetTab === 'colosseum' && apiKey) {
                         loadBettingInterface();
                     } else if (targetTab === 'bettracking' && apiKey) {
-                        loadBetData();
+                        loadUserBets();
                     }
                 });
             });
@@ -4321,11 +4324,16 @@
 
         // Load user's bets
         async function loadUserBets() {
-            const loadingEl = document.getElementById('user-bets-loading');
-            const contentEl = document.getElementById('user-bets-content');
+            console.log('🔄 Loading user bets...');
+            console.log('👤 User data:', userData);
+            console.log('🔑 API key available:', !!apiKey);
             
-            loadingEl.style.display = 'block';
-            contentEl.style.display = 'none';
+            // Use existing bet tracking HTML structure
+            const betTableBody = document.getElementById('bet-table-body');
+            if (!betTableBody) {
+                console.error('❌ Bet table body not found');
+                return;
+            }
 
             try {
                 // Check if user is authenticated
@@ -4351,33 +4359,97 @@
                     const result = await response.json();
                     
                     if (result.success) {
-                        // Convert server data format to match local format
-                        userBetsData = [
-                            ...result.bets.activeBets.map(bet => ({
-                                ...bet,
-                                status: 'pending'
-                            })),
-                            ...result.bets.betHistory.map(bet => ({
-                                ...bet,
-                                status: bet.status || 'completed'
-                            }))
-                        ];
-                        console.log('Loaded bets from server:', userBetsData.length);
+                        console.log('Server response:', result);
+                        
+                        // Convert server data to match existing bet tracking format
+                        const activeBets = result.bets.activeBets.map(bet => ({
+                            ...bet,
+                            playerId: userData.playerId,
+                            timePlaced: bet.timestamp || bet.placedAt,
+                            status: bet.status || 'pending',
+                            // Ensure all required fields are present
+                            warId: bet.warId,
+                            factionId: bet.factionId,
+                            factionName: bet.factionName,
+                            xanaxAmount: bet.xanaxAmount,
+                            betAmount: bet.betAmount,
+                            odds: bet.odds
+                        }));
+                        
+                        const betHistory = result.bets.betHistory.map(bet => ({
+                            ...bet,
+                            playerId: userData.playerId,
+                            timePlaced: bet.timestamp || bet.resolvedAt,
+                            status: bet.status || 'completed',
+                            // Ensure all required fields are present
+                            warId: bet.warId,
+                            factionId: bet.factionId,
+                            factionName: bet.factionName,
+                            xanaxAmount: bet.xanaxAmount,
+                            betAmount: bet.betAmount,
+                            odds: bet.odds
+                        }));
+                        
+                        // Update global variables used by existing functions
+                        allBets = [...activeBets, ...betHistory];
+                        filteredBets = [...allBets];
+                        userBetsData = allBets;
+                        
+                        console.log('Loaded bets from server:', allBets.length);
+                        console.log('Active bets:', activeBets.length);
+                        console.log('Bet history:', betHistory.length);
                     } else {
                         console.error('Failed to load bets from server:', result.error);
-                        userBetsData = [];
+                        console.log('🔄 Falling back to localStorage...');
+                        
+                        // Fallback to localStorage
+                        const existingBets = localStorage.getItem('tornBets');
+                        if (existingBets) {
+                            const allBets = JSON.parse(existingBets);
+                            const currentPlayerId = userData?.playerId || 'Unknown';
+                            const filteredBets = allBets.filter(bet => 
+                                bet.playerId.toString() === currentPlayerId.toString()
+                            );
+                            
+                            // Update global variables
+                            allBets = filteredBets;
+                            filteredBets = [...allBets];
+                            userBetsData = allBets;
+                            
+                            console.log('Loaded bets from localStorage fallback:', allBets.length);
+                        } else {
+                            allBets = [];
+                            filteredBets = [];
+                            userBetsData = [];
+                        }
                     }
                 }
 
                 // Refresh live war data before displaying
                 await refreshLiveWarData();
 
-                displayUserBets();
-                updateUserBetsLastUpdated();
+                // Update the existing bet tracking display
+                updateUserBetsDisplay();
+                updateBetStats();
+                updateBetTable();
+                updateBetFilters();
                 
             } catch (error) {
                 console.error('Error loading user bets:', error);
-                loadingEl.textContent = `Error: ${error.message}`;
+                console.error('Error details:', error);
+            }
+        }
+
+        // Update user bets display using existing bet tracking structure
+        function updateUserBetsDisplay() {
+            console.log('🔄 Updating user bets display...');
+            console.log('📊 Total bets loaded:', allBets ? allBets.length : 0);
+            
+            if (allBets && allBets.length > 0) {
+                console.log('✅ User bets loaded successfully');
+                console.log('📋 Sample bet:', allBets[0]);
+            } else {
+                console.log('⚠️  No user bets found');
             }
         }
 

@@ -5,8 +5,8 @@
       "username": "VanillaScoop",
       "profile": {
         "joinDate": "2025-08-02T19:19:21.162Z",
-        "totalBets": 1,
-        "totalVolume": 744983,
+        "totalBets": 2,
+        "totalVolume": 1489966,
         "totalWinnings": 0,
         "totalLosses": 0,
         "netProfit": 0,
@@ -14,7 +14,7 @@
         "averageBetSize": 744983,
         "largestBet": 744983,
         "favoriteFaction": "Lusty Love House",
-        "lastActive": "2025-08-02T20:51:05.798Z"
+        "lastActive": "2025-08-02T22:15:48.826Z"
       },
       "activeBets": [
         {
@@ -29,6 +29,22 @@
           "status": "pending",
           "timestamp": 1754167865797,
           "placedAt": "2025-08-02T20:51:05.797Z"
+        },
+        {
+          "betId": "AC8GYDRY",
+          "warId": "28732",
+          "factionId": "51541",
+          "factionName": "Static Disturbance",
+          "xanaxAmount": 1,
+          "betAmount": 744983,
+          "odds": 3.25,
+          "potentialPayout": 2421195,
+          "status": "pending",
+          "timestamp": 1754172948819,
+          "placedAt": "2025-08-02T22:15:48.826Z",
+          "resolvedAt": null,
+          "actualPayout": null,
+          "profit": null
         }
       ],
       "betHistory": [],
@@ -102,8 +118,8 @@
       "username": "FlowerJar",
       "profile": {
         "joinDate": "2025-08-02T19:08:44.551Z",
-        "totalBets": 1,
-        "totalVolume": 744983,
+        "totalBets": 2,
+        "totalVolume": 1489966,
         "totalWinnings": 0,
         "totalLosses": 0,
         "netProfit": 0,
@@ -111,7 +127,7 @@
         "averageBetSize": 744983,
         "largestBet": 744983,
         "favoriteFaction": "The Shogunate Spy",
-        "lastActive": "2025-08-02T20:53:34.835Z"
+        "lastActive": "2025-08-03T00:14:46.648Z"
       },
       "activeBets": [
         {
@@ -130,6 +146,22 @@
           "logId": "SNGjRGbVPtZlLKIkV4kB",
           "senderId": 3576736,
           "confirmedBy": 3576736
+        },
+        {
+          "betId": "LUHHY64P",
+          "warId": "28682",
+          "factionId": "9100",
+          "factionName": "The Black Hand",
+          "xanaxAmount": 1,
+          "betAmount": 744983,
+          "odds": 1.5,
+          "potentialPayout": 1117475,
+          "status": "pending",
+          "timestamp": 1754180086640,
+          "placedAt": "2025-08-03T00:14:46.648Z",
+          "resolvedAt": null,
+          "actualPayout": null,
+          "profit": null
         }
       ],
       "betHistory": [],
@@ -166,8 +198,8 @@
       "username": "TestPlayer",
       "profile": {
         "joinDate": "2025-08-02T21:29:44.292Z",
-        "totalBets": 2,
-        "totalVolume": 2000000,
+        "totalBets": 3,
+        "totalVolume": 3000000,
         "totalWinnings": 0,
         "totalLosses": 0,
         "netProfit": 0,
@@ -175,7 +207,7 @@
         "averageBetSize": 0,
         "largestBet": 0,
         "favoriteFaction": "",
-        "lastActive": "2025-08-02T21:32:09.045Z"
+        "lastActive": "2025-08-02T21:33:10.811Z"
       },
       "activeBets": [
         {
@@ -193,7 +225,7 @@
           "resolvedAt": null,
           "actualPayout": null,
           "profit": null,
-          "confirmedAt": "2025-08-02T21:32:09.046Z"
+          "confirmedAt": "2025-08-02T21:33:10.813Z"
         },
         {
           "betId": "TEST123",
@@ -207,6 +239,22 @@
           "status": "pending",
           "timestamp": 1754170329044,
           "placedAt": "2025-08-02T21:32:09.044Z",
+          "resolvedAt": null,
+          "actualPayout": null,
+          "profit": null
+        },
+        {
+          "betId": "TEST123",
+          "warId": "99999",
+          "factionId": "99999",
+          "factionName": "Test Faction",
+          "xanaxAmount": 1,
+          "betAmount": 1000000,
+          "odds": 2,
+          "potentialPayout": 2000000,
+          "status": "pending",
+          "timestamp": 1754170390810,
+          "placedAt": "2025-08-02T21:33:10.810Z",
           "resolvedAt": null,
           "actualPayout": null,
           "profit": null
@@ -236,11 +284,11 @@
   "metadata": {
     "version": "1.0",
     "created": "2025-08-02T18:00:00.000Z",
-    "lastUpdated": "2025-08-02T21:32:09.046Z",
+    "lastUpdated": "2025-08-03T00:14:46.648Z",
     "totalUsers": 3,
     "activeUsers": 2,
-    "totalActiveBets": 4,
-    "totalVolume": 3489966,
+    "totalActiveBets": 7,
+    "totalVolume": 5979932,
     "schema": {
       "userProfile": {
         "playerId": "string",
