@@ -83,14 +83,35 @@
         "italic": 1,
         "color": "green"
       }
+    },
+    "TTqjCkkwXZDaOJdhOyvE": {
+      "log": 4103,
+      "title": "Item receive",
+      "timestamp": 1754180136,
+      "category": "Item sending",
+      "data": {
+        "sender": 3576736,
+        "items": [
+          {
+            "id": 206,
+            "uid": 15450147517,
+            "qty": 1
+          }
+        ],
+        "message": "BET:28682:9100:1:LUHHY64P"
+      },
+      "params": {
+        "italic": 1,
+        "color": "green"
+      }
     }
   },
   "metadata": {
-    "last_updated": "2025-08-02T21:26:43.068Z",
-    "total_logs": 4,
-    "new_logs_found": 0,
-    "run_timestamp": "2025-08-02T21:26:43.068Z",
+    "last_updated": "2025-08-03T00:16:13.118Z",
+    "total_logs": 5,
+    "new_logs_found": 1,
+    "run_timestamp": "2025-08-03T00:16:13.118Z",
     "api_response_count": 100,
-    "filtered_count": 4
+    "filtered_count": 5
   }
 }
