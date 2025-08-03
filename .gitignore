@@ -58,4 +58,8 @@ jspm_packages/
 .Spotlight-V100
 .Trashes
 ehthumbs.db
-Thumbs.db 
+Thumbs.db
+
+# Google Sheets credentials
+google-sheets-credentials.json
+user-facing-spreadsheet-id.txt 

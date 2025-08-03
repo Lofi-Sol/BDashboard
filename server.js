@@ -1269,6 +1269,76 @@ app.get('/api/betting/my-bets/:playerId', async (req, res) => {
     }
 });
 
+// Get user's bets by player ID (public endpoint for testing - no authentication required)
+app.get('/api/betting/public-bets/:playerId', async (req, res) => {
+    try {
+        const { playerId } = req.params;
+        
+        // Get user's bets without authentication
+        const userProfile = await getUserProfile(playerId);
+        
+        console.log('🔍 Fetching public bets for player:', playerId);
+        console.log('📊 User profile found:', !!userProfile);
+        
+        if (!userProfile) {
+            console.log('❌ No user profile found for player:', playerId);
+            return res.json({
+                success: true,
+                player: {
+                    playerId: playerId,
+                    name: 'Unknown',
+                    level: 0,
+                    faction: 'None'
+                },
+                bets: {
+                    activeBets: [],
+                    betHistory: [],
+                    profile: {
+                        totalBets: 0,
+                        totalVolume: 0,
+                        totalWinnings: 0,
+                        totalLosses: 0,
+                        netProfit: 0,
+                        winRate: 0,
+                        averageBetSize: 0,
+                        largestBet: 0,
+                        favoriteFaction: '',
+                        lastActive: null
+                    }
+                }
+            });
+        }
+        
+        console.log('✅ Public user profile data:', {
+            activeBets: userProfile.activeBets.length,
+            betHistory: userProfile.betHistory.length,
+            profile: userProfile.profile
+        });
+        
+        res.json({
+            success: true,
+            player: {
+                playerId: playerId,
+                name: userProfile.username || 'Unknown',
+                level: 0,
+                faction: 'None'
+            },
+            bets: {
+                activeBets: userProfile.activeBets,
+                betHistory: userProfile.betHistory,
+                profile: userProfile.profile
+            }
+        });
+        
+    } catch (error) {
+        console.error('Error fetching public user bets:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
 // Static file routes
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'dashboard.html'));

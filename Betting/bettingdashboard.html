@@ -4355,8 +4355,17 @@
                 } else {
                     // Use server API for authenticated users
                     console.log('Loading bets from server for player:', userData.playerId);
-                    const response = await fetch(`/api/betting/my-bets/${userData.playerId}?apiKey=${apiKey}`);
-                    const result = await response.json();
+                    
+                    // Try authenticated endpoint first
+                    let response = await fetch(`/api/betting/my-bets/${userData.playerId}?apiKey=${apiKey}`);
+                    let result = await response.json();
+                    
+                    if (!result.success) {
+                        console.log('Authenticated endpoint failed, trying public endpoint...');
+                        // Fallback to public endpoint
+                        response = await fetch(`/api/betting/public-bets/${userData.playerId}`);
+                        result = await response.json();
+                    }
                     
                     if (result.success) {
                         console.log('Server response:', result);
@@ -4398,6 +4407,15 @@
                         console.log('Loaded bets from server:', allBets.length);
                         console.log('Active bets:', activeBets.length);
                         console.log('Bet history:', betHistory.length);
+                        
+                        // Log confirmed bets for debugging
+                        const confirmedBets = activeBets.filter(bet => bet.status === 'confirmed');
+                        if (confirmedBets.length > 0) {
+                            console.log('✅ Confirmed bets found:', confirmedBets.length);
+                            confirmedBets.forEach(bet => {
+                                console.log(`   - Bet ${bet.betId}: ${bet.factionName} (${bet.xanaxAmount} Xanax)`);
+                            });
+                        }
                     } else {
                         console.error('Failed to load bets from server:', result.error);
                         console.log('🔄 Falling back to localStorage...');

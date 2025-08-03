@@ -1,0 +1,36 @@
+name: Google Sheets Sync
+
+on:
+  push:
+    paths:
+      - 'data/user-bets.json'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  sync-to-sheets:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Set up Google Sheets credentials
+      env:
+        GOOGLE_SHEETS_CREDENTIALS: ${{ secrets.GOOGLE_SHEETS_CREDENTIALS }}
+      run: |
+        echo "$GOOGLE_SHEETS_CREDENTIALS" > google-sheets-credentials.json
+        
+    - name: Create new Google Sheets
+      run: node scripts/create-user-facing-sheets.js
+      
+    - name: Sync to Google Sheets
+      run: node scripts/sync-user-facing-sheets.js

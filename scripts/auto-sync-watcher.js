@@ -1,10 +1,10 @@
 const fs = require('fs');
 const path = require('path');
-const GoogleSheetsSync = require('./setup-google-sheets-sync');
+const UserFacingSheetsSync = require('./sync-user-facing-sheets');
 
 class AutoSyncWatcher {
     constructor() {
-        this.sync = new GoogleSheetsSync();
+        this.sync = new UserFacingSheetsSync();
         this.watchPath = path.join(__dirname, '../data/user-bets.json');
         this.isInitialized = false;
         this.lastSyncTime = 0;
@@ -33,8 +33,8 @@ class AutoSyncWatcher {
         }
 
         try {
-            console.log('🔄 Syncing to Google Sheets...');
-            await this.sync.syncToGoogleSheets();
+            console.log('🔄 Syncing to user-facing Google Sheets...');
+            await this.sync.syncToUserFacingSheets();
             this.lastSyncTime = now;
             console.log('✅ Sync completed successfully!');
         } catch (error) {
