@@ -156,12 +156,16 @@
           "betAmount": 744983,
           "odds": 1.5,
           "potentialPayout": 1117475,
-          "status": "pending",
+          "status": "confirmed",
           "timestamp": 1754180086640,
           "placedAt": "2025-08-03T00:14:46.648Z",
           "resolvedAt": null,
           "actualPayout": null,
-          "profit": null
+          "profit": null,
+          "confirmedAt": 1754180136000,
+          "logId": "TTqjCkkwXZDaOJdhOyvE",
+          "senderId": 3576736,
+          "confirmedBy": 3576736
         }
       ],
       "betHistory": [],
@@ -284,7 +288,7 @@
   "metadata": {
     "version": "1.0",
     "created": "2025-08-02T18:00:00.000Z",
-    "lastUpdated": "2025-08-03T00:14:46.648Z",
+    "lastUpdated": "2025-08-03T00:25:16.185Z",
     "totalUsers": 3,
     "activeUsers": 2,
     "totalActiveBets": 7,
