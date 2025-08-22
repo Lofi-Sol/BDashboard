@@ -5,7 +5,12 @@ const cors = require('cors');
 const { MongoClient } = require('mongodb');
 const TornDecimalOddsEngine = require('./Betting/odds-engine.js');
 const fs = require('fs').promises;
-require('dotenv').config();
+// Load environment variables if dotenv is available
+try {
+    require('dotenv').config();
+} catch (error) {
+    console.log('dotenv not available, using system environment variables');
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;
