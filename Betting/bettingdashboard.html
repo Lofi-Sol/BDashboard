@@ -176,6 +176,30 @@
             display: flex;
             gap: 0;
         }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(35,37,38,0.04);
+            border-bottom: 1px solid #ececec;
+            padding: 0 20px;
+            min-height: 60px;
+            gap: 20px;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        
+        .dashboard-header.hidden {
+            opacity: 0;
+            transform: translateY(-100%);
+            pointer-events: none;
+            height: 0;
+            min-height: 0;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
 
         .dashboard-controls {
             display: flex;
@@ -293,7 +317,7 @@
             font-family: 'Inter', 'DM Sans', Arial, sans-serif;
         }
         
-        /* Colosseum Betting Platform Styles */
+        /* Torn Colosseum Platform Styles */
         .betting-header {
             display: flex;
             justify-content: space-between;
@@ -2381,13 +2405,13 @@
         <div class="dashboard-content">
             <div class="tab-content" id="tab-colosseum">
                 <div class="betting-header">
-                    <div class="betting-title">🏛️ Colosseum Betting</div>
+                    <div class="betting-title">🏛️ Torn Colosseum</div>
                     <div class="betting-controls">
                         <span id="betting-last-updated" style="color: #6b7280; font-size: 0.9rem;"></span>
                     </div>
                 </div>
                 <div class="betting-info">
-                    <p>💰 <strong>How Betting Works:</strong> Place bets on faction wars using Xanax as currency. Odds are displayed in decimal format (e.g., 2.00, 1.50) and calculated dynamically based on faction strength, historical performance, and current betting volume. <strong>Decimal odds</strong> show your total return - multiply your bet by the odds to get your payout. For example, 2.00 odds means bet 1 Xanax → win 2 Xanax total (1 profit). Higher odds mean bigger potential returns, but lower probability of winning. Bet amounts are locked once the war starts, and payouts are calculated when the war ends. <strong>Selected Wars:</strong> Only the most interesting faction wars are available for betting, curated by our odds engine.</p>
+                    <p>💰 <strong>How Betting Works:</strong> Factions are chosen randomly for betting. Place bets by sending Xanax to the bookie. To avoid mugging, bets are made via Xanax - each Xanax represents $744,983. Copy the bet message and include it in the item transfer message when sending the Xanax. Payouts will be made in cash, not Xanax.</p>
                 </div>
                     
                 <div id="betting-loading" class="inventory-loading">Loading Ranked Wars...</div>
@@ -3378,14 +3402,7 @@
                 finished: bettingData.filter(market => market.status === 'finished').length
             };
 
-            // Check if we're using selected betting wars
-            const isUsingSelectedWars = window.bettingWarsCount && window.bettingWarsCount > 0;
-            const statusIndicator = isUsingSelectedWars ? 
-                '<div style="background: #dcfce7; color: #166534; padding: 8px 12px; border-radius: 6px; font-size: 0.8rem; margin-bottom: 12px;"><strong>🎯 Selected Wars:</strong> Using curated betting wars from betting-wars.json</div>' : 
-                '<div style="background: #fef3c7; color: #92400e; padding: 8px 12px; border-radius: 6px; font-size: 0.8rem; margin-bottom: 12px;"><strong>⚠️ All Wars:</strong> Using all available wars (betting-wars.json not found or empty)</div>';
-
             statsEl.innerHTML = `
-                ${statusIndicator}
                 <div class="betting-stat-card">
                     <h3>Total Wars</h3>
                     <div class="value">${stats.total}</div>
@@ -5162,6 +5179,37 @@
             });
         }
 
+        // Scroll-based header hiding functionality
+        let lastScrollTop = 0;
+        let scrollThreshold = 50; // pixels to scroll before hiding header
+        
+        function handleScroll() {
+            const dashboardContent = document.querySelector('.dashboard-content');
+            const dashboardHeader = document.querySelector('.dashboard-header');
+            
+            if (!dashboardContent || !dashboardHeader) return;
+            
+            const scrollTop = dashboardContent.scrollTop;
+            const isScrollingDown = scrollTop > lastScrollTop;
+            const hasScrolledEnough = scrollTop > scrollThreshold;
+            
+            if (isScrollingDown && hasScrolledEnough) {
+                dashboardHeader.classList.add('hidden');
+            } else if (scrollTop <= scrollThreshold) {
+                dashboardHeader.classList.remove('hidden');
+            }
+            
+            lastScrollTop = scrollTop;
+        }
+        
+        // Add scroll event listener when dashboard is shown
+        function setupScrollListener() {
+            const dashboardContent = document.querySelector('.dashboard-content');
+            if (dashboardContent) {
+                dashboardContent.addEventListener('scroll', handleScroll);
+            }
+        }
+        
         // Set up bet filter event listeners
         document.addEventListener('DOMContentLoaded', function() {
             // Check for existing API key on page load
@@ -5177,6 +5225,9 @@
             if (warFilter) {
                 warFilter.addEventListener('change', filterBets);
             }
+            
+            // Setup scroll listener for tab hiding
+            setupScrollListener();
         });
 
         // Filter bets based on current filters

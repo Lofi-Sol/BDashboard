@@ -5,8 +5,8 @@
       "username": "VanillaScoop",
       "profile": {
         "joinDate": "2025-08-02T19:19:21.162Z",
-        "totalBets": 2,
-        "totalVolume": 1489966,
+        "totalBets": 4,
+        "totalVolume": 2979932,
         "totalWinnings": 0,
         "totalLosses": 0,
         "netProfit": 0,
@@ -14,7 +14,7 @@
         "averageBetSize": 744983,
         "largestBet": 744983,
         "favoriteFaction": "Lusty Love House",
-        "lastActive": "2025-08-02T22:15:48.826Z"
+        "lastActive": "2025-08-22T03:46:29.052Z"
       },
       "activeBets": [
         {
@@ -42,6 +42,38 @@
           "status": "pending",
           "timestamp": 1754172948819,
           "placedAt": "2025-08-02T22:15:48.826Z",
+          "resolvedAt": null,
+          "actualPayout": null,
+          "profit": null
+        },
+        {
+          "betId": "3Y2EDTI8",
+          "warId": "29565",
+          "factionId": "8336",
+          "factionName": "Monarch HQ",
+          "xanaxAmount": 1,
+          "betAmount": 744983,
+          "odds": 1.5,
+          "potentialPayout": 1117475,
+          "status": "pending",
+          "timestamp": 1755834364177,
+          "placedAt": "2025-08-22T03:46:04.186Z",
+          "resolvedAt": null,
+          "actualPayout": null,
+          "profit": null
+        },
+        {
+          "betId": "Z1MIWFCT",
+          "warId": "29565",
+          "factionId": "8336",
+          "factionName": "Monarch HQ",
+          "xanaxAmount": 1,
+          "betAmount": 744983,
+          "odds": 1.5,
+          "potentialPayout": 1117475,
+          "status": "pending",
+          "timestamp": 1755834389050,
+          "placedAt": "2025-08-22T03:46:29.052Z",
           "resolvedAt": null,
           "actualPayout": null,
           "profit": null
@@ -288,11 +320,11 @@
   "metadata": {
     "version": "1.0",
     "created": "2025-08-02T18:00:00.000Z",
-    "lastUpdated": "2025-08-04T02:02:05.585Z",
+    "lastUpdated": "2025-08-22T03:46:29.052Z",
     "totalUsers": 3,
     "activeUsers": 2,
-    "totalActiveBets": 7,
-    "totalVolume": 5979932,
+    "totalActiveBets": 9,
+    "totalVolume": 7469898,
     "schema": {
       "userProfile": {
         "playerId": "string",
