@@ -1276,7 +1276,7 @@ app.get('/api/betting/my-bets/:playerId', async (req, res) => {
 
 // Static file routes
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'dashboard.html'));
+    res.sendFile(path.join(__dirname, 'Betting/bettingdashboard.html'));
 });
 
 app.get('/betting', (req, res) => {
