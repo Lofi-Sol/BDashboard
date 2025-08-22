@@ -16,7 +16,7 @@ const RATE_LIMIT = 50; // Max requests per minute per API key
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
 
 // MongoDB connection
-const MONGODB_URI = 'mongodb+srv://oowol003:TornData2341@torndata.vxouoj6.mongodb.net/?retryWrites=true&w=majority&appName=TornData';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://oowol003:TornData2341@torndata.vxouoj6.mongodb.net/?retryWrites=true&w=majority&appName=TornData';
 const DATABASE_NAME = 'torn_data';
 const COLLECTION_NAME = 'factions';
 
