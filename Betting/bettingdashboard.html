@@ -2351,6 +2351,160 @@
                 align-items: stretch;
             }
         }
+
+        /* FAQ Page Styles */
+        .faq-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px 0;
+        }
+
+        .faq-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #232526;
+            margin-bottom: 12px;
+        }
+
+        .faq-subtitle {
+            font-size: 1.1rem;
+            color: #6b7280;
+            margin: 0;
+        }
+
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .faq-section {
+            margin-bottom: 40px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(35,37,38,0.04);
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+        }
+
+        .faq-section h3 {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            color: white;
+            padding: 20px 24px;
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid #f1f5f9;
+            transition: background-color 0.2s ease;
+        }
+
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+
+        .faq-item:hover {
+            background-color: #f8fafc;
+        }
+
+        .faq-item h4 {
+            padding: 20px 24px;
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #232526;
+            cursor: pointer;
+            transition: color 0.2s ease;
+            position: relative;
+        }
+
+        .faq-item h4:hover {
+            color: #2563eb;
+        }
+
+        .faq-item h4::after {
+            content: '▼';
+            position: absolute;
+            right: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8rem;
+            color: #6b7280;
+            transition: transform 0.2s ease;
+        }
+
+        .faq-item.active h4::after {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        .faq-content {
+            padding: 0 24px 20px 24px;
+            color: #374151;
+            line-height: 1.6;
+            display: none;
+        }
+
+        .faq-content p {
+            margin-bottom: 16px;
+        }
+
+        .faq-content ul, .faq-content ol {
+            margin-bottom: 16px;
+            padding-left: 20px;
+        }
+
+        .faq-content li {
+            margin-bottom: 8px;
+        }
+
+        .faq-content strong {
+            color: #232526;
+            font-weight: 600;
+        }
+
+        /* FAQ Mobile Styles */
+        @media (max-width: 768px) {
+            .faq-header h2 {
+                font-size: 2rem;
+                margin-bottom: 8px;
+            }
+            
+            .faq-subtitle {
+                font-size: 1rem;
+            }
+            
+            .faq-container {
+                padding: 0 16px;
+            }
+            
+            .faq-section {
+                margin-bottom: 24px;
+            }
+            
+            .faq-section h3 {
+                padding: 16px 20px;
+                font-size: 1.2rem;
+            }
+            
+            .faq-item h4 {
+                padding: 16px 20px;
+                font-size: 1rem;
+                min-height: 48px;
+                display: flex;
+                align-items: center;
+            }
+            
+            .faq-content {
+                padding: 0 20px 16px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .faq-content ul, .faq-content ol {
+                padding-left: 16px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -2382,6 +2536,7 @@
             <div class="dashboard-tabs">
                 <button class="dashboard-tab active" data-tab="colosseum">Colosseum</button>
                 <button class="dashboard-tab" data-tab="bettracking">Bet Tracking</button>
+                <button class="dashboard-tab" data-tab="how-betting-works">How Betting Works</button>
             </div>
             
             <!-- User Info Section (Right) -->
@@ -2529,6 +2684,189 @@
                             <!-- Bet data will be populated here -->
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- How Betting Works Tab Content -->
+            <div class="tab-content" id="tab-how-betting-works" style="display:none;">
+                <div class="faq-header">
+                    <h2>📚 How Betting Works</h2>
+                    <p class="faq-subtitle">Everything you need to know about Torn City faction betting</p>
+                </div>
+
+                <div class="faq-container">
+                    <!-- Basic Betting Section -->
+                    <div class="faq-section">
+                        <h3>🎯 Basic Betting Process</h3>
+                        
+                        <div class="faq-item">
+                            <h4>How do I place a bet?</h4>
+                            <div class="faq-content">
+                                <ol>
+                                    <li><strong>Choose a war:</strong> Browse available faction wars in the Colosseum tab</li>
+                                    <li><strong>Select a faction:</strong> Click on the faction you want to bet on</li>
+                                    <li><strong>Enter your bet amount:</strong> Specify how much you want to bet (in Xanax)</li>
+                                    <li><strong>Copy the bet message:</strong> The system generates a unique bet message</li>
+                                    <li><strong>Send Xanax:</strong> Transfer the Xanax to the bookie with the bet message</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>Why do I bet with Xanax instead of cash?</h4>
+                            <div class="faq-content">
+                                <p>Xanax is used to prevent mugging during the betting process. Each Xanax represents $744,983 in betting value. This ensures your bet amount is secure and can't be stolen during transfer.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>How are payouts handled?</h4>
+                            <div class="faq-content">
+                                <p>All payouts are made in cash, not Xanax. If you win, you'll receive cash equivalent to your winnings. The Xanax you sent is converted to cash value for the payout calculation.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Odds and Calculations Section -->
+                    <div class="faq-section">
+                        <h3>📊 Understanding Odds</h3>
+                        
+                        <div class="faq-item">
+                            <h4>How are odds calculated?</h4>
+                            <div class="faq-content">
+                                <p>Odds are calculated based on faction performance data including:</p>
+                                <ul>
+                                    <li>Chain scores and respect</li>
+                                    <li>Faction rankings and history</li>
+                                    <li>Member count and activity</li>
+                                    <li>Recent war performance</li>
+                                </ul>
+                                <p>A 6% house edge is applied to ensure the bookie can cover payouts.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>What do decimal odds mean?</h4>
+                            <div class="faq-content">
+                                <p>Decimal odds show your total return if you win. For example:</p>
+                                <ul>
+                                    <li><strong>2.0 odds:</strong> Bet 1 Xanax → Win 2 Xanax total (1 profit)</li>
+                                    <li><strong>1.5 odds:</strong> Bet 1 Xanax → Win 1.5 Xanax total (0.5 profit)</li>
+                                    <li><strong>3.0 odds:</strong> Bet 1 Xanax → Win 3 Xanax total (2 profit)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>What is the house edge?</h4>
+                            <div class="faq-content">
+                                <p>The house edge is 6%, which means the bookie keeps 6% of all bets to cover operational costs and ensure profitability. This is built into the odds calculation.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Betting Rules Section -->
+                    <div class="faq-section">
+                        <h3>📋 Betting Rules</h3>
+                        
+                        <div class="faq-item">
+                            <h4>What are the minimum and maximum bet amounts?</h4>
+                            <div class="faq-content">
+                                <p><strong>Minimum bet:</strong> 1 Xanax ($744,983)</p>
+                                <p><strong>Maximum bet:</strong> 100 Xanax ($74,498,300)</p>
+                                <p>These limits help manage risk and ensure fair betting for all participants.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>When do bets close?</h4>
+                            <div class="faq-content">
+                                <p>Bets close when the war starts. Once a war begins, no new bets can be placed on that war. Make sure to place your bets before the war begins!</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>Can I cancel or modify my bet?</h4>
+                            <div class="faq-content">
+                                <p>No, once a bet is confirmed, it cannot be cancelled or modified. Make sure you're confident in your selection before placing the bet.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>What happens if a war is cancelled?</h4>
+                            <div class="faq-content">
+                                <p>If a war is cancelled before it starts, all bets are refunded in full. If a war is cancelled after it starts, the bookie will make a fair determination based on the circumstances.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Technical Section -->
+                    <div class="faq-section">
+                        <h3>🔧 Technical Information</h3>
+                        
+                        <div class="faq-item">
+                            <h4>How do I track my bets?</h4>
+                            <div class="faq-content">
+                                <p>Use the "Bet Tracking" tab to view all your current and past bets. You can see:</p>
+                                <ul>
+                                    <li>Active bets and their status</li>
+                                    <li>Bet history and results</li>
+                                    <li>Total winnings and losses</li>
+                                    <li>Performance statistics</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>How often is data updated?</h4>
+                            <div class="faq-content">
+                                <p>War data and odds are updated automatically every 5 minutes. Your bet tracking data is updated in real-time as new information becomes available.</p>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>What if I have technical issues?</h4>
+                            <div class="faq-content">
+                                <p>If you experience any technical issues:</p>
+                                <ol>
+                                    <li>Check your internet connection</li>
+                                    <li>Refresh the page</li>
+                                    <li>Clear your browser cache</li>
+                                    <li>Contact the bookie if the issue persists</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tips Section -->
+                    <div class="faq-section">
+                        <h3>💡 Betting Tips</h3>
+                        
+                        <div class="faq-item">
+                            <h4>How can I improve my betting success?</h4>
+                            <div class="faq-content">
+                                <ul>
+                                    <li><strong>Research factions:</strong> Look at their recent performance and member activity</li>
+                                    <li><strong>Check odds:</strong> Higher odds mean higher risk but potentially higher rewards</li>
+                                    <li><strong>Diversify:</strong> Don't put all your money on one bet</li>
+                                    <li><strong>Set limits:</strong> Only bet what you can afford to lose</li>
+                                    <li><strong>Track performance:</strong> Use the bet tracking feature to analyze your results</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <h4>What should I avoid?</h4>
+                            <div class="faq-content">
+                                <ul>
+                                    <li><strong>Emotional betting:</strong> Don't bet based on personal feelings about factions</li>
+                                    <li><strong>Chasing losses:</strong> Don't increase bet sizes to recover losses</li>
+                                    <li><strong>Betting without research:</strong> Always check faction data before betting</li>
+                                    <li><strong>Betting more than you can afford:</strong> Set strict betting limits</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2757,6 +3095,11 @@
                         loadBettingInterface();
                     } else if (targetTab === 'bettracking' && apiKey) {
                         loadUserBets();
+                    } else if (targetTab === 'how-betting-works') {
+                        // Initialize FAQ functionality when tab is shown
+                        setTimeout(() => {
+                            initializeFAQ();
+                        }, 100);
                     }
                 });
             });
@@ -5244,6 +5587,43 @@
             
             updateBetTable();
         }
+
+        // FAQ Functionality
+        function initializeFAQ() {
+            const faqItems = document.querySelectorAll('.faq-item h4');
+            
+            faqItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const faqItem = this.parentElement;
+                    const content = faqItem.querySelector('.faq-content');
+                    
+                    // Toggle active class
+                    faqItem.classList.toggle('active');
+                    
+                    // Toggle content visibility
+                    if (faqItem.classList.contains('active')) {
+                        content.style.display = 'block';
+                        // Smooth scroll to content if it's not visible
+                        setTimeout(() => {
+                            content.scrollIntoView({ 
+                                behavior: 'smooth', 
+                                block: 'nearest' 
+                            });
+                        }, 100);
+                    } else {
+                        content.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        // Initialize FAQ when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Existing DOMContentLoaded code...
+            
+            // Initialize FAQ functionality
+            initializeFAQ();
+        });
     </script>
 </body>
 </html> 
