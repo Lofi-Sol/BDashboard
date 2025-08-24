@@ -1,0 +1,847 @@
+{
+  "metadata": {
+    "weekStart": "2025-08-19T12:47:49.650Z",
+    "totalWars": 20,
+    "randomWars": 12,
+    "interestingWars": 8,
+    "extractedAt": "2025-08-24T22:14:54.090Z",
+    "source": "Torn City Faction Data"
+  },
+  "topFactions": [
+    {
+      "id": 8468,
+      "name": "Bloodbath and Beyond",
+      "respect": 18669482,
+      "rank": "Diamond I",
+      "members": 86,
+      "position": 63
+    },
+    {
+      "id": 16628,
+      "name": "Chain Reaction",
+      "respect": 18453690,
+      "rank": "Diamond III",
+      "members": 97,
+      "position": 5
+    },
+    {
+      "id": 11747,
+      "name": "Natural Selection II",
+      "respect": 18310736,
+      "rank": "Diamond III",
+      "members": 99,
+      "position": 10
+    },
+    {
+      "id": 16312,
+      "name": "39th Street Killers X",
+      "respect": 17931180,
+      "rank": "Diamond III",
+      "members": 96,
+      "position": 17
+    },
+    {
+      "id": 9533,
+      "name": "Natural Selection",
+      "respect": 17489266,
+      "rank": "Diamond III",
+      "members": 98,
+      "position": 2
+    },
+    {
+      "id": 230,
+      "name": "PT-Family",
+      "respect": 17380316,
+      "rank": "Diamond III",
+      "members": 85,
+      "position": 25
+    },
+    {
+      "id": 9041,
+      "name": "PT-Calculated",
+      "respect": 16197207,
+      "rank": "Diamond II",
+      "members": 85,
+      "position": 22
+    },
+    {
+      "id": 18736,
+      "name": "Monarch Research",
+      "respect": 16000326,
+      "rank": "Diamond",
+      "members": 100,
+      "position": 19
+    },
+    {
+      "id": 11581,
+      "name": "Natural Selection III",
+      "respect": 15937162,
+      "rank": "Diamond III",
+      "members": 98,
+      "position": 20
+    },
+    {
+      "id": 231,
+      "name": "Destructive Anomaly",
+      "respect": 15798002,
+      "rank": "Diamond I",
+      "members": 96,
+      "position": 32
+    },
+    {
+      "id": 8706,
+      "name": "Carbon",
+      "respect": 15413548,
+      "rank": "Diamond III",
+      "members": 89,
+      "position": 9
+    },
+    {
+      "id": 89,
+      "name": "Catalysis",
+      "respect": 15398156,
+      "rank": "Diamond III",
+      "members": 94,
+      "position": 3
+    },
+    {
+      "id": 12094,
+      "name": "Nuclear Fusion",
+      "respect": 14595252,
+      "rank": "Diamond II",
+      "members": 93,
+      "position": 30
+    },
+    {
+      "id": 3241,
+      "name": "JFK",
+      "respect": 14564783,
+      "rank": "Diamond II",
+      "members": 89,
+      "position": 28
+    },
+    {
+      "id": 13665,
+      "name": "PT-Penguins",
+      "respect": 14489253,
+      "rank": "Diamond II",
+      "members": 94,
+      "position": 24
+    },
+    {
+      "id": 8336,
+      "name": "Monarch HQ",
+      "respect": 14344333,
+      "rank": "Diamond III",
+      "members": 97,
+      "position": 1
+    },
+    {
+      "id": 6731,
+      "name": "The Next Level",
+      "respect": 14184694,
+      "rank": "Diamond III",
+      "members": 96,
+      "position": 12
+    },
+    {
+      "id": 13784,
+      "name": "WarBirds",
+      "respect": 14123771,
+      "rank": "Diamond II",
+      "members": 82,
+      "position": 7
+    },
+    {
+      "id": 7835,
+      "name": "Monarch Mutation",
+      "respect": 14106740,
+      "rank": "Diamond III",
+      "members": 86,
+      "position": 14
+    },
+    {
+      "id": 2736,
+      "name": "Itsi Bitsi Bikini",
+      "respect": 13778106,
+      "rank": "Platinum II",
+      "members": 93,
+      "position": 130
+    },
+    {
+      "id": 22781,
+      "name": "The Wolverines",
+      "respect": 13537815,
+      "rank": "Diamond III",
+      "members": 95,
+      "position": 26
+    },
+    {
+      "id": 14365,
+      "name": "JFK 2.1",
+      "respect": 13312078,
+      "rank": "Diamond I",
+      "members": 97,
+      "position": 27
+    },
+    {
+      "id": 13502,
+      "name": "Dead or Alive",
+      "respect": 13304758,
+      "rank": "Diamond",
+      "members": 97,
+      "position": 60
+    },
+    {
+      "id": 10174,
+      "name": "AQUA-Poseidon",
+      "respect": 13208360,
+      "rank": "Diamond II",
+      "members": 95,
+      "position": 11
+    },
+    {
+      "id": 16282,
+      "name": "Nuclear Winter",
+      "respect": 13147152,
+      "rank": "Diamond II",
+      "members": 94,
+      "position": 16
+    },
+    {
+      "id": 27223,
+      "name": "Stompers",
+      "respect": 13071954,
+      "rank": "Diamond",
+      "members": 100,
+      "position": 48
+    },
+    {
+      "id": 2013,
+      "name": "Subversive  Alliance",
+      "respect": 13046398,
+      "rank": "Diamond III",
+      "members": 85,
+      "position": 13
+    },
+    {
+      "id": 6799,
+      "name": "The Untouchables",
+      "respect": 12853122,
+      "rank": "Diamond I",
+      "members": 93,
+      "position": 61
+    },
+    {
+      "id": 946,
+      "name": "PT-IronHearts",
+      "respect": 12676467,
+      "rank": "Gold III",
+      "members": 86,
+      "position": 331
+    },
+    {
+      "id": 8151,
+      "name": "Chromatic",
+      "respect": 12550870,
+      "rank": "Diamond III",
+      "members": 95,
+      "position": 4
+    },
+    {
+      "id": 8422,
+      "name": "Monarch Cupid",
+      "respect": 12297280,
+      "rank": "Diamond I",
+      "members": 100,
+      "position": 8
+    },
+    {
+      "id": 9100,
+      "name": "The Black Hand",
+      "respect": 12123409,
+      "rank": "Diamond I",
+      "members": 75,
+      "position": 79
+    },
+    {
+      "id": 7709,
+      "name": "Vulpes Vulpes",
+      "respect": 11841701,
+      "rank": "Diamond I",
+      "members": 97,
+      "position": 54
+    },
+    {
+      "id": 8520,
+      "name": "Xenon",
+      "respect": 11648654,
+      "rank": "Diamond II",
+      "members": 97,
+      "position": 29
+    },
+    {
+      "id": 27370,
+      "name": "Desert Eagle",
+      "respect": 11605008,
+      "rank": "Platinum III",
+      "members": 70,
+      "position": 82
+    },
+    {
+      "id": 8384,
+      "name": "Savage Plague",
+      "respect": 11543976,
+      "rank": "Platinum II",
+      "members": 68,
+      "position": 130
+    },
+    {
+      "id": 14078,
+      "name": "~Twisted~",
+      "respect": 11502704,
+      "rank": "Diamond II",
+      "members": 90,
+      "position": 40
+    },
+    {
+      "id": 33007,
+      "name": "HAKA",
+      "respect": 11359887,
+      "rank": "Platinum III",
+      "members": 74,
+      "position": 82
+    },
+    {
+      "id": 8989,
+      "name": "JUX HQ",
+      "respect": 11326890,
+      "rank": "Diamond",
+      "members": 83,
+      "position": 58
+    },
+    {
+      "id": 8085,
+      "name": "Nuclear Blast",
+      "respect": 11218166,
+      "rank": "Diamond I",
+      "members": 96,
+      "position": 64
+    },
+    {
+      "id": 22492,
+      "name": "Dystopia",
+      "respect": 11199844,
+      "rank": "Diamond",
+      "members": 76,
+      "position": 62
+    },
+    {
+      "id": 25874,
+      "name": "Imminent Apocalypse",
+      "respect": 11182197,
+      "rank": "Unranked",
+      "members": 100,
+      "position": 1975
+    },
+    {
+      "id": 20747,
+      "name": "Damage Inc",
+      "respect": 11099080,
+      "rank": "Diamond III",
+      "members": 93,
+      "position": 37
+    },
+    {
+      "id": 27312,
+      "name": "SA Succession",
+      "respect": 10758079,
+      "rank": "Diamond II",
+      "members": 97,
+      "position": 50
+    },
+    {
+      "id": 18569,
+      "name": "Romania Elite Kommando",
+      "respect": 10678973,
+      "rank": "Diamond",
+      "members": 82,
+      "position": 53
+    },
+    {
+      "id": 11796,
+      "name": "SMTH - Bright Summit",
+      "respect": 10493037,
+      "rank": "Diamond I",
+      "members": 95,
+      "position": 46
+    },
+    {
+      "id": 8938,
+      "name": "Arcadia",
+      "respect": 10319875,
+      "rank": "Diamond I",
+      "members": 95,
+      "position": 49
+    },
+    {
+      "id": 9055,
+      "name": "Natural Selection IV",
+      "respect": 10149332,
+      "rank": "Diamond II",
+      "members": 96,
+      "position": 57
+    },
+    {
+      "id": 937,
+      "name": "Sport Club",
+      "respect": 9901558,
+      "rank": "Diamond",
+      "members": 98,
+      "position": 59
+    },
+    {
+      "id": 366,
+      "name": "Evolution",
+      "respect": 9888358,
+      "rank": "Diamond I",
+      "members": 100,
+      "position": 80
+    },
+    {
+      "id": 36891,
+      "name": "FLATLINE",
+      "respect": 9694758,
+      "rank": "Diamond I",
+      "members": 96,
+      "position": 72
+    },
+    {
+      "id": 8954,
+      "name": "Nuclear Armageddon",
+      "respect": 9621469,
+      "rank": "Diamond I",
+      "members": 99,
+      "position": 76
+    },
+    {
+      "id": 12893,
+      "name": "Darkline",
+      "respect": 9053530,
+      "rank": "Diamond II",
+      "members": 95,
+      "position": 42
+    },
+    {
+      "id": 42125,
+      "name": "ODB",
+      "respect": 8858627,
+      "rank": "Diamond III",
+      "members": 96,
+      "position": 33
+    },
+    {
+      "id": 9032,
+      "name": "Wolf Pack",
+      "respect": 8807184,
+      "rank": "Platinum III",
+      "members": 58,
+      "position": 82
+    },
+    {
+      "id": 35507,
+      "name": "The Nest",
+      "respect": 8791070,
+      "rank": "Platinum II",
+      "members": 85,
+      "position": 130
+    },
+    {
+      "id": 11428,
+      "name": "Swiss Squad",
+      "respect": 8687758,
+      "rank": "Diamond III",
+      "members": 86,
+      "position": 39
+    },
+    {
+      "id": 10818,
+      "name": "Lex Wolverines",
+      "respect": 8648806,
+      "rank": "Diamond I",
+      "members": 84,
+      "position": 75
+    },
+    {
+      "id": 8867,
+      "name": "Monarch Chrysalis",
+      "respect": 8622197,
+      "rank": "Diamond III",
+      "members": 96,
+      "position": 23
+    },
+    {
+      "id": 1149,
+      "name": "WTF",
+      "respect": 8622156,
+      "rank": "Diamond",
+      "members": 91,
+      "position": 56
+    },
+    {
+      "id": 10820,
+      "name": "Lithium",
+      "respect": 8555033,
+      "rank": "Platinum III",
+      "members": 75,
+      "position": 82
+    },
+    {
+      "id": 22295,
+      "name": "Aquarius",
+      "respect": 8448174,
+      "rank": "Diamond I",
+      "members": 79,
+      "position": 44
+    },
+    {
+      "id": 5431,
+      "name": "[Redacted]",
+      "respect": 8438014,
+      "rank": "Platinum II",
+      "members": 40,
+      "position": 130
+    },
+    {
+      "id": 33241,
+      "name": "Nub Navy",
+      "respect": 8431725,
+      "rank": "Diamond I",
+      "members": 95,
+      "position": 73
+    },
+    {
+      "id": 14821,
+      "name": "JFK - Future Killers",
+      "respect": 8412141,
+      "rank": "Diamond I",
+      "members": 98,
+      "position": 81
+    },
+    {
+      "id": 8836,
+      "name": "Vinerri",
+      "respect": 8323803,
+      "rank": "Diamond I",
+      "members": 95,
+      "position": 66
+    },
+    {
+      "id": 9176,
+      "name": "The Iron Fist",
+      "respect": 8313899,
+      "rank": "Platinum I",
+      "members": 77,
+      "position": 201
+    },
+    {
+      "id": 8803,
+      "name": "Buttgrass Inc",
+      "respect": 8269783,
+      "rank": "Platinum II",
+      "members": 93,
+      "position": 130
+    },
+    {
+      "id": 8500,
+      "name": "Extinction",
+      "respect": 8217548,
+      "rank": "Platinum III",
+      "members": 96,
+      "position": 82
+    },
+    {
+      "id": 30820,
+      "name": "Wolverines Resurrected",
+      "respect": 8213009,
+      "rank": "Diamond",
+      "members": 88,
+      "position": 70
+    },
+    {
+      "id": 9036,
+      "name": "The Black Pearl",
+      "respect": 8202528,
+      "rank": "Platinum III",
+      "members": 86,
+      "position": 82
+    },
+    {
+      "id": 9412,
+      "name": "BLACK STATUES",
+      "respect": 8130030,
+      "rank": "Platinum I",
+      "members": 90,
+      "position": 201
+    },
+    {
+      "id": 478,
+      "name": "PT-ShadowRazers",
+      "respect": 7976710,
+      "rank": "Platinum III",
+      "members": 83,
+      "position": 82
+    },
+    {
+      "id": 21665,
+      "name": "Monarch Army of Light",
+      "respect": 7892916,
+      "rank": "Diamond III",
+      "members": 94,
+      "position": 6
+    },
+    {
+      "id": 10610,
+      "name": "NPO - Strength",
+      "respect": 7799025,
+      "rank": "Diamond II",
+      "members": 88,
+      "position": 43
+    },
+    {
+      "id": 9305,
+      "name": "Legitimate Business",
+      "respect": 7716260,
+      "rank": "Platinum II",
+      "members": 72,
+      "position": 130
+    },
+    {
+      "id": 16040,
+      "name": "Winter is Coming",
+      "respect": 7636943,
+      "rank": "Platinum II",
+      "members": 77,
+      "position": 130
+    },
+    {
+      "id": 7049,
+      "name": "39th Street Healers",
+      "respect": 7617179,
+      "rank": "Platinum I",
+      "members": 92,
+      "position": 201
+    },
+    {
+      "id": 16335,
+      "name": "SMTH - November Chopin",
+      "respect": 7479742,
+      "rank": "Diamond II",
+      "members": 94,
+      "position": 52
+    },
+    {
+      "id": 21368,
+      "name": "Escensio Incursus",
+      "respect": 7459732,
+      "rank": "Diamond III",
+      "members": 100,
+      "position": 18
+    },
+    {
+      "id": 6974,
+      "name": "Onion Smugglers",
+      "respect": 7453807,
+      "rank": "Diamond",
+      "members": 81,
+      "position": 69
+    },
+    {
+      "id": 14760,
+      "name": "Dopeheads on Mopeds",
+      "respect": 7378026,
+      "rank": "Bronze",
+      "members": 96,
+      "position": 1207
+    },
+    {
+      "id": 7282,
+      "name": "Luscious Dreams",
+      "respect": 7287533,
+      "rank": "Platinum III",
+      "members": 72,
+      "position": 82
+    },
+    {
+      "id": 6984,
+      "name": "Wraith",
+      "respect": 7150420,
+      "rank": "Bronze",
+      "members": 97,
+      "position": 1207
+    },
+    {
+      "id": 9357,
+      "name": "The Next Level-Mavericks",
+      "respect": 7149625,
+      "rank": "Diamond II",
+      "members": 94,
+      "position": 51
+    },
+    {
+      "id": 15120,
+      "name": "Wolf Pack Next Generation",
+      "respect": 7139510,
+      "rank": "Gold I",
+      "members": 98,
+      "position": 449
+    },
+    {
+      "id": 8537,
+      "name": "NNGO",
+      "respect": 7133337,
+      "rank": "Diamond",
+      "members": 100,
+      "position": 68
+    },
+    {
+      "id": 26437,
+      "name": "The Prowl",
+      "respect": 7084738,
+      "rank": "Platinum III",
+      "members": 94,
+      "position": 82
+    },
+    {
+      "id": 33783,
+      "name": "Impulse",
+      "respect": 7061256,
+      "rank": "Bronze",
+      "members": 98,
+      "position": 1207
+    },
+    {
+      "id": 9517,
+      "name": "OverWatch",
+      "respect": 7026137,
+      "rank": "Platinum I",
+      "members": 93,
+      "position": 201
+    },
+    {
+      "id": 8076,
+      "name": "Order Through Chaos",
+      "respect": 7026125,
+      "rank": "Platinum III",
+      "members": 93,
+      "position": 82
+    },
+    {
+      "id": 13851,
+      "name": "Nuclear Therapy",
+      "respect": 7023111,
+      "rank": "Diamond I",
+      "members": 100,
+      "position": 55
+    },
+    {
+      "id": 7969,
+      "name": "WIT-Premier",
+      "respect": 6945859,
+      "rank": "Diamond II",
+      "members": 87,
+      "position": 41
+    },
+    {
+      "id": 25025,
+      "name": "DP Warriors",
+      "respect": 6915306,
+      "rank": "Platinum I",
+      "members": 94,
+      "position": 201
+    },
+    {
+      "id": 15222,
+      "name": "Mortiferi",
+      "respect": 6906905,
+      "rank": "Platinum II",
+      "members": 57,
+      "position": 130
+    },
+    {
+      "id": 9201,
+      "name": "Destination Unknown",
+      "respect": 6775682,
+      "rank": "Platinum II",
+      "members": 98,
+      "position": 130
+    },
+    {
+      "id": 8400,
+      "name": "Lingering Insanity",
+      "respect": 6749964,
+      "rank": "Gold III",
+      "members": 90,
+      "position": 331
+    },
+    {
+      "id": 2095,
+      "name": "SMTH - Huang Pu",
+      "respect": 6721520,
+      "rank": "Gold II",
+      "members": 62,
+      "position": 381
+    },
+    {
+      "id": 10140,
+      "name": "In Memory of the Fallen",
+      "respect": 6715259,
+      "rank": "Gold III",
+      "members": 86,
+      "position": 331
+    },
+    {
+      "id": 10566,
+      "name": "The Rifle Company",
+      "respect": 6687553,
+      "rank": "Platinum III",
+      "members": 59,
+      "position": 82
+    }
+  ],
+  "statistics": {
+    "totalFactions": 5986,
+    "totalRespect": 2163530922,
+    "averageRespect": 361432,
+    "rankDistribution": {
+      "Diamond III": 20,
+      "Diamond I": 28,
+      "Diamond II": 19,
+      "Platinum III": 48,
+      "Diamond": 14,
+      "Platinum II": 71,
+      "Platinum I": 87,
+      "Gold III": 50,
+      "Platinum": 43,
+      "Gold II": 68,
+      "Gold I": 84,
+      "Gold": 44,
+      "Silver III": 77,
+      "Silver II": 74,
+      "Silver I": 110,
+      "Silver": 58,
+      "Bronze III": 83,
+      "Bronze II": 108,
+      "Bronze I": 120,
+      "Bronze": 768,
+      "Unranked": 4012
+    },
+    "memberCountDistribution": {
+      "90-99": 148,
+      "100+": 26,
+      "75-89": 96,
+      "50-74": 132,
+      "0-49": 5584
+    }
+  }
+}

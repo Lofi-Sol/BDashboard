@@ -3,7 +3,7 @@ const path = require('path');
 const axios = require('axios');
 const cors = require('cors');
 const { MongoClient } = require('mongodb');
-const TornDecimalOddsEngine = require('./Betting/odds-engine.js');
+const TornProfessionalOddsEngine = require('./Betting/odds-engine-v4.js');
 const fs = require('fs').promises;
 // Load environment variables if dotenv is available
 try {
@@ -582,7 +582,11 @@ async function connectToMongoDB() {
 async function initializeOddsEngine() {
     if (!oddsEngine) {
         try {
-            oddsEngine = new TornDecimalOddsEngine();
+            oddsEngine = new TornProfessionalOddsEngine({
+    houseEdge: 0.06,
+    dollarPerXanax: 744983,
+    cacheTime: 300000
+});
             await oddsEngine.loadFactionData();
             console.log('Decimal odds engine initialized successfully');
         } catch (error) {
@@ -816,12 +820,71 @@ app.post('/api/odds/calculate', async (req, res) => {
     }
 });
 
+// Calculate professional odds with enhanced features
+app.post('/api/odds/calculate-professional', async (req, res) => {
+    try {
+        const { faction1Id, faction2Id, betAmount } = req.body;
+        
+        if (!faction1Id || !faction2Id) {
+            return res.status(400).json({
+                success: false,
+                error: 'Both faction1Id and faction2Id are required'
+            });
+        }
+        
+        // Use singleton odds engine
+        const engine = await initializeOddsEngine();
+        
+        // Calculate professional odds
+        const odds = await engine.calculateOdds(faction1Id, faction2Id);
+        
+        // Add specific payout calculation if bet amount provided
+        let specificPayout = null;
+        if (betAmount && odds[faction1Id] && odds[faction2Id]) {
+            try {
+                const payout1 = engine.calculatePayout(betAmount, odds[faction1Id].odds);
+                const payout2 = engine.calculatePayout(betAmount, odds[faction2Id].odds);
+                specificPayout = {
+                    faction1: payout1,
+                    faction2: payout2
+                };
+            } catch (error) {
+                console.warn('Could not calculate specific payout:', error.message);
+            }
+        }
+        
+        res.json({
+            success: true,
+            odds: odds,
+            specificPayout: specificPayout,
+            engineInfo: {
+                version: '4.0-professional',
+                features: [
+                    'Professional power rating system',
+                    'Dynamic odds calculation',
+                    'Dollar-based payouts',
+                    'Natural variance injection',
+                    'Comprehensive faction analysis'
+                ]
+            },
+            timestamp: new Date()
+        });
+        
+    } catch (error) {
+        console.error('Error calculating professional odds:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
 // Get odds engine health status
 app.get('/api/odds/health', async (req, res) => {
     try {
         // Use singleton odds engine
         const engine = await initializeOddsEngine();
-        const health = await engine.healthCheck();
+        const health = await engine.getHealthCheck();
         
         res.json({
             success: true,
@@ -830,6 +893,40 @@ app.get('/api/odds/health', async (req, res) => {
         
     } catch (error) {
         console.error('Error checking odds engine health:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// Update Xanax price
+app.post('/api/odds/update-xanax-price', async (req, res) => {
+    try {
+        const { newPrice } = req.body;
+        
+        if (!newPrice || newPrice <= 0) {
+            return res.status(400).json({
+                success: false,
+                error: 'Valid newPrice is required'
+            });
+        }
+        
+        // Use singleton odds engine
+        const engine = await initializeOddsEngine();
+        
+        // Update Xanax price
+        engine.updateXanaxPrice(newPrice);
+        
+        res.json({
+            success: true,
+            message: `Xanax price updated to $${newPrice.toLocaleString()}`,
+            newPrice: newPrice,
+            timestamp: new Date()
+        });
+        
+    } catch (error) {
+        console.error('Error updating Xanax price:', error);
         res.status(500).json({
             success: false,
             error: error.message
